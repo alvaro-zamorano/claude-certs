@@ -256,6 +256,14 @@ label:focus-within,[tabindex]:focus-visible{
   color:var(--accent-ink);text-decoration:none;border:1px solid var(--line-strong);
   border-radius:8px;padding:8px 13px;background:var(--surface)}
 .cc-prac:hover{border-color:var(--accent)}
+.cc-sec{display:block;margin-top:6px;font-size:var(--t-menor);color:var(--ink-3)}
+.cc-estado{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:0 0 26px}
+.cc-estado .lbl{display:block;font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);margin-bottom:6px}
+.cc-estado p{margin:0 0 10px;font-size:var(--t-dato);color:var(--ink-2)}
+.cc-estado table{margin:0 0 4px;font-size:var(--t-dato)}
+.cc-estado th,.cc-estado td{border:1px solid var(--line);padding:6px 10px;text-align:left}
+.cc-estado th{background:var(--surface-2);font-size:var(--t-micro)}
+.cc-estado td.bien{color:var(--ok);font-weight:600}.cc-estado td.mal{color:var(--bad);font-weight:600}
 .cc-skip{position:absolute;left:-9999px;top:0;background:var(--accent);color:#fff;
   padding:10px 16px;z-index:100;border-radius:0 0 8px 0}
 .cc-skip:focus{left:0}
@@ -546,6 +554,63 @@ def enlaza_apuntes(raw, lang, cert, n_por_sec):
     return re.sub(r'<section id="([^"]+)".*?</section>', una, raw, flags=re.S)
 
 
+ESTADO_T = {
+ "es": {"tit": "Tu estado ahora", "sin": "Todavía no has respondido nada de este examen. Empieza por un simulacro: la ruta te dirá por dónde seguir.",
+        "faltan": "Llevas {n} de {min} ítems distintos; con menos de {min} no se proyecta score.",
+        "score": "Score proyectado {s} (intervalo aprox. {lo}–{hi}; corte 720).",
+        "dom": "Dominio", "peso": "Peso", "tuyo": "Tu acierto", "ir": "Practicar →", "medir": "Hacer un simulacro →",
+        "sec": "Tu acierto en esta sección: {ok} de {n} ítems vistos ({pc}%)", "sec0": "Aún no has practicado esta sección"},
+ "en": {"tit": "Where you stand now", "sin": "You have not answered anything for this exam yet. Start with a mock: the route will tell you where to go next.",
+        "faltan": "You have answered {n} of {min} distinct items; below {min} no score is projected.",
+        "score": "Projected score {s} (approx. range {lo}–{hi}; cut score 720).",
+        "dom": "Domain", "peso": "Weight", "tuyo": "Your accuracy", "ir": "Practise →", "medir": "Take a mock →",
+        "sec": "Your accuracy on this section: {ok} of {n} items seen ({pc}%)", "sec0": "You have not practised this section yet"},
+}
+
+
+def estado(lang, cert, slug):
+    """Bloque que lee el progreso del simulador en la ruta y en los apuntes.
+
+    La ruta pedía «anotar el acierto por dominio» a mano y los apuntes no
+    sabían nada de lo que habías fallado: las tres piezas no se hablaban. Aquí
+    las dos páginas leen el mismo localStorage y la misma proyección.
+    """
+    t = ESTADO_T[lang]
+    test = ruta(lang, "test", cert)
+    panel = (f'<div class="cc-estado" id="ccEstado"><b class="lbl">{t["tit"]}</b>'
+             f'<p id="ccMsg">{t["sin"]}</p><div id="ccTabla"></div>'
+             f'<a class="cc-prac" href="{test}">{t["medir"]}</a></div>') if slug == "ruta" else ""
+    js = f"""<script>
+{SCORE_JS}
+(function(){{
+const CERT={json.dumps(cert)}, TT={json.dumps(t, ensure_ascii=False)}, TEST={json.dumps(test)};
+let ST={{}}; try{{ST=JSON.parse(localStorage.getItem("claude-certs-v1")||"{{}}")}}catch(e){{}}
+const pon=(s,o)=>{{for(const k in o)s=s.split("{{"+k+"}}").join(o[k]);return s}};
+Promise.all([fetch("../items.json").then(r=>r.json()),fetch("../exams.json").then(r=>r.json())]).then(([a,b])=>{{
+  // apuntes: acierto por sección junto al enlace de práctica
+  document.querySelectorAll("a.cc-prac[href*='?sec=']").forEach(el=>{{
+    const sec=new URL(el.href).searchParams.get("sec"); let n=0,ok=0;
+    a.items.forEach(it=>{{const r=ST[it.i]; if(it.n===sec&&r&&r.seen){{n++;ok+=ccVal(r)}}}});
+    const s=document.createElement("span"); s.className="cc-sec";
+    s.textContent=n?pon(TT.sec,{{ok:Math.round(ok),n,pc:Math.round(ok/n*100)}}):TT.sec0;
+    el.insertAdjacentElement("afterend",s);
+  }});
+  const caja=document.getElementById("ccEstado"); if(!caja) return;
+  const p=ccScore(a.items,b[CERT].w,ST); if(!p.n) return;
+  document.getElementById("ccMsg").textContent=p.enough
+    ?pon(TT.score,{{s:p.scaled,lo:p.lo,hi:p.hi}}):pon(TT.faltan,{{n:p.n,min:p.min}});
+  const esc=x=>x.replace(/&/g,"&amp;");
+  document.getElementById("ccTabla").innerHTML="<table><tr><th>"+TT.dom+"</th><th>"+TT.peso+"</th><th>"+TT.tuyo+"</th><th></th></tr>"+
+    Object.keys(p.dom).sort((x,y)=>(p.dom[x].n?p.dom[x].ok/p.dom[x].n:-1)-(p.dom[y].n?p.dom[y].ok/p.dom[y].n:-1)).map(d=>{{
+      const o=p.dom[d], pc=o.n?Math.round(o.ok/o.n*100):null;
+      return "<tr><td>"+esc(d)+"</td><td>"+o.w+"%</td><td class='"+(pc===null?"":pc>=85?"bien":pc<60?"mal":"")+"'>"+(pc===null?"—":pc+"% · "+o.n)+
+        "</td><td><a href='"+TEST+"?dom="+encodeURIComponent(d)+"'>"+TT.ir+"</a></td></tr>"}}).join("")+"</table>";
+}}).catch(()=>{{}});
+}})();
+</script>"""
+    return panel, js
+
+
 def titulos_apuntes(lang):
     raw = open(os.path.join(LANGS[lang]["frag"], "apuntes.html"), encoding="utf-8").read()
     quita = lambda t: re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", t)).strip()
@@ -692,6 +757,11 @@ def wrap(lang, slug, cert, cifras, T, scope, n_por_sec=None):
     raw = secciona(raw)
     if slug == "apuntes":
         raw = enlaza_apuntes(raw, lang, cert, n_por_sec or {})
+    if slug in ("ruta", "apuntes"):
+        panel, js = estado(lang, cert, slug)
+        if panel:
+            raw = raw.replace("<section", panel + "\n<section", 1)
+        raw += "\n" + js
     raw, fuera_ids = recorta(raw, slug, cert, lang, scope)
     raw = poda_indice(raw, fuera_ids)   # lo que no entra tampoco se indexa
     raw = indice(raw, lang)

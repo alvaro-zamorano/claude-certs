@@ -545,6 +545,8 @@ function arranque(){
   // Los apuntes enlazan aquí con ?sec=<sección> para practicar lo recién leído.
   const sec=new URLSearchParams(location.search).get("sec");
   if(sec&&SECS[sec]) startSec(sec);
+  const dom=new URLSearchParams(location.search).get("dom");
+  if(dom&&EXAMS[exam].w[dom]!=null) startDrill(dom);
 }
 Promise.all([
   fetch("../items.json").then(r=>{if(!r.ok)throw 0;return r.json()}),

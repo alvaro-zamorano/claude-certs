@@ -114,6 +114,28 @@ uno, no proyecta por debajo de 30 ítems y da un intervalo además del punto. La
 Un fallo entra en la cola de repaso al momento y sale tras dos aciertos seguidos separados por
 dos días. El progreso vive en `localStorage` y se puede exportar e importar como JSON.
 
+### Apuntes, simulador y ruta conectados
+
+`src/data/sources.json` lista las fuentes de cada sección de los apuntes con la URL completa. El
+build las pinta como enlaces y deduce de ellas a qué sección pertenece cada ítem (la que cita su
+misma fuente). Con eso:
+
+- cada explicación del simulador enlaza a su sección de apuntes, y el informe de bloque dice qué
+  secciones repasar;
+- cada sección de los apuntes enlaza a un drill con sus ítems (`/test/?sec=<id>`) y muestra tu
+  acierto en ella;
+- la ruta de estudio abre con tu estado real por dominio y un drill de cada uno (`?dom=`).
+
+### Metodología y calidad del banco
+
+`/metodologia/` (`/en/methodology/`) se genera en el build con los números reales del banco:
+ítems con cita y fecha, sesgo de longitud en los dos sentidos, posición, desvío del blueprint,
+absolutos y enunciados sin pregunta. Los mismos datos salen en `site/quality.json` y por consola.
+
+```bash
+python3 tools/check-sources.py   # ¿siguen vivas las fuentes del banco y de los apuntes?
+```
+
 ### Verificación por ítem
 
 Además de la fuente `s`, un ítem puede llevar `c` (cita literal de la fuente que sostiene la

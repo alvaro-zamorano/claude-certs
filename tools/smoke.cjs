@@ -16,16 +16,17 @@ const B=`http://127.0.0.1:${PUERTO}`;
 let fallos=0;
 const dormir=ms=>new Promise(r=>setTimeout(r,ms));
 const ok=(n,cond,x="")=>{ if(!cond){fallos++;console.log(`  x ${n} ${x}`)} else console.log(`  ok ${n}`) };
-async function abrir(url){
+async function abrir(url,semilla){
   const dom=await JSDOM.fromURL(B+url,{runScripts:"dangerously",resources:"usable",pretendToBeVisual:true,
-    beforeParse(w){ w.fetch=(u,o)=>fetch(new URL(u,B+url).href,o); }});
+    beforeParse(w){ w.fetch=(u,o)=>fetch(new URL(u,B+url).href,o);
+      if(semilla) for(const k in semilla) w.localStorage.setItem(k,semilla[k]); }});
   await dormir(2500); return dom;
 }
 
 async function simulador(){
  const casos=[
- {url:"/ccar-f/test/",    lang:"es", doms:5, examen:60, esperado:{modo:"Simulacro ponderado (20)", comprobar:"Comprobar"}},
- {url:"/en/ccar-f/test/", lang:"en", doms:5, examen:60, esperado:{modo:"Weighted mock (20)",       comprobar:"Check"}},
+ {url:"/ccar-f/test/",    lang:"es", doms:5, examen:60, ruta:"ruta/", esperado:{modo:"Simulacro ponderado (20)", comprobar:"Comprobar"}},
+ {url:"/en/ccar-f/test/", lang:"en", doms:5, examen:60, ruta:"track/", esperado:{modo:"Weighted mock (20)",       comprobar:"Check"}},
  {url:"/ccao-f/test/",    lang:"es", doms:7, examen:60, esperado:{modo:"Simulacro ponderado (20)", comprobar:"Comprobar"}},
 ];
 
@@ -123,7 +124,19 @@ async function simulador(){
   const ap=await abrir(c.url.replace(/test\/$/,"")+(c.lang==="en"?"notes/":"apuntes/"));
   const pr=ap.window.document.querySelector("a.cc-prac");
   ok("los apuntes enlazan al drill y las fuentes son enlaces", !!pr&&/\?sec=/.test(pr.getAttribute("href"))&&!!ap.window.document.querySelector(".src a[href^='https://']"));
+  ok("los apuntes muestran el acierto por sección", !!ap.window.document.querySelector(".cc-sec"));
   ap.window.close();
+  if(c.ruta){
+    const rt2=await abrir(c.url.replace(/test\/$/,"")+c.ruta,{"claude-certs-v1":
+      JSON.stringify(Object.fromEntries(w.eval("ITEMS.slice(0,40).map((it,k)=>[it.i,{seen:1,ok:k%2,last:k%2}])")))});
+    const rd=rt2.window.document;
+    ok("la ruta lee el progreso del simulador", /\d{3}/.test(rd.querySelector("#ccMsg").textContent)&&rd.querySelectorAll("#ccTabla tr").length===c.doms+1, rd.querySelector("#ccMsg").textContent.slice(0,60));
+    ok("la ruta enlaza al drill de cada dominio", /\?dom=/.test(rd.querySelector("#ccTabla a").getAttribute("href")));
+    rt2.window.close();
+    const dm=await abrir(c.url+rd.querySelector("#ccTabla a").getAttribute("href").replace(/^[^?]*/,""));
+    ok("?dom= lanza el drill del dominio", dm.window.eval("!!S&&S.mode")==="drill");
+    dm.window.close();
+  }
 
   // la portada de la certificación usa la misma proyección
   const h=await abrir(c.url.replace(/test\/$/,""));
