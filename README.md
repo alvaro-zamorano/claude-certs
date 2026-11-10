@@ -99,6 +99,28 @@ volvía a desbordar la tabla entera.
 
 Medido sobre doce páginas a 375 y a 1512 px: cero scroll lateral.
 
+### El simulador y la proyección
+
+Cuatro modos: drill del dominio más flojo, simulacro ponderado de 20, **examen completo** (el
+número de ítems y los minutos reales, de `exams.json`; corrige al final y deja marcar, saltar y
+volver) y repaso de fallos. Cada bloque termina en un informe con nota, acierto por dominio,
+tiempo, los fallos con su explicación y los bloques anteriores.
+
+`src/score.js` es la única definición del score proyectado; el build la incrusta en el simulador
+y en la portada de cada certificación. Cuenta ítems distintos y solo el último intento de cada
+uno, no proyecta por debajo de 30 ítems y da un intervalo además del punto. La conversión a
+100-1000 es lineal y aproximada, y la interfaz lo dice.
+
+Un fallo entra en la cola de repaso al momento y sale tras dos aciertos seguidos separados por
+dos días. El progreso vive en `localStorage` y se puede exportar e importar como JSON.
+
+### Verificación por ítem
+
+Además de la fuente `s`, un ítem puede llevar `c` (cita literal de la fuente que sostiene la
+clave) y `v` (fecha de verificación, `AAAA-MM-DD`). Son opcionales; el simulador los muestra
+junto a la explicación. La meta es que todo ítem los tenga: una URL de página dice de qué va el
+ítem, la cita demuestra que la clave es correcta.
+
 ### Validaciones que detienen el build
 
 - Ítem con dominio fuera del blueprint, respuesta fuera de rango, menos de dos opciones,

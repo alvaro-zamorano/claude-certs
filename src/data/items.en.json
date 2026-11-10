@@ -2308,10 +2308,12 @@
     "Add explanations to the project's CLAUDE.md about which patterns are intentional and that linting is handled separately."
    ],
    "a": [
-    2
+    0
    ],
-   "r": "The key detail is that this is the review managed by the GitHub App, not your own invocation, and its configuration mechanism is the action's prompt parameter. The rules passed to it treat each category with the remedy it calls for: suppress what duplicates the linter, ignore src/gen/ and require stricter evidence — not suppression — on rendering, which is what preserves real detection. CLAUDE.md feeds Claude Code in your pipeline, not the managed review. Three workflows fragment things and do not solve the lint noise. And REVIEW.md is not a file the action reads.",
-   "s": "https://code.claude.com/docs/en/github-actions"
+   "r": "The key detail is that this is the review managed by the GitHub App, not an action in your own CI. That service is tuned with files in the repository: <code>REVIEW.md</code>, at the root, holds instructions for reviews alone, and it is where you say what not to report (what CI already enforces, generated paths such as src/gen/) and where to require evidence before a finding is posted, which is what rendering calls for: a higher bar, not suppression. <code>CLAUDE.md</code> is read too, but as project context: it makes violations of its rules get flagged, it does not exclude paths or categories. The <code>prompt</code> parameter and separate workflows belong to the action you run in your CI, which is a different product and does not configure the managed review.",
+   "s": "https://code.claude.com/docs/en/code-review-customize",
+   "c": "REVIEW.md: instructions for reviews alone. Use it to say what your team wants flagged, at what severity, and what to skip.",
+   "v": "2026-11-10"
   },
   {
    "e": "CCAR-F",

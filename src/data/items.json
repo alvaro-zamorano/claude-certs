@@ -8,7 +8,9 @@
   "o": "opciones",
   "a": "índices correctos",
   "r": "razonamiento",
-  "s": "fuente"
+  "s": "fuente",
+  "c": "cita literal de la fuente que sostiene la clave (opcional)",
+  "v": "fecha en que se verificó contra la fuente, AAAA-MM-DD (opcional)"
  },
  "items": [
   {
@@ -2317,10 +2319,12 @@
     "Añadir al CLAUDE.md del proyecto explicaciones sobre qué patrones son intencionales y que el linting se gestiona aparte."
    ],
    "a": [
-    2
+    0
    ],
-   "r": "El detalle clave es que se trata del review gestionado por la GitHub App, no de tu invocación propia, y su mecanismo de configuración es el parámetro prompt de la action. Las reglas que se le pasan tratan cada categoría con el remedio que pide: suprimir lo que duplica el linter, ignorar src/gen/ y exigir evidencia más estricta —no supresión— en rendering, que es lo que preserva la detección real. CLAUDE.md alimenta a Claude Code en tu pipeline, no al managed review. Tres workflows fragmentan y no resuelven el ruido de lint. Y REVIEW.md no es un fichero que la action lea.",
-   "s": "https://code.claude.com/docs/en/github-actions"
+   "r": "El detalle clave es que se trata del review gestionado por la GitHub App, no de una action en tu propio CI. Ese servicio se ajusta con ficheros del repositorio: <code>REVIEW.md</code>, en la raíz, lleva instrucciones solo para las reviews, y es donde se dice qué no reportar (lo que CI ya aplica, rutas generadas como src/gen/) y dónde exigir evidencia antes de publicar un hallazgo, que es lo que pide el rendering: un listón más alto, no supresión. <code>CLAUDE.md</code> también se lee, pero como contexto de proyecto: hace que se marquen las violaciones de sus reglas, no excluye rutas ni categorías. El parámetro <code>prompt</code> y los workflows separados pertenecen a la action que ejecutas en tu CI, que es otro producto y no configura el review gestionado.",
+   "s": "https://code.claude.com/docs/en/code-review-customize",
+   "c": "REVIEW.md: instructions for reviews alone. Use it to say what your team wants flagged, at what severity, and what to skip.",
+   "v": "2026-11-10"
   },
   {
    "e": "CCAR-F",

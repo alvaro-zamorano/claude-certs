@@ -64,6 +64,7 @@ SLUG = {
 
 # Las dos páginas interactivas comparten fuente entre idiomas.
 COMPARTIDAS = {"test.html", "tarjetas.html"}
+SCORE_JS = open(os.path.join(SRC, "score.js"), encoding="utf-8").read()
 
 LANGS = {
     "es": {"prefix": "", "frag": SRC, "data": "", "locale": "es_ES",
@@ -604,6 +605,9 @@ def wrap(lang, slug, cert, cifras, T, scope):
             raise SystemExit(f"BUILD DETENIDO · faltan cadenas en src/i18n/{lang}.json: {faltan}")
         tjson = json.dumps({k: T[k] for k in usadas}, ensure_ascii=False)
         raw = raw.replace("<script>", f"<script>\nconst T={tjson};\n", 1)
+    # La proyección es una sola: el simulador y la portada de la certificación
+    # incrustan el mismo src/score.js en vez de calcularla cada uno a su manera.
+    raw = raw.replace("/*@SCORE*/", SCORE_JS)
 
     for k, v in cifras.items():
         raw = raw.replace("{{%s}}" % k, str(v))
@@ -682,6 +686,8 @@ HOME_T = {
         "flojo": "Lo más flojo ahora mismo es <b>{d}</b>, al {p}%.",
         "como": "Mide antes de estudiar: un simulacro ponderado te da un número por dominio, y ese número te dice qué estudiar en vez de adivinarlo.",
         "drill": "Drill de ese dominio →", "proy": "Score proyectado",
+        "rango": "Intervalo aproximado {lo}–{hi}; el corte está en 720.",
+        "faltan": "Llevas {n} de {min} ítems distintos: con menos de {min} todavía no se proyecta un score.",
         "parcial": "Cobertura parcial: este examen tiene menos material escrito que los demás."},
  "en": {"estado": "Where you stand", "sin": "You haven't answered anything for this exam yet.",
         "empezar": "Take a mock and measure →", "dom": "The domains and what they weigh",
@@ -690,6 +696,8 @@ HOME_T = {
         "flojo": "Your weakest right now is <b>{d}</b>, at {p}%.",
         "como": "Measure before you study: a weighted mock gives you a number per domain, and that number tells you what to study instead of guessing it.",
         "drill": "Drill that domain →", "proy": "Projected score",
+        "rango": "Approximate range {lo}–{hi}; the cut score is 720.",
+        "faltan": "You have answered {n} of {min} distinct items: below {min} no score is projected yet.",
         "parcial": "Partial coverage: this exam has less written material than the others."},
 }
 
@@ -740,34 +748,30 @@ def home(lang, cert, ex, n_items, n_cards, n_ap, n_ap_tot, T):
 </div>
 
 <script>
+{SCORE_JS}
 const CERT={json.dumps(cert)}, TT={json.dumps(t, ensure_ascii=False)};
 const RUTA_TEST={json.dumps(ruta(lang, 'test', cert))};
 let ST={{}}; try{{ST=JSON.parse(localStorage.getItem("claude-certs-v1")||"{{}}")}}catch(e){{}}
 Promise.all([fetch("items.json").then(r=>r.json()),fetch("exams.json").then(r=>r.json())])
  .then(([a,b])=>{{
-  const items=a.items, w=b[CERT].w, porDom={{}};
-  for(const d in w) porDom[d]={{n:0,ok:0,w:w[d]}};
-  items.forEach((it,i)=>{{
-    const r=ST[it.i]; if(!r||!r.seen||!porDom[it.d])return;
-    porDom[it.d].n+=r.seen; porDom[it.d].ok+=r.ok;
-  }});
-  let num=0,den=0,flojo=null,peor=2;
-  for(const d in porDom){{
-    const o=porDom[d];
-    const celda=document.querySelector(`[data-dom="${{d}}"]`);
-    if(o.n){{
-      const pc=Math.round(o.ok/o.n*100);
-      if(celda){{celda.textContent=pc+"%";celda.className="n "+(pc>=85?"bien":pc<60?"mal":"");}}
-      num+=(o.ok/o.n)*o.w; den+=o.w;
-      if(o.ok/o.n<peor){{peor=o.ok/o.n;flojo=d}}
-    }}
+  const p=ccScore(a.items,b[CERT].w,ST);
+  if(!p.n)return;
+  let flojo=null,peor=2;
+  for(const d in p.dom){{
+    const o=p.dom[d]; if(!o.n)continue;
+    const celda=document.querySelector(`[data-dom="${{d}}"]`), pc=Math.round(o.ok/o.n*100);
+    if(celda){{celda.textContent=pc+"% · "+o.n;celda.className="n "+(pc>=85?"bien":pc<60?"mal":"");}}
+    if(o.ok/o.n<peor){{peor=o.ok/o.n;flojo=d}}
   }}
-  if(!den)return;
-  const sc=Math.round(100+(num/den)*900);
-  document.getElementById("score").textContent=sc;
-  document.getElementById("score").className="num "+(sc>=800?"bien":sc<720?"mal":"");
-  document.getElementById("msg").innerHTML=
-    TT.flojo.replace("{{d}}",flojo).replace("{{p}}",Math.round(peor*100));
+  const sc=document.getElementById("score"), msg=document.getElementById("msg");
+  const txt=TT.flojo.replace("{{d}}",flojo).replace("{{p}}",Math.round(peor*100));
+  if(p.enough){{
+    sc.textContent=p.scaled;
+    sc.className="num "+(p.lo>=CC_CORTE?"bien":p.hi<CC_CORTE?"mal":"");
+    msg.innerHTML=TT.rango.replace("{{lo}}",p.lo).replace("{{hi}}",p.hi)+" "+txt;
+  }} else {{
+    msg.innerHTML=TT.faltan.replace("{{n}}",p.n).split("{{min}}").join(p.min)+" "+txt;
+  }}
   const cta=document.getElementById("cta");
   cta.textContent=TT.drill; cta.href=RUTA_TEST;
   const como=document.querySelector(".estado .como"); if(como) como.hidden=true;
@@ -1106,6 +1110,8 @@ def valida(it, cd, ex, lang):
         if len(set(x["a"])) != len(x["a"]): errores.append(f"{ctx}: respuesta duplicada")
         if not x.get("s", "").startswith("http"): errores.append(f"{ctx}: sin fuente")
         if len(set(x["o"])) != len(x["o"]): errores.append(f"{ctx}: opciones repetidas")
+        if "v" in x and not re.fullmatch(r"\d{4}-\d{2}-\d{2}", x["v"]): errores.append(f"{ctx}: fecha de verificación mal formada")
+        if "c" in x and not x["c"].strip(): errores.append(f"{ctx}: cita vacía")
     vistos = {}
     for n, x in enumerate(it["items"]):
         k = x["q"][:90]
@@ -1233,8 +1239,8 @@ def main():
             if len(a) != len(b):
                 errores.append(f"[{lang}] el banco tiene {len(b)} ítems y [{base_lang}] {len(a)}")
             for n, (x, y) in enumerate(zip(a, b)):
-                for k in ("e", "d", "a", "s"):
-                    if x[k] != y[k]:
+                for k in ("e", "d", "a", "s", "c", "v"):
+                    if x.get(k) != y.get(k):
                         errores.append(f'[{lang}] ítem {n}: "{k}" no coincide con [{base_lang}]')
                 if len(x["o"]) != len(y["o"]):
                     errores.append(f"[{lang}] ítem {n}: distinto número de opciones que [{base_lang}]")

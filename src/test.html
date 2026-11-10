@@ -82,6 +82,39 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
 h2.sec{font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);margin:0 0 10px;font-weight:600}
 .reset{background:none;border:none;color:var(--ink-3);font-size:var(--t-micro);text-decoration:underline;padding:0}
 
+.fill.low{background:var(--bad)}
+.range{font-size:var(--t-menor);color:var(--ink-3);margin-top:4px;font-family:var(--mono)}
+.tools{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.stem:focus{outline:none}
+.opt .mark{margin-left:auto;flex:0 0 auto;font-size:var(--t-micro);font-weight:600;white-space:nowrap;padding-left:10px}
+.opt[data-state="correct"] .mark{color:var(--ok)}
+.opt[data-state="wrong"] .mark{color:var(--bad)}
+.cite{margin:10px 0 0;padding:8px 12px;background:var(--surface-2);border-radius:6px;font-size:var(--t-menor);color:var(--ink-2)}
+.srcl{display:block;margin-top:8px;font-size:var(--t-menor);color:var(--ink-3)}
+.navq{display:flex;flex-wrap:wrap;gap:5px;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+.navq button{min-width:34px;height:30px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink-3);font-family:var(--mono);font-size:var(--t-micro);padding:0 4px}
+.navq button[data-done="1"]{background:var(--surface-2);color:var(--ink);border-color:var(--line-strong)}
+.navq button[data-flag="1"]{border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.navq button[aria-current="true"]{outline:2px solid var(--accent);outline-offset:1px}
+.acts2{display:flex;gap:8px;flex-wrap:wrap}
+.rep-num{font-size:var(--t-xl);font-weight:650;letter-spacing:-.035em;line-height:1.05}
+.rep-sub{color:var(--ink-2);font-size:var(--t-dato);margin:4px 0 16px}
+.rep table{margin:0 0 18px}
+.rep td.n,.rep th.n{text-align:right;font-family:var(--mono);white-space:nowrap}
+.rep td.bad{color:var(--bad);font-weight:600}.rep td.good{color:var(--ok);font-weight:600}
+.rep th,.rep td{border:1px solid var(--line);padding:6px 10px;text-align:left;font-size:var(--t-dato)}
+.rep th{background:var(--surface-2);font-size:var(--t-micro)}
+.miss{border:1px solid var(--line);border-radius:8px;padding:10px 13px;margin-bottom:8px}
+.miss summary{cursor:pointer;font-size:var(--t-dato);line-height:1.5}
+.miss .ans{font-size:var(--t-dato);margin:10px 0 0}
+.miss .ans b{font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.07em;color:var(--ink-3);display:block}
+.miss .ans.y b{color:var(--bad)}.miss .ans.c b{color:var(--ok)}
+@media(max-width:640px){
+  .rep .acts2{position:static}
+  .foot .acts2{flex:1}.foot .acts2 .btn{flex:1;padding:14px 8px}
+  .navq{margin-bottom:8px}
+}
+
 /* ---------- Móvil ---------- */
 @media (max-width:640px){
   .wrap{padding:16px 14px calc(96px + env(safe-area-inset-bottom))}
@@ -124,7 +157,9 @@ h2.sec{font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.1em;col
     <a href="https://alvaro-pipeline.pages.dev/examen/referencia/" style="color:var(--accent-ink);font-size:var(--t-menor);font-weight:520">{{t.nav_reference}}</a>
     <a href="https://alvaro-pipeline.pages.dev/examen/tarjetas/" style="color:var(--accent-ink);font-size:var(--t-menor);font-weight:520">{{t.nav_cards}}</a>
     <a href="https://alvaro-pipeline.pages.dev/examen/apuntes/" style="color:var(--accent-ink);font-size:var(--t-menor);font-weight:520">{{t.nav_notes}}</a>
-    <button class="reset" id="reset">{{t.reset_btn}}</button>
+    <span class="tools"><button class="reset" id="exp">{{t.export_btn}}</button>
+    <button class="reset" id="imp">{{t.import_btn}}</button><input type="file" id="impf" accept="application/json,.json" hidden>
+    <button class="reset" id="reset">{{t.reset_btn}}</button></span>
   </div>
 </header>
 
@@ -133,6 +168,7 @@ h2.sec{font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.1em;col
   <div class="panel">
     <div class="meter-lab">{{t.projected}}</div>
     <div class="meter-num" id="score">—</div>
+    <div class="range" id="range"></div>
     <div class="verdict" id="verdict">{{t.no_data_short}}</div>
   </div>
   <div class="panel">
@@ -144,6 +180,7 @@ h2.sec{font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.1em;col
 <div class="modes">
   <button class="btn" id="mDrill">{{t.mode_drill}}</button>
   <button class="btn ghost" id="mFull">{{t.mode_full}}</button>
+  <button class="btn ghost" id="mExam">{{t.mode_exam_plain}}</button>
   <button class="btn ghost" id="mFail">{{t.mode_fail}}</button>
 </div>
 
@@ -157,162 +194,321 @@ h2.sec{font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.1em;col
 </div>
 
 <script>
-let ITEMS=[], EXAMS={}, EXAMEN="";
-let ORDER=[];
+/*@SCORE*/
+let ITEMS=[], EXAMS={}, EXAMEN="", exam="";
 
-/* ---------- Estado persistente ---------- */
-const KEY="claude-certs-v1";
+/* ---------- Estado persistente ----------
+   Por ítem: {seen, ok, last, t, fail, run, due}. `last` es el resultado del
+   último intento y es lo único que cuenta para la proyección; `fail` marca que
+   el ítem está en la cola de fallos y `run` los aciertos seguidos desde que
+   entró. `__log` guarda un resumen por bloque para poder ver la tendencia. */
+const KEY="claude-certs-v1", DIA=86400000;
 let ST={};
 try{ST=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){ST={}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(ST))}catch(e){}}
-function rec(id){return ST[id]||(ST[id]={seen:0,ok:0,box:0,due:0})}
+function rec(id){return ST[id]||(ST[id]={seen:0,ok:0})}
+/* Los registros anteriores a `fail` no lo traen: se deduce de seen>ok. */
+function isFail(r){return !!r&&(r.fail!=null?r.fail===1:r.seen>r.ok)}
+function failReady(r,now){return isFail(r)&&(r.fail==null||!r.due||r.due<=now)}
 
-let exam=ORDER[0], queue=[], qi=0, picked=[], answered=false, timer=null, tleft=0;
-let perm=[], curOpts=[], curAns=[];
+let S=null, tick=null;   // sesión en curso y su reloj
+const $=id=>document.getElementById(id);
+const stage=()=>$("stage");
+const fill=(s,o)=>s.replace(/\{(\w+)\}/g,(_,k)=>o[k]);
 
 /* ---------- Métricas ---------- */
-function domainStats(ex){
-  const out={};
-  for(const d in EXAMS[ex].w) out[d]={n:0,ok:0,w:EXAMS[ex].w[d]};
-  ITEMS.filter(i=>i.e===ex).forEach(i=>{
-    const r=ST[i.id]; if(!r||!r.seen) return;
-    if(!out[i.d]) return;
-    out[i.d].n+=r.seen; out[i.d].ok+=r.ok;
-  });
-  return out;
-}
-function projected(ex){
-  const s=domainStats(ex); let num=0,den=0;
-  for(const d in s){ if(s[d].n>0){ num+=(s[d].ok/s[d].n)*s[d].w; den+=s[d].w; } }
-  if(!den) return null;
-  const pct=num/den;                      // acierto ponderado 0-1
-  return {pct, scaled:Math.round(100+pct*900), coverage:den/100};
-}
-
+function score(){return ccScore(ITEMS,EXAMS[exam].w,ST)}
 function render(){
-  // Sin chips de examen: se elige la certificación al entrar, no aquí dentro.
-
-  const p=projected(exam), sc=document.getElementById("score"), vd=document.getElementById("verdict");
-  if(!p){sc.textContent="—";vd.textContent=T.no_data;}
-  else{
+  const p=score(), sc=$("score"), vd=$("verdict"), rg=$("range");
+  rg.textContent="";
+  if(!p.n){sc.textContent="—";vd.textContent=T.no_data}
+  else if(!p.enough){
+    sc.textContent="—";
+    vd.textContent=fill(T.need_more,{n:p.n,min:p.min,pc:Math.round(p.ok/p.n*100)});
+  } else {
     sc.textContent=p.scaled;
-    const cov=Math.round(p.coverage*100);
-    let msg;
-    if(p.scaled>=800) msg=T.verdict_comfort;
-    else if(p.scaled>=760) msg=T.verdict_thin;
-    else if(p.scaled>=720) msg=T.verdict_edge;
-    else msg=T.verdict_below;
-    vd.innerHTML=`${Math.round(p.pct*100)}${T.weighted} ${msg} <span style="color:var(--ink-3)">${T.coverage} ${cov}%.</span>`;
+    rg.textContent=fill(T.range,{lo:p.lo,hi:p.hi});
+    const msg=p.lo>=CC_CORTE?T.verdict_comfort:p.scaled>=CC_CORTE?T.verdict_thin:p.hi>=CC_CORTE?T.verdict_edge:T.verdict_below;
+    vd.innerHTML=`${Math.round(p.pct*100)}${T.weighted} ${msg} <span style="color:var(--ink-3)">${fill(T.basis,{n:p.n,cov:Math.round(p.coverage*100)})}</span>`;
   }
-
-  const s=domainStats(exam);
-  document.getElementById("bars").innerHTML=Object.keys(s).map(d=>{
-    const o=s[d], pct=o.n?Math.round(o.ok/o.n*100):0;
-    const cls=!o.n?"none":(pct>=85?"pass":"");
-    return `<div class="bar-row"><div class="bar-top"><span>${d} <span style="color:var(--ink-3)">${o.w}%</span></span><b>${o.n?pct+"%":"—"}</b></div><div class="track"><div class="fill ${cls}" style="width:${o.n?pct:0}%"></div></div></div>`;
+  $("bars").innerHTML=Object.keys(p.dom).map(d=>{
+    const o=p.dom[d], pct=o.n?Math.round(o.ok/o.n*100):0;
+    const cls=!o.n?"none":pct>=85?"pass":pct<60?"low":"";
+    return `<div class="bar-row"><div class="bar-top"><span>${d} <span style="color:var(--ink-3)">${o.w}%</span></span><b>${o.n?pct+"% · "+o.n:"—"}</b></div><div class="track"><div class="fill ${cls}" style="width:${o.n?pct:0}%"></div></div></div>`;
   }).join("");
+  const now=Date.now(), nf=ITEMS.filter(i=>failReady(ST[i.id],now)).length;
+  $("mFail").textContent=T.mode_fail+(nf?` (${nf})`:"");
 }
 
 /* ---------- Selección de ítems ---------- */
-function pool(ex){return ITEMS.filter(i=>i.e===ex)}
-function weakest(ex){
-  const s=domainStats(ex); let worst=null,wv=2;
-  for(const d in s){ const v=s[d].n?s[d].ok/s[d].n:-1; if(v<wv){wv=v;worst=d} }
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+/* Primero lo no visto, luego lo último fallado, luego lo visto hace más tiempo:
+   repetir lo recién acertado mide memoria del ítem, no dominio del tema. */
+function prioriza(list){
+  const pr=i=>{const r=ST[i.id]; return !r||!r.seen?0:r.last===0?1:2};
+  return shuffle(list.slice()).sort((a,b)=>pr(a)-pr(b)||((ST[a.id]||{}).t||0)-((ST[b.id]||{}).t||0));
+}
+function weakest(){
+  const s=score().dom; let worst=null,wv=2;
+  for(const d in s){const v=s[d].n?s[d].ok/s[d].n:-1; if(v<wv){wv=v;worst=d}}
   return worst;
 }
-function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+/* Reparto por pesos del blueprint con restos mayores, sin pasarse de lo que
+   hay escrito en cada dominio. */
+function reparto(total){
+  const w=EXAMS[exam].w, byD={}; ITEMS.forEach(i=>(byD[i.d]=byD[i.d]||[]).push(i));
+  const ds=Object.keys(w).filter(d=>byD[d]), sw=ds.reduce((a,d)=>a+w[d],0), n={};
+  total=Math.min(total,ds.reduce((a,d)=>a+byD[d].length,0));
+  ds.forEach(d=>n[d]=Math.min(byD[d].length,Math.floor(total*w[d]/sw)));
+  let falta=total-ds.reduce((a,d)=>a+n[d],0);
+  const orden=ds.slice().sort((a,b)=>(total*w[b]/sw)%1-(total*w[a]/sw)%1);
+  for(let k=0;falta>0&&k<ds.length*total;k++){const d=orden[k%orden.length]; if(n[d]<byD[d].length){n[d]++;falta--}}
+  const out=[]; ds.forEach(d=>out.push(...prioriza(byD[d]).slice(0,n[d])));
+  return shuffle(out);
+}
 
 function startDrill(){
-  const d=weakest(exam);
-  queue=shuffle(pool(exam).filter(i=>i.d===d)); begin(`${T.label_drill} ${d}`);
+  const d=weakest();
+  begin("drill",`${T.label_drill} ${d}`,prioriza(ITEMS.filter(i=>i.d===d)).slice(0,15));
 }
-function startFull(){
-  const p=pool(exam), w=EXAMS[exam].w, out=[];
-  const byD={}; p.forEach(i=>(byD[i.d]=byD[i.d]||[]).push(i));
-  for(const d in w){ const n=Math.max(1,Math.round(20*w[d]/100)); out.push(...shuffle(byD[d]||[]).slice(0,n)); }
-  queue=shuffle(out).slice(0,20); begin(T.label_full,queue.length*120);
+function startFull(){const q=reparto(20); begin("full",T.label_full,q,q.length*120)}
+function startExam(){
+  const ex=EXAMS[exam], real=ex.n||60, q=reparto(real);
+  begin("exam",T.label_exam,q,Math.round((ex.min||120)*60*q.length/real),true);
 }
-function startFail(){
+function startFail(only){
   const now=Date.now();
-  queue=shuffle(pool(exam).filter(i=>{const r=ST[i.id];return r&&r.seen>r.ok&&(!r.due||r.due<=now)}));
-  begin(T.label_fail);
+  const q=only||shuffle(ITEMS.filter(i=>failReady(ST[i.id],now)));
+  if(!q.length){
+    const esp=ITEMS.filter(i=>isFail(ST[i.id])).length;
+    stop(); S=null;
+    stage().innerHTML='<p class="empty">'+(esp?fill(T.fail_waiting,{n:esp}):T.queue_empty)+'</p>';
+    return;
+  }
+  begin("fail",T.label_fail,q);
 }
-function begin(label,seconds){
-  if(!queue.length){document.getElementById("stage").innerHTML='<p class="empty">'+T.queue_empty+'</p>';return}
-  qi=0;stop();
-  if(seconds){tleft=seconds;timer=setInterval(()=>{tleft--;const el=document.getElementById("tm");if(el){el.textContent=fmt(tleft);el.className="timer"+(tleft<120?" low":"")}if(tleft<=0)stop()},1000)}
-  queue.label=label; show();
+
+/* ---------- Sesión ---------- */
+function begin(mode,label,items,seconds,deferred){
+  stop();
+  if(!items.length){S=null;stage().innerHTML='<p class="empty">'+T.queue_empty+'</p>';return}
+  S={mode,label,deferred:!!deferred,i:0,t0:Date.now(),end:seconds?Date.now()+seconds*1000:0,
+     qs:items.map(it=>{
+       // Las opciones se barajan en cada aparición: la posición nunca es una pista.
+       const perm=shuffle(it.o.map((_,k)=>k));
+       return {it,opts:perm.map(k=>it.o[k]),orig:perm,
+               ans:perm.map((o,k)=>it.a.includes(o)?k:-1).filter(k=>k>=0),
+               picked:[],done:false,ok:null,flag:false};
+     })};
+  if(S.end) tick=setInterval(reloj,500);
+  show();
 }
-function stop(){if(timer){clearInterval(timer);timer=null}}
-function fmt(s){const m=Math.floor(s/60);return m+":"+String(s%60).padStart(2,"0")}
+function stop(){if(tick){clearInterval(tick);tick=null}}
+function fmt(s){s=Math.max(0,s);const h=Math.floor(s/3600),m=Math.floor(s%3600/60);return (h?h+":"+String(m).padStart(2,"0"):m)+":"+String(s%60).padStart(2,"0")}
+function left(){return Math.ceil((S.end-Date.now())/1000)}
+function reloj(){
+  if(!S||!S.end) return;
+  const s=left(), el=$("tm");
+  if(el){el.textContent=fmt(s);el.className="timer"+(s<120?" low":"")}
+  if(s<=0) finish(true);   // el tiempo agotado cierra el bloque, como en el examen
+}
 
 function show(){
-  if(qi>=queue.length){
-    stop();
-    document.getElementById("stage").innerHTML=`<h2 class="sec">${T.block_done}</h2><p class="empty">${queue.length} ${T.block_done_body}</p>`;
-    render();return;
-  }
-  const it=queue[qi]; picked=[]; answered=false;
-  const multi=it.a.length>1;
-  // Las opciones se barajan en cada aparición: la posición nunca es una pista.
-  perm=shuffle(it.o.map((_,i)=>i));
-  curOpts=perm.map(i=>it.o[i]);
-  curAns=perm.map((orig,disp)=>it.a.includes(orig)?disp:-1).filter(x=>x>=0);
-  document.getElementById("stage").innerHTML=`
+  const q=S.qs[S.i], it=q.it, multi=q.ans.length>1, last=S.i+1>=S.qs.length;
+  const pie=S.deferred
+    ? `<span class="acts2"><button class="btn ghost" id="prev" ${S.i?"":"disabled"}>${T.prev}</button>
+        <button class="btn ghost" id="flag" aria-pressed="${q.flag}">${q.flag?T.unflag:T.flag}</button>
+        <button class="btn" id="act">${last?T.finish_exam:T.next}</button></span>`
+    : `<button class="btn" id="act">${q.done?(last?T.finish:T.next):T.check}</button>`;
+  stage().innerHTML=`
    <div class="qmeta">
      <span class="tag">${it.e}</span><span class="tag">${it.d}</span>
-     ${multi?'<span class="tag warn">'+T.pick_two+'</span>':''}
-     ${timer?'<span class="timer" id="tm">'+fmt(tleft)+'</span>':''}
+     ${multi?'<span class="tag warn">'+fill(T.pick_n,{n:q.ans.length})+'</span>':''}
+     ${S.end?'<span class="timer" id="tm" role="timer">'+fmt(left())+'</span>':''}
    </div>
-   <p class="stem">${it.q}</p>
-   <div class="opts" id="opts" role="group" aria-label="${T.aria_options}">${curOpts.map((o,k)=>`<button class="opt" data-k="${k}" aria-pressed="false"><span class="key">${"ABCD"[k]}</span><span>${o}</span></button>`).join("")}</div>
+   <p class="stem" id="stem" tabindex="-1">${it.q}</p>
+   <div class="opts" id="opts" role="group" aria-label="${T.aria_options}">${q.opts.map((o,k)=>`<button class="opt" data-k="${k}" aria-pressed="false"><span class="key">${"ABCDEFGH"[k]}</span><span>${o}</span></button>`).join("")}</div>
    <div id="rat" role="status" aria-live="polite"></div>
-   <div class="foot"><span class="count">${queue.label} · ${qi+1}/${queue.length}<span class="kbd"> · ${T.keys_hint}</span></span><button class="btn" id="act">${T.check}</button></div>`;
+   <div class="foot"><span class="count">${S.label} · ${S.i+1}/${S.qs.length}<span class="kbd"> · ${T.keys_hint}</span></span>${pie}</div>
+   ${S.deferred?`<nav class="navq" aria-label="${T.aria_nav}">${S.qs.map((x,k)=>`<button data-go="${k}" data-done="${x.picked.length?1:0}" data-flag="${x.flag?1:0}" ${k===S.i?'aria-current="true"':''} aria-label="${k+1}${x.flag?" · "+T.flagged:""}${x.picked.length?"":" · "+T.unanswered}">${k+1}${x.flag?"⚑":""}</button>`).join("")}</nav>`:""}`;
+  pinta(q);
   document.querySelectorAll("#opts .opt").forEach(b=>b.onclick=()=>{
-    if(answered)return; const k=+b.dataset.k;
-    if(multi){ const ix=picked.indexOf(k); if(ix>=0)picked.splice(ix,1); else if(picked.length<curAns.length)picked.push(k); }
-    else picked=[k];
-    document.querySelectorAll("#opts .opt").forEach(x=>{
-      const sel=picked.includes(+x.dataset.k);
-      x.dataset.sel=sel?"1":"0"; x.setAttribute("aria-pressed",sel?"true":"false");
-    });
+    if(q.done) return; const k=+b.dataset.k;
+    if(multi){const ix=q.picked.indexOf(k); if(ix>=0)q.picked.splice(ix,1); else if(q.picked.length<q.ans.length)q.picked.push(k)}
+    else q.picked=[k];
+    pinta(q);
+    if(S.deferred){const nb=document.querySelector(`.navq [data-go="${S.i}"]`); if(nb)nb.dataset.done=q.picked.length?1:0}
   });
-  document.getElementById("act").onclick=()=>answered?next():check(it);
+  if(S.deferred){
+    $("prev").onclick=()=>{S.i--;show()};
+    $("flag").onclick=()=>{q.flag=!q.flag;show();$("flag").focus()};
+    $("act").onclick=()=>last?finish(false):(S.i++,show());
+    document.querySelectorAll(".navq [data-go]").forEach(b=>b.onclick=()=>{S.i=+b.dataset.go;show()});
+  } else {
+    $("act").onclick=()=>q.done?(last?finish(false):(S.i++,show())):check(q);
+    if(q.done) feedback(q);
+  }
+  // El foco se perdía en cada ítem al sustituir el HTML: vuelve al enunciado.
+  try{$("stem").focus({preventScroll:true})}catch(e){}
 }
-function check(it){
-  if(!picked.length)return;
-  answered=true;
-  const ok=picked.length===curAns.length&&picked.every(k=>curAns.includes(k));
+function pinta(q){
+  document.querySelectorAll("#opts .opt").forEach(x=>{
+    const sel=q.picked.includes(+x.dataset.k);
+    x.dataset.sel=sel?"1":"0"; x.setAttribute("aria-pressed",sel?"true":"false");
+  });
+}
+function grade(q){q.ok=q.picked.length===q.ans.length&&q.picked.every(k=>q.ans.includes(k));return q.ok}
+/* Un fallo entra en la cola al momento. Sale tras dos aciertos seguidos con al
+   menos dos días entre ellos: acertarlo a los cinco minutos no prueba nada. */
+function anota(q){
+  const r=rec(q.it.id), now=Date.now(), estaba=isFail(r);
+  r.seen++; r.last=q.ok?1:0; r.t=now;
+  if(q.ok){
+    r.ok++;
+    if(estaba){r.run=(r.run||0)+1; if(r.run>=2){r.fail=0;r.due=0}else{r.fail=1;r.due=now+2*DIA}}
+  } else {r.fail=1;r.run=0;r.due=0}
+}
+function check(q){
+  if(!q.picked.length) return;
+  q.done=true; grade(q); anota(q); save();
+  feedback(q);
+  $("act").textContent=S.i+1<S.qs.length?T.next:T.finish;
+  render();
+  try{$("act").focus({preventScroll:true})}catch(e){}
+}
+/* La correcta y la elegida se marcan con texto además de con color. */
+function feedback(q){
   document.querySelectorAll("#opts .opt").forEach(b=>{
     const k=+b.dataset.k; b.disabled=true;
-    if(curAns.includes(k))b.dataset.state="correct";
-    else if(picked.includes(k))b.dataset.state="wrong";
+    const c=q.ans.includes(k), p=q.picked.includes(k);
+    if(c) b.dataset.state="correct"; else if(p) b.dataset.state="wrong";
+    if((c||p)&&!b.querySelector(".mark"))
+      b.insertAdjacentHTML("beforeend",`<span class="mark">${c?"✓ "+T.mark_correct:"✗ "+T.mark_yours}</span>`);
   });
-  const r=rec(it.id); r.seen++; if(ok){r.ok++;r.box=Math.min(2,r.box+1)}else{r.box=0}
-  r.due=Date.now()+(r.box===0?2:7)*86400000; save();
-  document.getElementById("rat").innerHTML=
-    `<div class="rat"><b>${ok?T.correct:T.wrong}</b> ${it.r}<br><a href="${it.s}" target="_blank" rel="noopener">${it.s}</a></div>`;
-  document.getElementById("act").textContent=qi+1<queue.length?T.next:T.finish;
-  render();
+  $("rat").innerHTML=`<div class="rat"><b>${q.ok?T.correct:T.wrong}</b> ${razon(q.it)}</div>`;
 }
-function next(){qi++;show()}
+function razon(it){
+  return it.r+(it.c?`<blockquote class="cite">«${it.c}»</blockquote>`:"")+
+    `<span class="srcl">${T.source} <a href="${it.s}" target="_blank" rel="noopener">${it.s}</a>${it.v?" · "+T.verified+" "+it.v:""}</span>`;
+}
 
+/* ---------- Fin de bloque ---------- */
+function finish(timeout){
+  if(!S) return;
+  if(S.deferred&&!timeout){
+    const sin=S.qs.filter(q=>!q.picked.length).length;
+    if(sin&&!confirm(fill(T.confirm_finish,{n:sin}))) return;
+  }
+  stop();
+  const secs=Math.round((Date.now()-S.t0)/1000);
+  // En el examen se corrige al final. Lo no respondido cuenta como fallo en la
+  // nota del bloque, pero no se anota en el ítem: no llegaste a verlo.
+  if(S.deferred) S.qs.forEach(q=>{if(q.picked.length){q.done=true;grade(q);anota(q)}else q.ok=false});
+  const hechos=S.deferred?S.qs:S.qs.filter(q=>q.done);
+  const n=hechos.length, ok=hechos.filter(q=>q.ok).length;
+  if(n){
+    const log=ST.__log||(ST.__log=[]);
+    log.push({t:Date.now(),m:S.mode,n,ok,s:secs}); if(log.length>60) log.shift();
+  }
+  save();
+  const fallos=hechos.filter(q=>!q.ok), pc=n?Math.round(ok/n*100):0;
+  const w=EXAMS[exam].w, dom={};
+  hechos.forEach(q=>{const o=dom[q.it.d]||(dom[q.it.d]={n:0,ok:0}); o.n++; if(q.ok)o.ok++});
+  const filas=Object.keys(w).filter(d=>dom[d]).map(d=>{
+    const o=dom[d], p=Math.round(o.ok/o.n*100);
+    return `<tr><td>${d}</td><td class="n">${o.ok}/${o.n}</td><td class="n ${p>=85?"good":p<60?"bad":""}">${p}%</td></tr>`}).join("");
+  const letra=(q,ks)=>ks.length?ks.map(k=>`${"ABCDEFGH"[k]}. ${q.opts[k]}`).join("<br>"):"—";
+  const lista=fallos.map(q=>`<details class="miss"><summary>${q.it.q}</summary>
+     <p class="ans y"><b>${T.your_answer}</b>${q.picked.length?letra(q,q.picked):T.unanswered}</p>
+     <p class="ans c"><b>${T.right_answer}</b>${letra(q,q.ans)}</p>
+     <div class="rat">${razon(q.it)}</div></details>`).join("");
+  const hist=(ST.__log||[]).slice(-6,-1).reverse().map(l=>
+    `<tr><td>${new Date(l.t).toLocaleDateString()}</td><td>${T["label_"+l.m]||l.m}</td><td class="n">${l.ok}/${l.n}</td><td class="n">${Math.round(l.ok/l.n*100)}%</td></tr>`).join("");
+  const aprox=S.mode==="exam"||S.mode==="full"?` · ${fill(T.block_scaled,{s:Math.round(100+ok/n*900)})}`:"";
+  const fq=fallos.map(q=>q.it);
+  stage().innerHTML=`<div class="rep">
+    <h2 class="sec" id="repT" tabindex="-1">${T.block_done} · ${S.label}</h2>
+    ${timeout?`<p class="empty"><b>${T.time_up}</b></p>`:""}
+    ${n?`<div class="rep-num">${ok}/${n}</div>
+    <p class="rep-sub">${pc}% · ${fill(T.time_used,{t:fmt(secs)})}${n?aprox:""}</p>
+    <table><tr><th>${T.by_domain}</th><th class="n">${T.hits}</th><th class="n">%</th></tr>${filas}</table>
+    ${fallos.length?`<h2 class="sec">${fill(T.missed_list,{n:fallos.length})}</h2>${lista}`:`<p class="empty">${T.no_misses}</p>`}
+    ${hist?`<h2 class="sec" style="margin-top:20px">${T.history}</h2><table><tr><th>${T.h_date}</th><th>${T.h_block}</th><th class="n">${T.hits}</th><th class="n">%</th></tr>${hist}</table>`:""}`
+    :`<p class="empty">${T.none_answered}</p>`}
+    <div class="acts2" style="margin-top:16px">
+      ${fq.length?`<button class="btn" id="again">${T.retry_missed}</button>`:""}
+      <button class="btn ghost" id="other">${T.mode_full}</button>
+    </div></div>`;
+  S=null;
+  if(fq.length) $("again").onclick=()=>startFail(shuffle(fq));
+  $("other").onclick=startFull;
+  render();
+  try{$("repT").focus({preventScroll:true})}catch(e){}
+}
+
+/* ---------- Teclado ----------
+   Enter y Espacio solo avanzan cuando el foco no está en otro control: antes
+   se secuestraban también sobre enlaces y botones, y quien navega con Tab no
+   podía activar lo que tenía enfocado. Sobre una opción ya elegida, avanzan. */
 document.addEventListener("keydown",e=>{
-  const act=document.getElementById("act");
-  if(!act||e.metaKey||e.ctrlKey||e.altKey)return;
-  const t=e.target.tagName;
-  if(t==="INPUT"||t==="TEXTAREA"||t==="SELECT")return;
-  if(e.key>="1"&&e.key<="4"){
-    const b=document.querySelector(`#opts .opt[data-k="${+e.key-1}"]`);
+  if(!S||e.metaKey||e.ctrlKey||e.altKey) return;
+  const el=e.target, tag=el&&el.tagName;
+  if(tag==="INPUT"||tag==="TEXTAREA"||tag==="SELECT") return;
+  const k=(e.key||"").toLowerCase();
+  let idx=-1;
+  if(k.length===1&&k>="1"&&k<="8") idx=+k-1;
+  else if(k.length===1&&k>="a"&&k<="h") idx=k.charCodeAt(0)-97;
+  if(idx>=0){
+    const b=document.querySelector(`#opts .opt[data-k="${idx}"]`);
     if(b&&!b.disabled){e.preventDefault();b.click()}
-  } else if(e.key==="Enter"||e.key===" "){
-    e.preventDefault(); act.click();
+    return;
+  }
+  if(e.key==="Enter"||e.key===" "){
+    const c=el&&el.closest?el.closest("a,button,summary"):null;
+    if(c&&!(c.classList.contains("opt")&&c.dataset.sel==="1")) return;
+    const act=$("act"); if(act){e.preventDefault();act.click()}
   }
 });
+/* Un examen a medias no se guarda: avisar antes de perderlo. */
+window.addEventListener("beforeunload",e=>{
+  if(S&&S.deferred&&S.qs.some(q=>q.picked.length)){e.preventDefault();e.returnValue=""}
+});
 
-document.getElementById("mDrill").onclick=startDrill;
-document.getElementById("mFull").onclick=startFull;
-document.getElementById("mFail").onclick=startFail;
+$("mDrill").onclick=startDrill;
+$("mFull").onclick=startFull;
+$("mExam").onclick=startExam;
+$("mFail").onclick=()=>startFail();
+
+/* ---------- Progreso: exportar, importar, borrar ----------
+   Todo vive en este navegador. Sin exportar, cambiar de equipo o limpiar los
+   datos del sitio era perderlo. */
+const propias=k=>/^claude-certs|journey/.test(k);
+$("exp").onclick=()=>{
+  const data={};
+  try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i); if(propias(k)) data[k]=localStorage.getItem(k)}}catch(e){}
+  const blob=new Blob([JSON.stringify({app:"claude-certs",v:1,exported:new Date().toISOString(),data},null,1)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+  a.download="claude-certs-progreso-"+new Date().toISOString().slice(0,10)+".json";
+  document.body.appendChild(a); a.click(); a.remove();
+};
+$("imp").onclick=()=>$("impf").click();
+$("impf").onchange=e=>{
+  const f=e.target.files[0]; if(!f) return;
+  f.text().then(t=>{
+    const d=JSON.parse(t);
+    if(d.app!=="claude-certs"||!d.data) throw 0;
+    if(!confirm(T.import_confirm)) return;
+    for(const k in d.data) if(propias(k)&&typeof d.data[k]==="string") localStorage.setItem(k,d.data[k]);
+    location.reload();
+  }).catch(()=>alert(T.import_bad));
+  e.target.value="";
+};
+$("reset").onclick=()=>{
+  if(!confirm(T.reset_confirm)) return;
+  stop(); S=null; ST={__migrado:1}; save(); render();
+  stage().innerHTML='<p class="empty">'+T.reset_done+'</p>';
+};
+
 /* El progreso se guardaba por posición en el banco. Al pasar a identificadores
    estables hay que trasladar lo que ya había, una sola vez. */
 function migra(){
@@ -323,25 +519,23 @@ function migra(){
   }).catch(()=>{ ST.__migrado=1; save(); });
 }
 function arranque(){
-  // El sitio es por certificación: items.json ya viene acotado y no hay nada
-  // que conmutar. El id lleva el examen delante para que el progreso de cada
-  // certificación no se pise con el de otra.
-  ORDER=[EXAMEN];
+  // El sitio es por certificación: items.json ya viene acotado. El id lleva el
+  // examen delante para que el progreso de cada certificación no pise al de otra.
   ITEMS.forEach(it=>it.id=it.i);   // identidad estable, no la posición
   exam=EXAMEN;
+  const n=Math.min(EXAMS[exam].n||60,ITEMS.length);
+  $("mExam").textContent=fill(T.mode_exam,{n,min:Math.round((EXAMS[exam].min||120)*n/(EXAMS[exam].n||60))});
   render();
-  document.getElementById("stage").innerHTML='<p class="empty">'+T.stage_empty+'</p>';
+  stage().innerHTML='<p class="empty">'+T.stage_empty+'</p>';
 }
 Promise.all([
   fetch("../items.json").then(r=>{if(!r.ok)throw 0;return r.json()}),
   fetch("../exams.json").then(r=>{if(!r.ok)throw 0;return r.json()})
 ]).then(([a,b])=>{ ITEMS=a.items; EXAMEN=a.exam; EXAMS=b;
-   document.getElementById("stage").removeAttribute("aria-busy");
+   stage().removeAttribute("aria-busy");
    migra().then(arranque); })
  .catch(()=>{
-   document.getElementById("stage").innerHTML='<p class="empty"><b>'+T.load_fail_b+'</b><br>'+T.load_fail+'</p>';
+   stage().innerHTML='<p class="empty"><b>'+T.load_fail_b+'</b><br>'+T.load_fail+'</p>';
    document.querySelectorAll(".modes .btn").forEach(b=>b.disabled=true);
  });
-
-document.getElementById("reset").onclick=()=>{if(confirm(T.reset_confirm)){ST={};save();queue=[];render();document.getElementById("stage").innerHTML='<p class="empty">'+T.reset_done+'</p>'}};
 </script>

@@ -135,7 +135,10 @@ const rec=id=>ST[id]||(ST[id]={box:0,seen:0,due:0});
 const isDue=c=>{const r=ST[c.id];return c.x!==false&&(!r||!r.due||r.due<=Date.now())};
 const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 
-let CARDS=[], TEMAS=[], FUERA=[], deck=[], i=0, shown=false, res=[], subieron=[];
+let CARDS=[], TEMAS=[], FUERA=[], deck=[], i=0, shown=false, res=[], subieron=[], tocaba=[];
+/* Fecha local, no UTC: con toISOString la racha cambiaba de día a la una o las
+   dos de la madrugada en España. */
+const dia=t=>{const d=new Date(t);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
 
 fetch("../cards.json").then(r=>r.json()).then(d=>{
   CARDS=d.cards; TEMAS=d.temas; FUERA=d.fuera||[];
@@ -146,14 +149,14 @@ fetch("../cards.json").then(r=>r.json()).then(d=>{
 
 /* ---------- Racha ---------- */
 function racha(){
-  const hoy=new Date().toISOString().slice(0,10);
+  const hoy=dia(Date.now());
   const m=ST.__meta||(ST.__meta={dias:[],racha:0});
   return {hoy,m};
 }
 function marcaDia(){
   const {hoy,m}=racha();
   if(m.dias[m.dias.length-1]===hoy) return;
-  const ayer=new Date(Date.now()-86400000).toISOString().slice(0,10);
+  const ayer=dia(Date.now()-86400000);
   m.racha = m.dias[m.dias.length-1]===ayer ? (m.racha||0)+1 : 1;
   m.dias.push(hoy); if(m.dias.length>60)m.dias.shift();
   save();
@@ -199,7 +202,7 @@ function cablea(){
   el("goAll").onclick=()=>start(shuffle(CARDS.filter(c=>c.x!==false)).slice(0,TANDA),T.free_label);
   document.querySelectorAll(".tema").forEach(b=>b.onclick=()=>{
     const t=b.dataset.t, cs=CARDS.filter(c=>c.t===t);
-    const orden=[...cs.filter(isDue),...cs.filter(c=>!isDue(c))];
+    const orden=[...shuffle(cs.filter(isDue)),...shuffle(cs.filter(c=>!isDue(c)))];
     start(orden.slice(0,TANDA),t);
   });
 }
@@ -208,6 +211,9 @@ function cablea(){
 function start(cs,titulo){
   if(!cs.length)return;
   deck=cs; i=0; res=[]; subieron=[];
+  // Se fija al empezar: una tarjeta que no tocaba no sube de nivel por repasarla
+  // antes de tiempo. Sin esto se llegaba de «Nueva» a «Dominada» en una sentada.
+  tocaba=cs.map(isDue);
   el("home").classList.add("off"); el("top").classList.add("off"); el("sesion").classList.add("on");
   el("temaLbl").dataset.base=titulo;
   draw();
@@ -219,7 +225,7 @@ function draw(){
   el("pbar").innerHTML=deck.map((_,k)=>`<span class="pdot ${res[k]===1?'ok':res[k]===0?'no':k===i?'now':''}"></span>`).join("");
   el("temaLbl").textContent=el("temaLbl").dataset.base+" · "+(i+1)+" "+T.of+" "+deck.length;
   const lv=Math.min(3,r.box||0);
-  el("lvlLbl").textContent=NIV[lv]; el("lvlLbl").className="lvl"+(lv===0?"":lv<3?" l1":" l2");
+  el("lvlLbl").textContent=NIV[lv]+(tocaba[i]?"":" · "+T.not_due); el("lvlLbl").className="lvl"+(lv===0?"":lv<3?" l1":" l2");
   const card=el("card");
   card.className="card"; card.innerHTML=`<div class="q">${c.f}</div><div id="ans"></div><div class="hint" id="hint">${T.tap_card}</div>`;
   card.onclick=reveal;
@@ -235,8 +241,9 @@ function reveal(){
 }
 function grade(ok){
   const c=deck[i], r=rec(c.id), antes=Math.min(3,r.box||0);
-  r.seen++; r.box=ok?Math.min(4,(r.box||0)+1):0;
-  r.due=Date.now()+GAP[r.box]*86400000;
+  r.seen++;
+  if(!ok){r.box=0; r.due=Date.now()+GAP[0]*86400000}
+  else if(tocaba[i]){r.box=Math.min(4,(r.box||0)+1); r.due=Date.now()+GAP[r.box]*86400000}
   const ahora=Math.min(3,r.box);
   if(ok&&ahora>antes) subieron.push({t:c.t,n:NIV[ahora]});
   res[i]=ok; save();

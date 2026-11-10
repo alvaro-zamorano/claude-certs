@@ -24,9 +24,9 @@ async function abrir(url){
 
 async function simulador(){
  const casos=[
- {url:"/ccar-f/test/",    lang:"es", doms:5, esperado:{modo:"Simulacro ponderado (20)", comprobar:"Comprobar"}},
- {url:"/en/ccar-f/test/", lang:"en", doms:5, esperado:{modo:"Weighted mock (20)",       comprobar:"Check"}},
- {url:"/ccao-f/test/",    lang:"es", doms:7, esperado:{modo:"Simulacro ponderado (20)", comprobar:"Comprobar"}},
+ {url:"/ccar-f/test/",    lang:"es", doms:5, examen:60, esperado:{modo:"Simulacro ponderado (20)", comprobar:"Comprobar"}},
+ {url:"/en/ccar-f/test/", lang:"en", doms:5, examen:60, esperado:{modo:"Weighted mock (20)",       comprobar:"Check"}},
+ {url:"/ccao-f/test/",    lang:"es", doms:7, examen:60, esperado:{modo:"Simulacro ponderado (20)", comprobar:"Comprobar"}},
 ];
 
 
@@ -55,7 +55,8 @@ async function simulador(){
   ok("muestra veredicto", /Correcto|Incorrecto|Correct|Incorrect/.test(rat), `-> "${rat.slice(0,40)}"`);
   ok("enlaza la fuente", /^https?:/.test($("#rat a").getAttribute("href")));
   ok("marca correcta/incorrecta", [...d.querySelectorAll("#opts .opt")].some(b=>b.dataset.state==="correct"));
-  ok("score deja de ser —", $("#score").textContent!=="—", `-> ${$("#score").textContent}`);
+  ok("con una respuesta no proyecta score", $("#score").textContent==="—"&&/1 (de|of) 30/.test($("#verdict").textContent), `-> ${$("#score").textContent} · ${$("#verdict").textContent.slice(0,50)}`);
+  ok("correcta marcada con texto", !!d.querySelector('#opts .opt[data-state="correct"] .mark'));
   // teclado
   $("#act").dispatchEvent(new w.MouseEvent("click"));
   await dormir(200);
@@ -64,7 +65,55 @@ async function simulador(){
   d.dispatchEvent(new w.KeyboardEvent("keydown",{key:"Enter",bubbles:true}));
   await dormir(200);
   ok("Enter comprueba", $("#rat").textContent.length>20);
+  // Enter sobre un enlace enfocado es del enlace, no del simulador
+  const antes=$(".count").textContent, enlace=d.querySelector(".note a");
+  enlace.dispatchEvent(new w.KeyboardEvent("keydown",{key:"Enter",bubbles:true}));
+  ok("Enter en un enlace no avanza", $(".count").textContent===antes);
+
+  // cola de fallos: un fallo es repasable al momento y no se gradúa con un acierto
+  const click=el=>el.dispatchEvent(new w.MouseEvent("click"));
+  const responde=async bien=>{
+    const st=w.eval("S.qs[S.i]"), k=bien?st.ans[0]:[0,1,2,3].find(x=>!st.ans.includes(x));
+    click(d.querySelector(`#opts .opt[data-k="${k}"]`)); click($("#act")); await dormir(60);
+  };
+  w.eval("ST={__migrado:1};save();render()");
+  click($("#mFull")); await dormir(100);
+  await responde(false);
+  click($("#mFail")); await dormir(100);
+  ok("fallo repasable al momento", !!$("#opts")&&/1\/1/.test($(".count").textContent), `-> "${$("#stage").textContent.trim().slice(0,50)}"`);
+  await responde(true); click($("#act")); await dormir(100);
+  ok("informe de bloque", !!$(".rep-num")&&$(".rep-num").textContent==="1/1");
+  click($("#mFail")); await dormir(100);
+  ok("un acierto no gradúa: queda en espera", !$("#opts")&&/1/.test($("#stage").textContent), `-> "${$("#stage").textContent.trim().slice(0,60)}"`);
+
+  // examen completo: corrige al final, deja volver y marcar
+  w.confirm=()=>true;
+  click($("#mExam")); await dormir(150);
+  const total=w.eval("S.qs.length");
+  ok("examen con el tamaño real", total===Math.min(c.examen,w.eval("ITEMS.length")), `hay ${total}`);
+  ok("reloj y navegador", !!$("#tm")&&d.querySelectorAll(".navq button").length===total);
+  click(d.querySelector('#opts .opt[data-k="0"]'));
+  ok("sin corrección inmediata", $("#rat").textContent===""&&!d.querySelector("#opts .opt[data-state]"));
+  click($("#flag")); ok("marca la pregunta", d.querySelector('.navq [data-go="0"]').dataset.flag==="1");
+  click($("#act")); await dormir(50);
+  click($("#prev")); await dormir(50);
+  ok("vuelve y conserva la respuesta", d.querySelector('#opts .opt[data-k="0"]').getAttribute("aria-pressed")==="true");
+  w.eval("S.qs.forEach(q=>{q.picked=[q.ans[0]]})");
+  click(d.querySelector(`.navq [data-go="${total-1}"]`)); await dormir(50);
+  click($("#act")); await dormir(150);
+  ok("informe del examen", !!$(".rep-num")&&/^\d+\/\d+$/.test($(".rep-num").textContent), `-> ${$(".rep-num")&&$(".rep-num").textContent}`);
+  ok("historial guardado", w.eval("ST.__log.length")>=2);
+  ok("proyecta con intervalo", /^\d{3,4}$/.test($("#score").textContent)&&/\d+–\d+/.test($("#range").textContent), `-> ${$("#score").textContent} · ${$("#range").textContent}`);
+  // tiempo agotado: cierra el bloque
+  click($("#mFull")); await dormir(100);
+  w.eval("S.end=Date.now()-1"); await dormir(700);
+  ok("el tiempo agotado cierra el bloque", !$("#opts")&&!!$(".rep"));
   dom.window.close();
+
+  // la portada de la certificación usa la misma proyección
+  const h=await abrir(c.url.replace(/test\/$/,""));
+  ok("portada sin datos: sin score", h.window.document.querySelector("#score").textContent==="—");
+  h.window.close();
  }
 
 }
