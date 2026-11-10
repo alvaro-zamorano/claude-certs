@@ -15,12 +15,12 @@ SUF = "" if LANG == "es" else "." + LANG
 OUT = os.path.join(ROOT, "src", "static", f"og{SUF}.png")
 
 TEXTO = {
- "es": {"eyebrow": "P R O Y E C T O   A B I E R T O   ·   N O   O F I C I A L",
+ "es": {"eyebrow": "P R O Y E C T O   A B I E R T O   \u00b7   N O   O F I C I A L",
         "titulo": ["Certificaciones Claude,", "con material que", "puedes auditar."],
         "sub": ["Simulador con los pesos reales de cada blueprint, tarjetas con",
-                "repetición espaciada y la fuente oficial enlazada en cada ítem."],
-        "cifras": ["ÍTEMS", "TARJETAS", "EXÁMENES", "LICENCIA"]},
- "en": {"eyebrow": "O P E N   P R O J E C T   ·   U N O F F I C I A L",
+                "repetici\u00f3n espaciada y la fuente oficial enlazada en cada \u00edtem."],
+        "cifras": ["\u00cdTEMS", "TARJETAS", "EX\u00c1MENES", "LICENCIA"]},
+ "en": {"eyebrow": "O P E N   P R O J E C T   \u00b7   U N O F F I C I A L",
         "titulo": ["Claude certifications,", "with material you", "can audit."],
         "sub": ["A simulator with the real blueprint weights, spaced-repetition",
                 "flashcards, and the official source linked on every item."],
