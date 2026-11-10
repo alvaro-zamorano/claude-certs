@@ -1,0 +1,103 @@
+<title>Claude Certs — herramienta de estudio abierta</title>
+<style>
+:root{
+  --bg:#f7f6f3;--surface:#fffefb;--surface-2:#f0eee8;--line:#e0ddd4;--line-strong:#c9c5b8;
+  --ink:#20201d;--ink-2:#57544c;--ink-3:#8b8779;
+  --accent:#b5541f;--accent-soft:#f6e8de;--accent-ink:#8c3f16;
+  --ok:#2f6b46;--ok-soft:#e2efe7;
+  --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:ui-sans-serif,-apple-system,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#16161a;--surface:#1e1e23;--surface-2:#26262c;--line:#33333b;--line-strong:#4a4a55;
+  --ink:#eceae4;--ink-2:#a8a49b;--ink-3:#7b776e;
+  --accent:#e0834c;--accent-soft:#3a2617;--accent-ink:#f0a274;
+  --ok:#6dbb8e;--ok-soft:#1c2f24;}}
+:root[data-theme="dark"]{
+  --bg:#16161a;--surface:#1e1e23;--surface-2:#26262c;--line:#33333b;--line-strong:#4a4a55;
+  --ink:#eceae4;--ink-2:#a8a49b;--ink-3:#7b776e;
+  --accent:#e0834c;--accent-soft:#3a2617;--accent-ink:#f0a274;
+  --ok:#6dbb8e;--ok-soft:#1c2f24;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:calc(40px + env(safe-area-inset-top)) 20px 20px}
+a{color:var(--accent-ink)}
+.hero{margin-bottom:34px}
+h1{font-size:var(--t-tit);margin:0 0 10px;letter-spacing:-.03em;line-height:1.15}
+.tag{font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.12em;color:var(--accent-ink);font-weight:700;margin-bottom:10px}
+.sub{font-size:var(--t-base);color:var(--ink-2);max-width:60ch;margin:0 0 6px}
+.nums{display:flex;flex-wrap:wrap;gap:20px;margin:22px 0 0;padding-top:18px;border-top:1px solid var(--line)}
+.num b{display:block;font-size:var(--t-tit);font-weight:650;letter-spacing:-.02em;line-height:1.1}
+.num span{font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3)}
+h2{font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.12em;color:var(--ink-3);margin:34px 0 12px;font-weight:700}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+@media(max-width:680px){.cards{grid-template-columns:1fr}}
+.c{display:block;background:var(--surface);border:1px solid var(--line);border-radius:12px;
+   padding:16px 17px;text-decoration:none;color:var(--ink);transition:.14s}
+.c:hover{border-color:var(--line-strong);transform:translateY(-1px)}
+.c .t{font-size:var(--t-base);font-weight:600;letter-spacing:-.01em;margin-bottom:4px}
+.c .d{font-size:var(--t-dato);color:var(--ink-2);line-height:1.5}
+.c.big{grid-column:1/-1;background:var(--accent-soft);border-color:transparent}
+.c.big .t{color:var(--accent-ink)}
+.paso{display:flex;gap:13px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--line);font-size:var(--t-dato)}
+.paso:first-of-type{border-top:none}
+.paso .n{font-family:var(--mono);font-size:var(--t-micro);background:var(--surface-2);border:1px solid var(--line);
+  border-radius:99px;padding:3px 9px;color:var(--ink-3);flex:0 0 auto;margin-top:2px}
+.paso b{display:block;margin-bottom:2px}
+.paso .x{color:var(--ink-2);font-size:var(--t-dato)}
+table{width:100%;border-collapse:collapse;font-size:var(--t-dato);margin:0 0 14px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--surface-2);font-weight:600;font-size:var(--t-micro);white-space:nowrap}
+.nota{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;font-size:var(--t-dato);color:var(--ink-2);margin:0 0 14px}
+.nota b{color:var(--ink)}
+p{margin:0 0 12px}
+@media(max-width:640px){
+  .wrap{padding:26px 16px 16px}
+  h1{font-size:var(--t-tit)}.sub{font-size:var(--t-dato)}
+}
+
+.grupo{font-size:var(--t-dato);margin:26px 0 10px;letter-spacing:-.01em;display:flex;
+  align-items:baseline;gap:9px;flex-wrap:wrap}
+.grupo span{font-size:var(--t-micro);font-weight:400;color:var(--ink-3);text-transform:none;letter-spacing:0}
+.paso-lead{font-size:var(--t-dato);color:var(--ink-2);max-width:62ch;margin:0 0 4px}
+</style>
+
+<div class="wrap">
+<div class="hero">
+  <div class="tag">Proyecto abierto · no oficial</div>
+  <h1>Prepara las certificaciones Claude con material que puedes auditar</h1>
+  <p class="sub">Un simulador con los pesos reales de cada blueprint, tarjetas con repetición espaciada, apuntes y una referencia técnica. Todo escrito a mano, verificado contra documentación pública y con la fuente enlazada en cada ítem.</p>
+  <div class="nums">
+    <div class="num"><b>{{N_ITEMS}}</b><span>ítems de práctica</span></div>
+    <div class="num"><b>{{N_CARDS}}</b><span>tarjetas</span></div>
+    <div class="num"><b>{{N_EXAMS}}</b><span>exámenes cubiertos</span></div>
+    <div class="num"><b>CC BY</b><span>material libre de reutilizar</span></div>
+  </div>
+</div>
+
+{{SELECTOR}}
+
+<h2>Cómo usarlo</h2>
+<div class="paso"><span class="n">1</span><div><b>Mide antes de estudiar</b><span class="x">Un simulacro ponderado te da un número por dominio. Sin eso, estudiar es intuición.</span></div></div>
+<div class="paso"><span class="n">2</span><div><b>Memoriza con tarjetas, entiende con apuntes</b><span class="x">Las tarjetas fijan lo memorístico en sesiones cortas. Cuando una no te cuadre, ve a los apuntes a por el porqué.</span></div></div>
+<div class="paso"><span class="n">3</span><div><b>Comprueba con el simulador</b><span class="x">Las opciones se barajan en cada aparición, así que la posición nunca es una pista y el mismo ítem se ve distinto en cada pasada.</span></div></div>
+<div class="paso"><span class="n">4</span><div><b>No te presentes hasta pasar del 85%</b><span class="x">El corte real está en 720 sobre 1000 y la conversión no es lineal. Deja colchón.</span></div></div>
+
+<h2>Los cuatro exámenes</h2>
+<table>
+<tr><th>Código</th><th>Credencial</th><th>Ítems</th><th>Rasgo propio</th></tr>
+<tr><td>CCAO-F</td><td>Associate – Foundations</td><td>60</td><td>Examen de criterio de negocio, no técnico</td></tr>
+<tr><td>CCDV-F</td><td>Developer – Foundations</td><td>53</td><td>El único cuya guía publica pesos por skill</td></tr>
+<tr><td>CCAR-F</td><td>Architect – Foundations</td><td>60</td><td>Presenta cuatro escenarios de un banco de seis</td></tr>
+<tr><td>CCAR-P</td><td>Architect – Professional</td><td>63</td><td>El más ancho: RAG, evals, gobernanza, stakeholders</td></tr>
+</table>
+<p style="font-size:var(--t-dato);color:var(--ink-2)">Los cuatro duran 120 minutos, aprueban en 720 sobre una escala de 100 a 1.000 y caducan a los 12 meses. Se registran en Anthropic Partner Academy y los entrega Pearson VUE.</p>
+
+<h2>Qué es esto y qué no</h2>
+<div class="nota"><b>Qué es.</b> Material de estudio escrito desde cero contra los objetivos que Anthropic publica en sus guías de examen, y verificado contra documentación pública viva. Cada ítem lleva enlazada la fuente en la que se apoya, para que puedas comprobarlo en lugar de creerlo.</div>
+<div class="nota"><b>Qué no es.</b> No es un volcado de preguntas reales, no reproduce el banco del examen y no está afiliado a Anthropic. Quien te venda preguntas reales te está vendiendo algo que viola el NDA que tú firmas antes de empezar, y que además suele estar desactualizado.</div>
+<div class="nota"><b>Una advertencia honesta.</b> La documentación de Anthropic se reescribe deprisa. Varias prácticas que los cursos siguen enseñando ya están deprecadas, y este material intenta señalarlas, pero también envejece. Antes de apoyarte en un dato concreto, contrástalo con la fuente enlazada.</div>
+
+<h2>Contribuir</h2>
+<p style="font-size:var(--t-dato);color:var(--ink-2)">El banco de ítems y las tarjetas viven en dos ficheros JSON del repositorio. Si encuentras un error, un dato desactualizado o quieres añadir ítems, abre un issue o un pull request. La única regla dura: <b>ningún ítem entra sin una URL oficial que lo respalde</b>, y ninguno puede proceder del examen real.</p>
+</div>
