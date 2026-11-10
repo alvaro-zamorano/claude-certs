@@ -1,0 +1,160 @@
+<title>Flash Review</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{
+  --bg:#f7f6f3;--surface:#fffefb;--surface-2:#f0eee8;--line:#e0ddd4;
+  --ink:#20201d;--ink-2:#57544c;--ink-3:#8b8779;
+  --accent:#b5541f;--accent-soft:#f6e8de;--accent-ink:#8c3f16;
+  --ok:#2f6b46;--ok-soft:#e2efe7;--bad:#a32f28;--bad-soft:#f8e5e3;
+  --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:ui-sans-serif,-apple-system,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#16161a;--surface:#1e1e23;--surface-2:#26262c;--line:#33333b;
+  --ink:#eceae4;--ink-2:#a8a49b;--ink-3:#7b776e;
+  --accent:#e0834c;--accent-soft:#3a2617;--accent-ink:#f0a274;
+  --ok:#6dbb8e;--ok-soft:#1c2f24;--bad:#e0817a;--bad-soft:#33201e;}}
+:root[data-theme="dark"]{
+  --bg:#16161a;--surface:#1e1e23;--surface-2:#26262c;--line:#33333b;
+  --ink:#eceae4;--ink-2:#a8a49b;--ink-3:#7b776e;
+  --accent:#e0834c;--accent-soft:#3a2617;--accent-ink:#f0a274;
+  --ok:#6dbb8e;--ok-soft:#1c2f24;--bad:#e0817a;--bad-soft:#33201e;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:680px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom))}
+h1{font-size:var(--t-sub);margin:0 0 2px;letter-spacing:-.02em}
+.sub{color:var(--ink-3);font-size:var(--t-micro);margin-bottom:18px}
+h2{font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.12em;color:var(--accent-ink);margin:26px 0 9px;font-weight:700;
+   border-bottom:1px solid var(--line);padding-bottom:5px}
+.r{background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:11px 13px;margin-bottom:7px;font-size:var(--t-dato)}
+.r b{color:var(--ink)}
+.r .k{display:block;font-weight:640;margin-bottom:3px;letter-spacing:-.01em}
+.r .v{color:var(--ink-2)}
+.hot{background:var(--accent-soft);border-color:transparent}
+.no{background:var(--bad-soft);border-color:transparent}
+.no .k{color:var(--bad)}
+.si{background:var(--ok-soft);border-color:transparent}
+.si .k{color:var(--ok)}
+code{font-family:var(--mono);font-size:var(--t-dato);background:var(--surface-2);padding:1px 4px;border-radius:4px;border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;font-size:var(--t-dato);margin:0 0 8px;display:block;overflow-x:auto}
+td{border:1px solid var(--line);padding:5px 8px;vertical-align:top}
+td:first-child{font-weight:560;white-space:nowrap;background:var(--surface-2)}
+.top-nav{font-size:var(--t-micro);margin-bottom:16px;display:flex;gap:12px;flex-wrap:wrap}
+a{color:var(--accent-ink)}
+.fin{margin-top:30px;padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-radius:10px;font-size:var(--t-dato);color:var(--ink-2)}
+</style>
+
+<div class="wrap">
+<h1>Flash Review</h1>
+<div class="sub">What you need fresh. In order of weight, not of syllabus.</div>
+<div class="top-nav"><a href="../architect/">Architect</a><a href="../">Test</a><a href="../tarjetas/">Cards</a><a href="../referencia/">Reference</a><a href="../apuntes/">Notes</a></div>
+
+<h2>If you only read one thing</h2>
+<div class="r hot"><span class="k">The mold of almost every item</span><span class="v">Symptom → which technique is missing. The option "rewrite the prompt with more detail" is almost always the distractor. And between two valid options, the winner is the one that <b>removes the capability</b> or <b>verifies against the source</b>, not the one that audits afterwards.</span></div>
+<div class="r hot"><span class="k">For any model or architecture doubt</span><span class="v">The smallest, simplest thing that passes the eval. Never "use the most capable". Never "adopt the framework". Never "add an agent" if a workflow does it.</span></div>
+
+<h2>Diagnosis: symptom → what's missing</h2>
+<table>
+<tr><td>Wrong shape</td><td>Output constraint</td></tr>
+<tr><td>Drift across turns</td><td>Underspecified system prompt</td></tr>
+<tr><td>Hallucinated structure</td><td>Few-shot examples</td></tr>
+<tr><td>The parser keeps breaking</td><td>Structured outputs in the API</td></tr>
+<tr><td>Wrong tool <b>from turn 1</b></td><td>The description (exclusion condition)</td></tr>
+<tr><td>Wrong tool <b>after N turns</b></td><td>The context window</td></tr>
+<tr><td>Tool error when retrying after a cutoff</td><td>Half-built block</td></tr>
+<tr><td>Units pass, e2e fails</td><td>The seam → integration test</td></tr>
+<tr><td>Inconsistent across runs</td><td>Hallucination</td></tr>
+<tr><td>Reproducible failure</td><td>Prompt or model capability</td></tr>
+</table>
+
+<h2>Agentic loop</h2>
+<div class="r"><span class="k">Loop control</span><span class="v"><code>stop_reason</code>: keep going on <code>tool_use</code>, stop on <code>end_turn</code>. Never parse natural language or use an iteration cap as the criterion.</span></div>
+<div class="r"><span class="k">Returning results</span><span class="v"><code>role: user</code> message with <code>tool_result</code> + <code>tool_use_id</code> blocks. <b>There is no tool role.</b> They go <b>first</b> in content, text after, or 400.</span></div>
+<div class="r"><span class="k">Tool failure</span><span class="v"><code>is_error: true</code>. Never an exception, never an empty result (the model reads it as data).</span></div>
+<div class="r"><span class="k">Subagents</span><span class="v"><b>Fresh</b> context: only the prompt string crosses. Only the final message comes back. <b>They don't preload skills.</b> Parallelizing = several spawn calls <b>in a single response</b>.</span></div>
+<div class="r"><span class="k">Cost</span><span class="v">Agent ~4× a chat · multi-agent ~<b>15×</b>. Only pays off on tasks that <b>split into independent parallel parts</b>.</span></div>
+
+<h2>Workflow or agent</h2>
+<div class="r"><span class="k">The line</span><span class="v"><b>Workflow</b> if you can write the exact steps in code. <b>Agent</b> if you can give goal and tools but <b>not the path</b>.</span></div>
+<div class="r"><span class="k">Parallelization vs orchestrator-workers</span><span class="v">The only difference: <b>whether the subtasks were predefined</b>. In orchestrator the model decides them at runtime.</span></div>
+<div class="r"><span class="k">Human-in-the-loop</span><span class="v">If a tool does something <b>irreversible</b>, the checkpoint goes in <b>before wiring the loop</b>. A log is forensic, not preventive.</span></div>
+
+<h2>Numbers</h2>
+<table>
+<tr><td>Pass mark</td><td>720 / 1000</td></tr>
+<tr><td>Batch</td><td><b>50%</b> discount · 100,000 req or 256 MB · expires 24 h · results 29 days · no streaming</td></tr>
+<tr><td>Batch states</td><td>Only <code>in_progress</code> and <code>ended</code></td></tr>
+<tr><td>Cache TTL</td><td>5 min · 1 h extended</td></tr>
+<tr><td>Cache price</td><td>write 1.25× / 2× · read <b>0.1×</b> → pays off at the <b>1st</b> read (5 min), 2nd (1 h)</td></tr>
+<tr><td>Breakpoints</td><td>Maximum <b>4</b></td></tr>
+<tr><td>Invalidates everything</td><td>Changing <code>tools</code> · also the <b>effort</b> (it renders in the prompt)</td></tr>
+<tr><td>Tools</td><td>Degrades above <b>30-50</b> · description min. 3-4 sentences</td></tr>
+<tr><td>MCP connected</td><td>5 servers ≈ <b>55,000 tokens</b> before doing any work</td></tr>
+<tr><td>Strict outputs</td><td>20 tools · 24 optional · 16 unions · 180 s compilation</td></tr>
+<tr><td>Image</td><td><code>⌈w/28⌉ × ⌈h/28⌉</code> · high res 2576px/4784 · standard 1568px/1568</td></tr>
+<tr><td>Non-streaming timeout</td><td>10 minutes</td></tr>
+<tr><td>SDK retries</td><td>2 by default, exponential backoff</td></tr>
+<tr><td>RAG without RAG</td><td>Fits under <b>200k tokens</b> → all into the prompt with caching</td></tr>
+<tr><td>Contextual retrieval</td><td>−35% · −49% with BM25 · <b>−67%</b> with reranking · top-20 from top-150</td></tr>
+<tr><td>Tool outputs in production</td><td><b>3-5×</b> bigger than the fixtures</td></tr>
+</table>
+
+<h2>Errors</h2>
+<div class="r"><span class="k">429 vs 529</span><span class="v">429 = your quota. <b>529 = global API overload</b>, not yours. Both with backoff.</span></div>
+<div class="r"><span class="k">Streaming</span><span class="v">Errors as <code>event: error</code> <b>after HTTP 200</b>. Block closed at <code>content_block_stop</code>, turn at <code>message_stop</code>. <b>Tool use and thinking don't recover partially.</b></span></div>
+<div class="r"><span class="k">Classifying failures</span><span class="v">Would waiting fix it? Yes → backoff <b>with a cap and a budget</b>, never a loop. No → <b>named fallback</b>, or the exception becomes the default behavior.</span></div>
+<div class="r"><span class="k">Context window</span><span class="v">Doesn't fit → <b>error before generating</b>. Runs out midway → <b>truncated</b> with <code>model_context_window_exceeded</code>. Managing the history is <b>the app's job</b>.</span></div>
+
+<h2>Security — the answer pattern</h2>
+<div class="r si"><span class="k">Correct</span><span class="v"><b>Remove the capability.</b> Untrusted content <b>only in <code>tool_result</code></b>. JSON-encode it. <code>PreToolUse</code> hook that <b>blocks and logs before</b>.</span></div>
+<div class="r no"><span class="k">Distractors</span><span class="v">Logging to audit afterwards · asking for confirmation · instructing in the system prompt · "our users are trusted" (the injection arrives through the <b>content it reads</b>) · a more capable model (may be <b>more</b> susceptible).</span></div>
+<div class="r"><span class="k">Regulated client</span><span class="v">Identity → OAuth · credentials → environment variables · audit → <code>PostToolUse</code> hook · configuration → managed settings. And raise it <b>in scoping</b>, not after failing the review.</span></div>
+
+<h2>Claude Code and MCP</h2>
+<div class="r"><span class="k">Permissions</span><span class="v">Order <b>deny → ask → allow</b>, first match decides, specificity doesn't change the order. The mode is a <b>risk decision</b>; the deny rule covers what the mode doesn't.</span></div>
+<div class="r"><span class="k">CLAUDE.md</span><span class="v"><b>Concatenated</b>, not overwritten. Re-injected on every request (that's why it survives compaction).</span></div>
+<div class="r"><span class="k">4 mechanisms, 4 problems</span><span class="v">CLAUDE.md = memory (dilutes) · rules = scope · hooks = determinism · subagents = separate context. <b>Putting everything in CLAUDE.md is the anti-pattern.</b></span></div>
+<div class="r"><span class="k">Transport and scope</span><span class="v">stdio = local · HTTP = remote or multi-developer. <b>A stdio in <code>.mcp.json</code> looks shareable and isn't.</b> Team = HTTP <b>and</b> project scope.</span></div>
+<div class="r"><span class="k">MCP primitives</span><span class="v">Tools → the <b>model</b> · Resources → the <b>application</b> · Prompts → the <b>user</b>.</span></div>
+
+<h2>Evals</h2>
+<div class="r"><span class="k">When</span><span class="v"><b>Before building.</b> Define success while the design can still change.</span></div>
+<div class="r"><span class="k">Grader by output type</span><span class="v">One correct form → exact match · structured → code · open-ended → judge <b>calibrated beforehand</b> against human cases. Order: code → LLM → human ("avoid it if you can").</span></div>
+<div class="r"><span class="k">Volume over quality</span><span class="v">More cases with automatic grading > few graded by hand. Counterintuitive and literal.</span></div>
+<div class="r"><span class="k">Levels</span><span class="v">Unit = inside · integration = <b>the seam</b> · e2e = says it fails, not where. The trace says <b>which step</b>.</span></div>
+
+<h2>Deployment and packaging</h2>
+<div class="r"><span class="k">Pin, not alias</span><span class="v">Pin the <b>specific model version</b> and <b>keep the previous one available</b>. An alias is "the current edition of the book": the text can change. With a pin, you adopt the change <b>deliberately</b> and have a way back.</span></div>
+<div class="r"><span class="k">Choosing a platform</span><span class="v">By the <b>client's cloud and compliance posture</b>. Defended by measuring: latency <b>from the client's region</b>, compliance against <b>their certification</b>, and <b>total cost per call</b>, not price per token.</span></div>
+<div class="r"><span class="k">Compliance</span><span class="v">With a regulated client it's <b>pass or fail</b>. Raised in <b>scoping</b>, or it kills the build at contract review.</span></div>
+<div class="r"><span class="k">Data processor</span><span class="v">Bedrock → <b>AWS</b> (that's why Anthropic's ZDR doesn't apply) · Claude Platform on AWS → <b>Anthropic</b> · Vertex → Google · Foundry → Anthropic. FedRAMP/IL4/IL5 or "AWS sole processor" → <b>Bedrock</b>.</span></div>
+<div class="r"><span class="k">Packaging while hot</span><span class="v">An accelerator keeps the reusable logic, exposes the client-specific parts as <b>documented parameters</b>, and brings the <b>eval and the audit log</b>. Knowing what was client-specific is the most expensive thing to reconstruct later.</span></div>
+<div class="r"><span class="k">Contributing</span><span class="v">A maintainer accepts <b>what they can verify</b>: scoped code, a runnable example, a test and the assumptions written down. License rights confirmed <b>before</b> the technical review.</span></div>
+<div class="r"><span class="k">Seams</span><span class="v">An application is only as contained as its <b>most privileged</b> seam. Trust <b>is not inherited</b> from the component that sends the data. A seam that can't be secured → <b>human owner</b>, not deployed.</span></div>
+
+<h2>The nine recurring patterns</h2>
+<div class="r hot"><span class="k">1 · Root cause over symptom</span><span class="v">Preventing at generation beats filtering afterwards. If one option fixes the origin and another cleans the result, the first wins.</span></div>
+<div class="r"><span class="k">2 · Three mechanisms, three problems</span><span class="v">Project conventions → <b>persistent context</b>. Judgment and generalization → <b>few-shot examples</b>. Structural guarantees → <b>contracts</b> (tool use, JSON Schema, tools by purpose).</span></div>
+<div class="r"><span class="k">3 · The right platform mechanism</span><span class="v">Appending to the default prompt instead of replacing it · forcing the tool and leaving enrichment for later turns · iteration and spend caps · batch only when latency allows.</span></div>
+<div class="r"><span class="k">4 · Targeted retrieval over bulk loading</span><span class="v">Search to locate, read only the hits, follow references. Never dump the whole repository "so it has context".</span></div>
+<div class="r"><span class="k">5 · Preserve information, don't flatten it</span><span class="v">Metadata separate from content · each data type in its own format · uncertainty explicit · an index of sources instead of the whole sources.</span></div>
+<div class="r no"><span class="k">6 · Never fabricate data to pass validation</span><span class="v">Recomputing a total from the line items is the clearest trap: it generates a false value that now does validate. Worse than manual review.</span></div>
+<div class="r"><span class="k">7 · Fixed schemas age</span><span class="v">If the distribution evolves, prefer the model's judgment or an escape hatch ("other" plus detail) over a closed list or a trained classifier.</span></div>
+<div class="r"><span class="k">8 · Isolated context in subagents</span><span class="v">No automatic inheritance, no shared memory. Everything travels in the prompt.</span></div>
+<div class="r"><span class="k">9 · Parallelism and observability</span><span class="v">Parallelizing is emitting several calls in one message, and the coordinator is still the one that launches and aggregates. If execution escapes it, you lose the trace.</span></div>
+
+<h2>Recurring errors in the distractors</h2>
+<div class="r no"><span class="k">Confusing input with output</span><span class="v"><code>max_tokens</code> limits the <b>output</b>. It doesn't fix a document that doesn't fit or a context-exceeded error.</span></div>
+<div class="r no"><span class="k">False technical premises</span><span class="v">Concurrency doesn't lower the price per token · the order of the tools array gives no priority · there are CLI flags that simply don't exist.</span></div>
+<div class="r no"><span class="k">Hiding the failure instead of fixing it</span><span class="v">Making the fields that aren't extracted optional · documenting the limitation · accepting the behavior as normal.</span></div>
+<div class="r no"><span class="k">Retrying with the same prompt</span><span class="v">Without feedback on the specific error, the same failure reproduces deterministically.</span></div>
+<div class="r no"><span class="k">Keywords or regex where judgment is needed</span><span class="v">Filtering by words also suppresses the cases where the pattern is a real problem.</span></div>
+<div class="r no"><span class="k">Adding infrastructure when asked to avoid it</span><span class="v">If the stem says "before adding complexity", the answer isn't a classifier.</span></div>
+
+<h2>Version traps</h2>
+<div class="r no"><span class="k">No longer valid</span><span class="v">Prefill with <code>{</code> to force JSON · extended thinking <code>budget_tokens</code> · sampling and roots in MCP · "discard the partial turn" (the docs say <b>resume</b>).</span></div>
+<div class="r no"><span class="k">Careful</span><span class="v">The guide calls the subagent tool <code>Task</code>; the current docs call it <code>Agent</code>. On the exam, <b>anchor to the guide</b>.</span></div>
+<div class="r"><span class="k">Output that doesn't match the schema</span><span class="v">Only two cases: <code>refusal</code> (200 and billed) and <code>max_tokens</code>. <code>enum</code> doesn't guarantee capitalization.</span></div>
+
+<div class="fin"><b>On the exam:</b> 120 minutes. Flag and move on: don't get stuck. Read how many answers each item asks for. If code appears, read it as <b>shape</b> (what happens and what fails), not as syntax. And on a tie, pick the option that's still correct six months from now and at ten times the volume.</div>
+</div>
