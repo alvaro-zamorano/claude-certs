@@ -246,6 +246,11 @@ label:focus-within,[tabindex]:focus-visible{
   border-top:1px solid var(--line);font-size:var(--t-menor);line-height:1.6;color:var(--ink-3)}
 .cc-foot a{color:var(--ink-3)}
 .cc-foot b{color:var(--ink-2)}
+.src a{color:inherit}
+.cc-prac{display:inline-block;margin-top:12px;font-size:var(--t-dato);font-weight:550;
+  color:var(--accent-ink);text-decoration:none;border:1px solid var(--line-strong);
+  border-radius:8px;padding:8px 13px;background:var(--surface)}
+.cc-prac:hover{border-color:var(--accent)}
 .cc-skip{position:absolute;left:-9999px;top:0;background:var(--accent);color:#fff;
   padding:10px 16px;z-index:100;border-radius:0 0 8px 0}
 .cc-skip:focus{left:0}
@@ -299,7 +304,7 @@ label:focus-within,[tabindex]:focus-visible{
   :root{--bg:#fff;--surface:#fff;--surface-2:#f4f4f2;--ink:#000;--ink-2:#333;--ink-3:#555;
         --line:#bbb;--accent:#000;--accent-ink:#000;--accent-soft:#f0f0ee;
         --ok-soft:#f4f4f2;--bad-soft:#f4f4f2}
-  .cc-bar,.cc-skip,.cc-foot,.jump,nav.toc,.cc-toc,.modes,.prog,.reset,.acts,.cacts{display:none!important}
+  .cc-bar,.cc-skip,.cc-foot,.jump,nav.toc,.cc-toc,.cc-prac,.modes,.prog,.reset,.acts,.cacts{display:none!important}
   body{font-size:10.5pt}
   .wrap,.layout,.app{max-width:100%;padding:0}
   a{text-decoration:none}
@@ -485,6 +490,60 @@ def localiza(s, lang, cert):
     return s.replace('href="/"', f'href="{ruta(lang, "home", cert)}"'.replace('href="', 'href="'))
 
 
+FUENTES = json.load(open(os.path.join(SRC, "data", "sources.json"), encoding="utf-8"))["apuntes"]
+PRACTICA = {"es": "Practica esta sección: {n} ítems en el simulador →",
+            "en": "Practise this section: {n} items in the simulator →"}
+FUENTES_LBL = {"es": "Fuentes", "en": "Sources"}
+
+
+def seccion_de(item, cert, scope):
+    """Sección de los apuntes a la que pertenece un ítem, por su fuente.
+
+    Un ítem y una sección que citan la misma página hablan de lo mismo: es el
+    único vínculo que ya estaba en los datos, y evita etiquetar 338 ítems a
+    mano. Gana la primera sección, en el orden de los apuntes, que entre en ese
+    examen; si ninguna cita la fuente, el ítem no enlaza a ninguna.
+    """
+    for sid, v in FUENTES.items():
+        if cert in scope["sections"]["apuntes"].get(sid, []) and \
+                item["s"] in v.get("src", []) + v.get("extra", []):
+            return sid
+    return None
+
+
+def enlaza_apuntes(raw, lang, cert, n_por_sec):
+    """Fuentes como enlaces reales y, debajo, el drill de esa sección.
+
+    Las fuentes de los apuntes eran texto abreviado («.../settings»): no se
+    podían seguir ni salían al imprimir. Ahora vienen de sources.json con la URL
+    entera, que es además lo que comprueba tools/check-sources.py.
+    """
+    def una(m):
+        sid, cuerpo = m.group(1), m.group(0)
+        urls = FUENTES.get(sid, {}).get("src", [])
+        if urls:
+            corto = lambda u: re.sub(r"^https://(www\.)?", "", u)
+            enlaces = " · ".join(f'<a href="{u}" rel="noopener">{corto(u)}</a>' for u in urls)
+            nuevo = f'<div class="src"><b>{FUENTES_LBL[lang]}:</b> {enlaces}</div>'
+            cuerpo, k = re.subn(r'<div class="src">.*?</div>', lambda _: nuevo, cuerpo, count=1, flags=re.S)
+            if not k:
+                cuerpo = cuerpo.replace("</section>", nuevo + "\n</section>")
+        n = n_por_sec.get(sid, 0)
+        if n:
+            href = f'{ruta(lang, "test", cert)}?sec={sid}'
+            cuerpo = cuerpo.replace(
+                "</section>", f'<a class="cc-prac" href="{href}">{PRACTICA[lang].format(n=n)}</a>\n</section>')
+        return cuerpo
+    return re.sub(r'<section id="([^"]+)".*?</section>', una, raw, flags=re.S)
+
+
+def titulos_apuntes(lang):
+    raw = open(os.path.join(LANGS[lang]["frag"], "apuntes.html"), encoding="utf-8").read()
+    quita = lambda t: re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", t)).strip()
+    return {i: quita(t) for i, t in
+            re.findall(r'<section id="([^"]+)"[^>]*>\s*<h2[^>]*>(.*?)</h2>', raw, re.S)}
+
+
 def secciona(raw):
     """Envuelve en <section id="sN"> cada h2 y lo que le sigue.
 
@@ -582,7 +641,7 @@ def barra(lang, slug, cert, alt, otro):
 </div></div>"""
 
 
-def wrap(lang, slug, cert, cifras, T, scope):
+def wrap(lang, slug, cert, cifras, T, scope, n_por_sec=None):
     cfg = LANGS[lang]
     src_file = RUTA_SRC[cert] if slug == "ruta" else PAGES[slug]
     carpeta = SRC if src_file in COMPARTIDAS else cfg["frag"]
@@ -622,6 +681,8 @@ def wrap(lang, slug, cert, cifras, T, scope):
         raw = re.sub(pat, rep, raw)
     raw = limpia_nav(raw, lang)
     raw = secciona(raw)
+    if slug == "apuntes":
+        raw = enlaza_apuntes(raw, lang, cert, n_por_sec or {})
     raw, fuera_ids = recorta(raw, slug, cert, lang, scope)
     raw = poda_indice(raw, fuera_ids)   # lo que no entra tampoco se indexa
     raw = indice(raw, lang)
@@ -1182,12 +1243,14 @@ def main():
             conteos[cert] = (len(items), len(cartas))
             n_ap = sum(1 for v in scope["sections"]["apuntes"].values() if cert in v)
 
+            sec_item = [seccion_de(x, cert, scope) for x in items]
+            n_por_sec = Counter(s_ for s_ in sec_item if s_)
             cifras = {"N_ITEMS": len(items), "N_CARDS": len(cartas), "N_EXAMS": len(ex)}
             for slug in PAGES:
                 if slug == "ruta" and cert not in RUTA_SRC:
                     continue
                 emite(os.path.join(cbase, SLUG[lang][slug], "index.html"),
-                      wrap(lang, slug, cert, cifras, T, scope))
+                      wrap(lang, slug, cert, cifras, T, scope, n_por_sec))
 
             emite(os.path.join(cbase, "index.html"),
                   envuelve(lang, "home", cert,
@@ -1195,8 +1258,13 @@ def main():
 
             # Datos acotados al examen. El simulador ya no tiene que filtrar ni
             # ofrecer un conmutador: lo que se sirve aquí es sólo de esta cert.
+            tit = titulos_apuntes(lang)
             json.dump({"generated": it["generated"], "exam": cert,
-                       "items": [dict(x, i=ident(x)) for x in items]},
+                       # a dónde mandar un fallo: sección de los apuntes de cada ítem
+                       "notes": "../" + SLUG[lang]["apuntes"] + "/",
+                       "secs": {k: tit[k] for k in n_por_sec},
+                       "items": [dict(x, i=ident(x), **({"n": s_} if s_ else {}))
+                                 for x, s_ in zip(items, sec_item)]},
                       open(os.path.join(cbase, "items.json"), "w", encoding="utf-8"),
                       ensure_ascii=False, indent=1)
             # El mazo entero viaja, pero cada tarjeta dice si entra en este

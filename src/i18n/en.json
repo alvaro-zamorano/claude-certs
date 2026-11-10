@@ -122,5 +122,11 @@
   "import_btn": "import",
   "import_confirm": "This replaces the progress saved in this browser with the one in the file. Continue?",
   "import_bad": "That file is not a Claude Certs progress backup.",
-  "not_due": "Early review: level unchanged"
+  "not_due": "Early review: level unchanged",
+  "to_notes": "Review in the notes:",
+  "label_sec": "Section ·",
+  "review_next": "What to review",
+  "n_misses": "{n} misses",
+  "drill_this": "Practise this domain",
+  "bars_hint": "Select a domain to practise it."
 }

@@ -122,5 +122,11 @@
   "import_btn": "importar",
   "import_confirm": "Esto sustituye el progreso guardado en este navegador por el del fichero. ¿Continuar?",
   "import_bad": "Ese fichero no es una copia de progreso de Claude Certs.",
-  "not_due": "Repaso adelantado: no cambia el nivel"
+  "not_due": "Repaso adelantado: no cambia el nivel",
+  "to_notes": "Repasar en los apuntes:",
+  "label_sec": "Sección ·",
+  "review_next": "Qué repasar",
+  "n_misses": "{n} fallos",
+  "drill_this": "Practicar este dominio",
+  "bars_hint": "Pulsa un dominio para practicarlo."
 }

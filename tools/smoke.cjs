@@ -38,7 +38,7 @@ async function simulador(){
   ok("html lang", d.documentElement.lang===c.lang);
   ok("sin conmutador de examen", !$("#examChips") && !/CCDV-F|CCAR-P/.test(d.body.innerHTML.replace(/<script[\s\S]*?<\/script>/g,"")));
   ok("botón de modo traducido", $("#mFull").textContent===c.esperado.modo, `-> "${$("#mFull").textContent}"`);
-  ok(`${c.doms} barras de dominio`, $("#bars").children.length===c.doms, `hay ${$("#bars").children.length}`);
+  ok(`${c.doms} barras de dominio`, d.querySelectorAll("#bars .bar-row").length===c.doms, `hay ${d.querySelectorAll("#bars .bar-row").length}`);
   // lanzar un simulacro y responder mal a propósito, luego bien
   $("#mFull").dispatchEvent(new w.MouseEvent("click"));
   await dormir(300);
@@ -109,6 +109,21 @@ async function simulador(){
   w.eval("S.end=Date.now()-1"); await dormir(700);
   ok("el tiempo agotado cierra el bloque", !$("#opts")&&!!$(".rep"));
   dom.window.close();
+
+  // de los apuntes al simulador y vuelta
+  const sec=w.eval("Object.keys(SECS)[0]");
+  const ds=await abrir(c.url+"?sec="+sec);
+  const dd=ds.window.document;
+  ok("?sec= lanza el drill de la sección", !!dd.querySelector("#opts")&&ds.window.eval("S.mode")==="sec"&&ds.window.eval("S.qs.every(q=>q.it.n==="+JSON.stringify(sec)+")"));
+  dd.querySelector('#opts .opt[data-k="0"]').dispatchEvent(new ds.window.MouseEvent("click"));
+  dd.querySelector("#act").dispatchEvent(new ds.window.MouseEvent("click"));
+  const ln=dd.querySelector("#rat a.tonotes");
+  ok("la explicación enlaza a su sección de apuntes", !!ln&&ln.getAttribute("href").endsWith("#"+sec), ln&&ln.getAttribute("href"));
+  ds.window.close();
+  const ap=await abrir(c.url.replace(/test\/$/,"")+(c.lang==="en"?"notes/":"apuntes/"));
+  const pr=ap.window.document.querySelector("a.cc-prac");
+  ok("los apuntes enlazan al drill y las fuentes son enlaces", !!pr&&/\?sec=/.test(pr.getAttribute("href"))&&!!ap.window.document.querySelector(".src a[href^='https://']"));
+  ap.window.close();
 
   // la portada de la certificación usa la misma proyección
   const h=await abrir(c.url.replace(/test\/$/,""));

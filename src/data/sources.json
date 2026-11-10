@@ -1,0 +1,155 @@
+{
+ "_": "Fuentes de cada sección de los apuntes, con la URL completa. El build las pinta como enlaces al pie de la sección y las usa para saber a qué sección pertenece cada ítem (por su campo s). 'extra' son fuentes que usa el banco y que encajan en la sección aunque los apuntes no las citen. tools/check-sources.py comprueba que todas responden.",
+ "apuntes": {
+  "loop": {
+   "src": [
+    "https://platform.claude.com/docs/en/agents-and-tools/tool-use/handle-tool-calls",
+    "https://platform.claude.com/docs/en/agents-and-tools/tool-use/define-tools",
+    "https://code.claude.com/docs/en/agent-sdk/agent-loop"
+   ],
+   "extra": [
+    "https://docs.claude.com/en/agents-and-tools/tool-use/overview"
+   ]
+  },
+  "subagentes": {
+   "src": [
+    "https://code.claude.com/docs/en/agent-sdk/subagents",
+    "https://www.anthropic.com/engineering/multi-agent-research-system"
+   ]
+  },
+  "patrones": {
+   "src": [
+    "https://www.anthropic.com/engineering/building-effective-agents"
+   ]
+  },
+  "contexto": {
+   "src": [
+    "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"
+   ],
+   "extra": [
+    "https://code.claude.com/docs/en/context-window",
+    "https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool"
+   ]
+  },
+  "claudecode": {
+   "src": [
+    "https://code.claude.com/docs/en/memory",
+    "https://code.claude.com/docs/en/settings",
+    "https://code.claude.com/docs/en/permissions",
+    "https://code.claude.com/docs/en/hooks",
+    "https://code.claude.com/docs/en/headless"
+   ],
+   "extra": [
+    "https://code.claude.com/docs/en/tools-reference",
+    "https://code.claude.com/docs/en/agent-sdk/hooks",
+    "https://code.claude.com/docs/en/agent-sdk/sessions",
+    "https://code.claude.com/docs/en/best-practices"
+   ]
+  },
+  "mcp": {
+   "src": [
+    "https://modelcontextprotocol.io/docs/learn/architecture",
+    "https://modelcontextprotocol.io/docs/learn/server-concepts",
+    "https://modelcontextprotocol.io/specification/latest/basic/authorization",
+    "https://code.claude.com/docs/en/mcp"
+   ]
+  },
+  "quecosa": {
+   "src": [
+    "https://code.claude.com/docs/en/features-overview",
+    "https://docs.claude.com/en/docs/agents-and-tools/agent-skills/overview"
+   ],
+   "extra": [
+    "https://code.claude.com/docs/en/skills",
+    "https://docs.claude.com/en/docs/agents-and-tools/agent-skills/best-practices"
+   ]
+  },
+  "api": {
+   "src": [
+    "https://docs.claude.com/en/api/messages",
+    "https://docs.claude.com/en/api/errors",
+    "https://docs.claude.com/en/build-with-claude/streaming",
+    "https://docs.claude.com/en/build-with-claude/batch-processing"
+   ],
+   "extra": [
+    "https://platform.claude.com/docs/en/build-with-claude/streaming",
+    "https://platform.claude.com/docs/en/build-with-claude/batch-processing"
+   ]
+  },
+  "modelos": {
+   "src": [
+    "https://docs.claude.com/en/about-claude/models/overview",
+    "https://docs.claude.com/en/build-with-claude/thinking",
+    "https://docs.claude.com/en/api/rate-limits"
+   ],
+   "extra": [
+    "https://platform.claude.com/docs/en/about-claude/models/choosing-a-model",
+    "https://docs.claude.com/en/build-with-claude/token-counting"
+   ]
+  },
+  "caching": {
+   "src": [
+    "https://docs.claude.com/en/build-with-claude/prompt-caching"
+   ]
+  },
+  "structured": {
+   "src": [
+    "https://platform.claude.com/docs/en/build-with-claude/structured-outputs",
+    "https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/increase-consistency"
+   ]
+  },
+  "evals": {
+   "src": [
+    "https://platform.claude.com/docs/en/test-and-evaluate/develop-tests",
+    "https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations"
+   ]
+  },
+  "seguridad": {
+   "src": [
+    "https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/mitigate-jailbreaks",
+    "https://platform.claude.com/docs/en/manage-claude/authentication",
+    "https://platform.claude.com/docs/en/agents-and-tools/mcp-connector"
+   ]
+  },
+  "rag": {
+   "src": [
+    "https://www.anthropic.com/engineering/contextual-retrieval",
+    "https://platform.claude.com/docs/en/build-with-claude/embeddings"
+   ]
+  },
+  "compliance": {
+   "src": [
+    "https://support.claude.com/en/articles/10015870",
+    "https://platform.claude.com/docs/en/manage-claude/api-and-data-retention"
+   ]
+  },
+  "criterio": {
+   "src": []
+  },
+  "equipo": {
+   "src": [
+    "https://code.claude.com/docs/en/permissions",
+    "https://code.claude.com/docs/en/permission-modes",
+    "https://code.claude.com/docs/en/plugins-reference",
+    "https://docs.claude.com/en/docs/agents-and-tools/agent-skills/overview"
+   ],
+   "extra": [
+    "https://code.claude.com/docs/en/code-review-customize"
+   ]
+  },
+  "despliegue": {
+   "src": [
+    "https://code.claude.com/docs/en/mcp",
+    "https://modelcontextprotocol.io/specification/latest/basic/transports",
+    "https://modelcontextprotocol.io/specification/latest/basic/authorization",
+    "https://code.claude.com/docs/en/hooks"
+   ]
+  },
+  "numeros": {
+   "src": []
+  },
+  "trampas": {
+   "src": []
+  }
+ }
+}
