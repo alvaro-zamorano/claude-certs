@@ -1,0 +1,347 @@
+<title>{{t.test_title}}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{
+  --bg:#f7f6f3; --surface:#fffefb; --surface-2:#f0eee8; --line:#e0ddd4; --line-strong:#c9c5b8;
+  --ink:#20201d; --ink-2:#57544c; --ink-3:#8b8779;
+  --accent:#b5541f; --accent-soft:#f6e8de; --accent-ink:#8c3f16;
+  --ok:#2f6b46; --ok-soft:#e2efe7; --bad:#a32f28; --bad-soft:#f8e5e3;
+  --radius:10px;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+  --sans:ui-sans-serif,-apple-system,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#16161a; --surface:#1e1e23; --surface-2:#26262c; --line:#33333b; --line-strong:#4a4a55;
+    --ink:#eceae4; --ink-2:#a8a49b; --ink-3:#7b776e;
+    --accent:#e0834c; --accent-soft:#3a2617; --accent-ink:#f0a274;
+    --ok:#6dbb8e; --ok-soft:#1c2f24; --bad:#e0817a; --bad-soft:#33201e;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#16161a; --surface:#1e1e23; --surface-2:#26262c; --line:#33333b; --line-strong:#4a4a55;
+  --ink:#eceae4; --ink-2:#a8a49b; --ink-3:#7b776e;
+  --accent:#e0834c; --accent-soft:#3a2617; --accent-ink:#f0a274;
+  --ok:#6dbb8e; --ok-soft:#1c2f24; --bad:#e0817a; --bad-soft:#33201e;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:920px;margin:0 auto;padding:28px 20px 80px}
+header.top{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;margin-bottom:22px}
+h1{font-size:var(--t-tit);margin:0;letter-spacing:-.02em}
+.sub{color:var(--ink-3);font-size:var(--t-menor);margin-top:3px}
+button{font-family:inherit;font-size:inherit;cursor:pointer}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.chip{background:var(--surface);border:1px solid var(--line);color:var(--ink-2);padding:6px 11px;border-radius:99px;font-size:var(--t-menor);transition:.14s}
+.chip:hover{border-color:var(--line-strong)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:680px){.grid2{grid-template-columns:1fr}}
+.meter-num{font-size:var(--t-cifra);font-weight:650;letter-spacing:-.03em;line-height:1}
+.meter-lab{font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.09em;color:var(--ink-3);margin-bottom:6px}
+.verdict{font-size:var(--t-menor);margin-top:8px;color:var(--ink-2)}
+.bars{display:flex;flex-direction:column;gap:9px;margin-top:4px}
+.bar-row{font-size:var(--t-micro)}
+.bar-top{display:flex;justify-content:space-between;gap:10px;margin-bottom:3px;color:var(--ink-2)}
+.bar-top b{color:var(--ink);font-weight:600}
+.track{height:6px;background:var(--surface-2);border-radius:99px;overflow:hidden}
+.fill{height:100%;background:var(--accent);border-radius:99px;transition:width .4s}
+.fill.pass{background:var(--ok)}
+.fill.none{background:var(--line-strong)}
+.modes{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 14px}
+.btn{background:var(--accent);color:#fff;border:1px solid var(--accent);padding:9px 15px;border-radius:8px;font-weight:520;font-size:var(--t-dato)}
+.btn.ghost{background:var(--surface);color:var(--ink);border-color:var(--line-strong)}
+.btn.ghost:hover{background:var(--surface-2)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.qmeta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:var(--t-micro);color:var(--ink-3);margin-bottom:12px;text-transform:uppercase;letter-spacing:.07em}
+.tag{background:var(--surface-2);border:1px solid var(--line);padding:2px 8px;border-radius:99px;letter-spacing:.04em}
+.tag.warn{background:var(--accent-soft);color:var(--accent-ink);border-color:transparent}
+.stem{font-size:var(--t-base);margin:0 0 16px;line-height:1.6}
+.stem code,.rat code{font-family:var(--mono);font-size:var(--t-dato);background:var(--surface-2);padding:1px 5px;border-radius:4px;border:1px solid var(--line)}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;gap:10px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:11px 13px;text-align:left;width:100%;color:var(--ink);font-size:var(--t-dato);line-height:1.45;transition:.12s}
+.opt:hover:not(:disabled){border-color:var(--line-strong);background:var(--surface-2)}
+.opt .key{font-family:var(--mono);font-size:var(--t-micro);color:var(--ink-3);flex:0 0 auto;margin-top:1px}
+.opt[data-sel="1"]{border-color:var(--accent);background:var(--accent-soft)}
+.opt[data-state="correct"]{border-color:var(--ok);background:var(--ok-soft)}
+.opt[data-state="wrong"]{border-color:var(--bad);background:var(--bad-soft)}
+.opt:disabled{cursor:default}
+.rat{margin-top:16px;border-left:3px solid var(--accent);padding:2px 0 2px 14px;font-size:var(--t-dato);color:var(--ink-2)}
+.rat b{color:var(--ink)}
+.rat a{color:var(--accent-ink);word-break:break-all}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:18px;flex-wrap:wrap}
+.count{font-size:var(--t-micro);color:var(--ink-3);font-family:var(--mono)}
+.kbd{opacity:.8}
+@media(max-width:640px){.kbd{display:none}}
+.empty{color:var(--ink-2);font-size:var(--t-dato)}
+.note{font-size:var(--t-micro);color:var(--ink-3);margin-top:26px;border-top:1px solid var(--line);padding-top:14px}
+.note a{color:var(--accent-ink)}
+.timer{font-family:var(--mono);font-size:var(--t-menor);color:var(--ink-2)}
+.timer.low{color:var(--bad)}
+h2.sec{font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);margin:0 0 10px;font-weight:600}
+.reset{background:none;border:none;color:var(--ink-3);font-size:var(--t-micro);text-decoration:underline;padding:0}
+
+/* ---------- Móvil ---------- */
+@media (max-width:640px){
+  .wrap{padding:16px 14px calc(96px + env(safe-area-inset-bottom))}
+  header.top{margin-bottom:16px}
+  h1{font-size:var(--t-sub)}
+  .sub{font-size:var(--t-micro)}
+  /* los chips de examen: una fila deslizable en vez de cuatro líneas */
+  .chips{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin:0 -14px 14px;padding:0 14px 4px}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:0 0 auto;font-size:var(--t-menor);padding:8px 13px}
+  .grid2{gap:10px}
+  .panel{padding:15px}
+  .meter-num{font-size:var(--t-cifra)}
+  .modes{gap:6px;margin:16px 0 12px}
+  .modes .btn{flex:1 1 auto;font-size:var(--t-menor);padding:11px 10px;text-align:center}
+  .stem{font-size:var(--t-base)}
+  .opt{padding:14px 13px;font-size:var(--t-dato);min-height:52px;align-items:center}
+  .opt .key{font-size:var(--t-menor)}
+  .rat{font-size:var(--t-dato)}
+  /* barra de acción fija al pulgar */
+  .foot{position:fixed;left:0;right:0;bottom:0;z-index:20;margin:0;padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+        background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -6px 20px rgba(0,0,0,.07)}
+  .foot .btn{flex:1;padding:14px;font-size:var(--t-base)}
+  .count{font-size:var(--t-micro);flex:0 0 auto}
+  .note{font-size:var(--t-micro)}
+}
+/* iOS no hace zoom si el control mide 16px o más */
+@media (max-width:640px){.btn,.opt,.chip{font-size:max(16px,.95rem)}}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div>
+    <h1>{{t.test_title}}</h1>
+    <div class="sub">{{t.test_sub}}</div>
+  </div>
+  <div style="display:flex;gap:14px;align-items:center">
+    <a href="https://alvaro-pipeline.pages.dev/examen/architect/" style="color:var(--accent-ink);font-size:var(--t-menor);font-weight:520">{{t.nav_architect}}</a>
+    <a href="https://alvaro-pipeline.pages.dev/examen/developer/" style="color:var(--accent-ink);font-size:var(--t-menor);font-weight:520">{{t.nav_developer}}</a>
+    <a href="https://alvaro-pipeline.pages.dev/examen/referencia/" style="color:var(--accent-ink);font-size:var(--t-menor);font-weight:520">{{t.nav_reference}}</a>
+    <a href="https://alvaro-pipeline.pages.dev/examen/tarjetas/" style="color:var(--accent-ink);font-size:var(--t-menor);font-weight:520">{{t.nav_cards}}</a>
+    <a href="https://alvaro-pipeline.pages.dev/examen/apuntes/" style="color:var(--accent-ink);font-size:var(--t-menor);font-weight:520">{{t.nav_notes}}</a>
+    <button class="reset" id="reset">{{t.reset_btn}}</button>
+  </div>
+</header>
+
+
+<div class="grid2">
+  <div class="panel">
+    <div class="meter-lab">{{t.projected}}</div>
+    <div class="meter-num" id="score">—</div>
+    <div class="verdict" id="verdict">{{t.no_data_short}}</div>
+  </div>
+  <div class="panel">
+    <div class="meter-lab">{{t.by_domain}}</div>
+    <div class="bars" id="bars"></div>
+  </div>
+</div>
+
+<div class="modes">
+  <button class="btn" id="mDrill">{{t.mode_drill}}</button>
+  <button class="btn ghost" id="mFull">{{t.mode_full}}</button>
+  <button class="btn ghost" id="mFail">{{t.mode_fail}}</button>
+</div>
+
+<div class="panel" id="stage" aria-busy="true">
+  <p class="empty">{{t.cargando}}</p>
+</div>
+
+<div class="note">
+  {{t.test_note}}
+</div>
+</div>
+
+<script>
+let ITEMS=[], EXAMS={}, EXAMEN="";
+let ORDER=[];
+
+/* ---------- Estado persistente ---------- */
+const KEY="claude-certs-v1";
+let ST={};
+try{ST=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){ST={}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(ST))}catch(e){}}
+function rec(id){return ST[id]||(ST[id]={seen:0,ok:0,box:0,due:0})}
+
+let exam=ORDER[0], queue=[], qi=0, picked=[], answered=false, timer=null, tleft=0;
+let perm=[], curOpts=[], curAns=[];
+
+/* ---------- Métricas ---------- */
+function domainStats(ex){
+  const out={};
+  for(const d in EXAMS[ex].w) out[d]={n:0,ok:0,w:EXAMS[ex].w[d]};
+  ITEMS.filter(i=>i.e===ex).forEach(i=>{
+    const r=ST[i.id]; if(!r||!r.seen) return;
+    if(!out[i.d]) return;
+    out[i.d].n+=r.seen; out[i.d].ok+=r.ok;
+  });
+  return out;
+}
+function projected(ex){
+  const s=domainStats(ex); let num=0,den=0;
+  for(const d in s){ if(s[d].n>0){ num+=(s[d].ok/s[d].n)*s[d].w; den+=s[d].w; } }
+  if(!den) return null;
+  const pct=num/den;                      // acierto ponderado 0-1
+  return {pct, scaled:Math.round(100+pct*900), coverage:den/100};
+}
+
+function render(){
+  // Sin chips de examen: se elige la certificación al entrar, no aquí dentro.
+
+  const p=projected(exam), sc=document.getElementById("score"), vd=document.getElementById("verdict");
+  if(!p){sc.textContent="—";vd.textContent=T.no_data;}
+  else{
+    sc.textContent=p.scaled;
+    const cov=Math.round(p.coverage*100);
+    let msg;
+    if(p.scaled>=800) msg=T.verdict_comfort;
+    else if(p.scaled>=760) msg=T.verdict_thin;
+    else if(p.scaled>=720) msg=T.verdict_edge;
+    else msg=T.verdict_below;
+    vd.innerHTML=`${Math.round(p.pct*100)}${T.weighted} ${msg} <span style="color:var(--ink-3)">${T.coverage} ${cov}%.</span>`;
+  }
+
+  const s=domainStats(exam);
+  document.getElementById("bars").innerHTML=Object.keys(s).map(d=>{
+    const o=s[d], pct=o.n?Math.round(o.ok/o.n*100):0;
+    const cls=!o.n?"none":(pct>=85?"pass":"");
+    return `<div class="bar-row"><div class="bar-top"><span>${d} <span style="color:var(--ink-3)">${o.w}%</span></span><b>${o.n?pct+"%":"—"}</b></div><div class="track"><div class="fill ${cls}" style="width:${o.n?pct:0}%"></div></div></div>`;
+  }).join("");
+}
+
+/* ---------- Selección de ítems ---------- */
+function pool(ex){return ITEMS.filter(i=>i.e===ex)}
+function weakest(ex){
+  const s=domainStats(ex); let worst=null,wv=2;
+  for(const d in s){ const v=s[d].n?s[d].ok/s[d].n:-1; if(v<wv){wv=v;worst=d} }
+  return worst;
+}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+function startDrill(){
+  const d=weakest(exam);
+  queue=shuffle(pool(exam).filter(i=>i.d===d)); begin(`${T.label_drill} ${d}`);
+}
+function startFull(){
+  const p=pool(exam), w=EXAMS[exam].w, out=[];
+  const byD={}; p.forEach(i=>(byD[i.d]=byD[i.d]||[]).push(i));
+  for(const d in w){ const n=Math.max(1,Math.round(20*w[d]/100)); out.push(...shuffle(byD[d]||[]).slice(0,n)); }
+  queue=shuffle(out).slice(0,20); begin(T.label_full,queue.length*120);
+}
+function startFail(){
+  const now=Date.now();
+  queue=shuffle(pool(exam).filter(i=>{const r=ST[i.id];return r&&r.seen>r.ok&&(!r.due||r.due<=now)}));
+  begin(T.label_fail);
+}
+function begin(label,seconds){
+  if(!queue.length){document.getElementById("stage").innerHTML='<p class="empty">'+T.queue_empty+'</p>';return}
+  qi=0;stop();
+  if(seconds){tleft=seconds;timer=setInterval(()=>{tleft--;const el=document.getElementById("tm");if(el){el.textContent=fmt(tleft);el.className="timer"+(tleft<120?" low":"")}if(tleft<=0)stop()},1000)}
+  queue.label=label; show();
+}
+function stop(){if(timer){clearInterval(timer);timer=null}}
+function fmt(s){const m=Math.floor(s/60);return m+":"+String(s%60).padStart(2,"0")}
+
+function show(){
+  if(qi>=queue.length){
+    stop();
+    document.getElementById("stage").innerHTML=`<h2 class="sec">${T.block_done}</h2><p class="empty">${queue.length} ${T.block_done_body}</p>`;
+    render();return;
+  }
+  const it=queue[qi]; picked=[]; answered=false;
+  const multi=it.a.length>1;
+  // Las opciones se barajan en cada aparición: la posición nunca es una pista.
+  perm=shuffle(it.o.map((_,i)=>i));
+  curOpts=perm.map(i=>it.o[i]);
+  curAns=perm.map((orig,disp)=>it.a.includes(orig)?disp:-1).filter(x=>x>=0);
+  document.getElementById("stage").innerHTML=`
+   <div class="qmeta">
+     <span class="tag">${it.e}</span><span class="tag">${it.d}</span>
+     ${multi?'<span class="tag warn">'+T.pick_two+'</span>':''}
+     ${timer?'<span class="timer" id="tm">'+fmt(tleft)+'</span>':''}
+   </div>
+   <p class="stem">${it.q}</p>
+   <div class="opts" id="opts" role="group" aria-label="${T.aria_options}">${curOpts.map((o,k)=>`<button class="opt" data-k="${k}" aria-pressed="false"><span class="key">${"ABCD"[k]}</span><span>${o}</span></button>`).join("")}</div>
+   <div id="rat" role="status" aria-live="polite"></div>
+   <div class="foot"><span class="count">${queue.label} · ${qi+1}/${queue.length}<span class="kbd"> · ${T.keys_hint}</span></span><button class="btn" id="act">${T.check}</button></div>`;
+  document.querySelectorAll("#opts .opt").forEach(b=>b.onclick=()=>{
+    if(answered)return; const k=+b.dataset.k;
+    if(multi){ const ix=picked.indexOf(k); if(ix>=0)picked.splice(ix,1); else if(picked.length<curAns.length)picked.push(k); }
+    else picked=[k];
+    document.querySelectorAll("#opts .opt").forEach(x=>{
+      const sel=picked.includes(+x.dataset.k);
+      x.dataset.sel=sel?"1":"0"; x.setAttribute("aria-pressed",sel?"true":"false");
+    });
+  });
+  document.getElementById("act").onclick=()=>answered?next():check(it);
+}
+function check(it){
+  if(!picked.length)return;
+  answered=true;
+  const ok=picked.length===curAns.length&&picked.every(k=>curAns.includes(k));
+  document.querySelectorAll("#opts .opt").forEach(b=>{
+    const k=+b.dataset.k; b.disabled=true;
+    if(curAns.includes(k))b.dataset.state="correct";
+    else if(picked.includes(k))b.dataset.state="wrong";
+  });
+  const r=rec(it.id); r.seen++; if(ok){r.ok++;r.box=Math.min(2,r.box+1)}else{r.box=0}
+  r.due=Date.now()+(r.box===0?2:7)*86400000; save();
+  document.getElementById("rat").innerHTML=
+    `<div class="rat"><b>${ok?T.correct:T.wrong}</b> ${it.r}<br><a href="${it.s}" target="_blank" rel="noopener">${it.s}</a></div>`;
+  document.getElementById("act").textContent=qi+1<queue.length?T.next:T.finish;
+  render();
+}
+function next(){qi++;show()}
+
+document.addEventListener("keydown",e=>{
+  const act=document.getElementById("act");
+  if(!act||e.metaKey||e.ctrlKey||e.altKey)return;
+  const t=e.target.tagName;
+  if(t==="INPUT"||t==="TEXTAREA"||t==="SELECT")return;
+  if(e.key>="1"&&e.key<="4"){
+    const b=document.querySelector(`#opts .opt[data-k="${+e.key-1}"]`);
+    if(b&&!b.disabled){e.preventDefault();b.click()}
+  } else if(e.key==="Enter"||e.key===" "){
+    e.preventDefault(); act.click();
+  }
+});
+
+document.getElementById("mDrill").onclick=startDrill;
+document.getElementById("mFull").onclick=startFull;
+document.getElementById("mFail").onclick=startFail;
+/* El progreso se guardaba por posición en el banco. Al pasar a identificadores
+   estables hay que trasladar lo que ya había, una sola vez. */
+function migra(){
+  if(ST.__migrado) return Promise.resolve();
+  return fetch("../migra.json").then(r=>r.ok?r.json():null).then(m=>{
+    if(m){ for(const viejo in m){ if(ST[viejo]&&!ST[m[viejo]]) ST[m[viejo]]=ST[viejo]; } }
+    ST.__migrado=1; save();
+  }).catch(()=>{ ST.__migrado=1; save(); });
+}
+function arranque(){
+  // El sitio es por certificación: items.json ya viene acotado y no hay nada
+  // que conmutar. El id lleva el examen delante para que el progreso de cada
+  // certificación no se pise con el de otra.
+  ORDER=[EXAMEN];
+  ITEMS.forEach(it=>it.id=it.i);   // identidad estable, no la posición
+  exam=EXAMEN;
+  render();
+  document.getElementById("stage").innerHTML='<p class="empty">'+T.stage_empty+'</p>';
+}
+Promise.all([
+  fetch("../items.json").then(r=>{if(!r.ok)throw 0;return r.json()}),
+  fetch("../exams.json").then(r=>{if(!r.ok)throw 0;return r.json()})
+]).then(([a,b])=>{ ITEMS=a.items; EXAMEN=a.exam; EXAMS=b;
+   document.getElementById("stage").removeAttribute("aria-busy");
+   migra().then(arranque); })
+ .catch(()=>{
+   document.getElementById("stage").innerHTML='<p class="empty"><b>'+T.load_fail_b+'</b><br>'+T.load_fail+'</p>';
+   document.querySelectorAll(".modes .btn").forEach(b=>b.disabled=true);
+ });
+
+document.getElementById("reset").onclick=()=>{if(confirm(T.reset_confirm)){ST={};save();queue=[];render();document.getElementById("stage").innerHTML='<p class="empty">'+T.reset_done+'</p>'}};
+</script>
