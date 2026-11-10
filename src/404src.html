@@ -1,0 +1,32 @@
+<title>Página no encontrada</title>
+<style>
+:root{--bg:#f7f6f3;--surface:#fffefb;--line:#e0ddd4;--ink:#20201d;--ink-2:#57544c;--ink-3:#8b8779;
+--accent:#b5541f;--accent-soft:#f6e8de;--accent-ink:#8c3f16;
+--sans:ui-sans-serif,-apple-system,"Segoe UI",Inter,Helvetica,Arial,sans-serif;--mono:ui-monospace,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#16161a;--surface:#1e1e23;--line:#33333b;
+--ink:#eceae4;--ink-2:#a8a49b;--ink-3:#7b776e;--accent:#e0834c;--accent-soft:#3a2617;--accent-ink:#f0a274}}
+:root[data-theme="dark"]{--bg:#16161a;--surface:#1e1e23;--line:#33333b;--ink:#eceae4;--ink-2:#a8a49b;
+--ink-3:#7b776e;--accent:#e0834c;--accent-soft:#3a2617;--accent-ink:#f0a274}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6}
+.wrap{max-width:560px;margin:0 auto;padding:70px 20px 20px;text-align:center}
+.code{font-family:var(--mono);font-size:var(--t-xl);font-weight:650;color:var(--accent-ink);letter-spacing:-.04em;line-height:1}
+h1{font-size:var(--t-sub);margin:12px 0 8px;letter-spacing:-.02em}
+p{color:var(--ink-2);font-size:var(--t-dato);margin:0 0 22px}
+.links{display:grid;gap:8px;text-align:left}
+.l{display:block;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:13px 15px;
+text-decoration:none;color:var(--ink);font-size:var(--t-dato)}
+.l span{display:block;font-size:var(--t-menor);color:var(--ink-2);margin-top:2px}
+.l:hover{border-color:var(--accent)}
+a{color:var(--accent-ink)}
+@media(max-width:640px){.wrap{padding:44px 16px 16px}}
+</style>
+<div class="wrap">
+  <div class="code">404</div>
+  <h1>Aquí no hay nada</h1>
+  <p>Esa dirección no existe en este sitio. Desde aquí se vuelve al principio.</p>
+  <div class="links">
+    <a class="l" href="/">Elegir certificación<span>Qué es esto y por dónde empezar</span></a>
+    <a class="l" id="ult" hidden href="#"></a>
+  </div>
+</div>
