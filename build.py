@@ -84,6 +84,7 @@ META = {
   "home":       ("{{CERT}}", "Dónde estás en el {{CERT}}: score proyectado, acierto por dominio y qué toca estudiar ahora."),
   "index":      ("Claude Certs", "Herramienta de estudio abierta para las certificaciones Claude. Eliges examen y todo el material se acota a lo que ese examen evalúa."),
   "404":        ("Página no encontrada", "Esa página no existe en claude-certs."),
+  "metodo":     ("Metodología", "Cómo se escribe y se verifica cada ítem, qué controla el build, cómo se calcula el score y qué límites tiene este material."),
  },
  "en": {
   "test":       ("Simulator", "Weighted mocks using the real {{CERT}} blueprint weights, with a projected score out of 1000."),
@@ -95,6 +96,7 @@ META = {
   "home":       ("{{CERT}}", "Where you stand on the {{CERT}}: projected score, accuracy by domain and what to study next."),
   "index":      ("Claude Certs", "Open study tool for the Claude certifications. Pick an exam and every page narrows to what that exam tests."),
   "404":        ("Page not found", "That page doesn't exist on claude-certs."),
+  "metodo":     ("Methodology", "How each item is written and verified, what the build checks, how the score is computed and what the limits of this material are."),
  },
 }
 
@@ -114,7 +116,7 @@ ANCHO = {
     "apuntes": "var(--w-texto)", "architect": "var(--w-texto)",
     "developer": "var(--w-texto)", "flash": "var(--w-texto)",
     "ruta": "var(--w-texto)", "home": "var(--w-texto)", "index": "var(--w-texto)",
-    "tarjetas": "var(--w-foco)", "404": "var(--w-foco)",
+    "tarjetas": "var(--w-foco)", "404": "var(--w-foco)", "metodo": "var(--w-texto)",
 }
 
 CSS_UNIFICADO = """
@@ -246,7 +248,10 @@ label:focus-within,[tabindex]:focus-visible{
   border-top:1px solid var(--line);font-size:var(--t-menor);line-height:1.6;color:var(--ink-3)}
 .cc-foot a{color:var(--ink-3)}
 .cc-foot b{color:var(--ink-2)}
-.src a{color:inherit}
+.src a{color:inherit;overflow-wrap:anywhere}
+/* Una columna 1fr no baja de su contenido más ancho: una URL larga en las
+   fuentes ensanchaba la página entera en móvil. */
+.layout>*{min-width:0}
 .cc-prac{display:inline-block;margin-top:12px;font-size:var(--t-dato);font-weight:550;
   color:var(--accent-ink);text-decoration:none;border:1px solid var(--line-strong);
   border-radius:8px;padding:8px 13px;background:var(--surface)}
@@ -336,6 +341,7 @@ proyecto no está afiliado a Anthropic ni avalado por ella. Para el temario, los
 y las políticas, la fuente es siempre la guía de examen que Anthropic distribuye a sus partners.
 <br><br>Verificado contra documentación pública de Anthropic y la especificación MCP.
 La documentación cambia con frecuencia: comprueba cualquier dato antes de apoyarte en él.
+· <a href="{MET}">Metodología y límites</a>
 · <a href="https://github.com/alvaro-zamorano/claude-certs">Código y banco de ítems en GitHub</a>
 · <a href="{ALT}" hreflang="en">Read this in English</a>
 </footer>""",
@@ -347,6 +353,7 @@ syllabus, the official weights and the policies, the source is always the exam g
 distributes to its partners.
 <br><br>Verified against Anthropic's public documentation and the MCP specification.
 That documentation changes often: check any fact before you rely on it.
+· <a href="{MET}">Methodology and limits</a>
 · <a href="https://github.com/alvaro-zamorano/claude-certs">Code and item bank on GitHub</a>
 · <a href="{ALT}" hreflang="es">Léelo en español</a>
 </footer>""",
@@ -473,6 +480,8 @@ def ruta(lang, slug, cert=None):
         return f"{BASE_PATH}/{p}"
     if slug == "404":
         return f"{BASE_PATH}/404.html"
+    if slug == "metodo":
+        return f"{BASE_PATH}/{p}{'metodologia' if lang == 'es' else 'methodology'}/"
     c = CERT_SLUG[cert]
     if slug == "home":
         return f"{BASE_PATH}/{p}{c}/"
@@ -731,7 +740,7 @@ def wrap(lang, slug, cert, cifras, T, scope, n_por_sec=None):
 <a class="cc-skip" href="#main">{SKIP[lang]}</a>"""
 
     bar = barra(lang, slug, cert, alt, otro)
-    foot = FOOT[lang].replace("{ALT}", alt)
+    foot = FOOT[lang].replace("{ALT}", alt).replace("{MET}", ruta(lang, "metodo"))
     return head + bar + '\n<main id="main">\n' + raw.strip() + "\n</main>\n" + foot + "\n</body>\n</html>\n"
 
 
@@ -992,6 +1001,167 @@ def valida_banco(items, ex):
     return errores
 
 
+ABSOLUTOS = re.compile(r"\b(siempre|nunca|jamás|todos|todas|ningún|ninguna|ninguno|únicamente|garantiza\w*)\b", re.I)
+
+
+def calidad(items, ex, scope):
+    """Lo que se puede medir del banco sin datos de respuesta, por examen.
+
+    Se publica en la página de metodología tal cual sale: un banco que pide
+    confianza tiene que enseñar sus números, también los que no quedan bien.
+    """
+    out = {}
+    for e in ex:
+        sub = [x for x in items if x["e"] == e]
+        if not sub:
+            continue
+        uni = [x for x in sub if len(x["a"]) == 1]
+        corta = sum(1 for x in uni if _largo(x["o"][x["a"][0]]) <
+                    min(_largo(o) for i, o in enumerate(x["o"]) if i != x["a"][0]))
+        ab_k = sum(bool(ABSOLUTOS.search(re.sub(r"<[^>]+>", "", x["o"][i]))) for x in sub for i in x["a"])
+        ab_d = sum(bool(ABSOLUTOS.search(re.sub(r"<[^>]+>", "", o)))
+                   for x in sub for i, o in enumerate(x["o"]) if i not in x["a"])
+        n_k = sum(len(x["a"]) for x in sub)
+        n_d = sum(len(x["o"]) - len(x["a"]) for x in sub)
+        sin_q = [n for n, x in enumerate(sub)
+                 if "?" not in re.sub(r"<[^>]+>", "", x["q"])[-40:]]
+        c = Counter(x["d"] for x in sub)
+        out[e] = {
+            "items": len(sub),
+            "citados": sum(1 for x in sub if x.get("c") and x.get("v")),
+            "fuentes": len({x["s"] for x in sub}),
+            "larga": sesgo_longitud(sub)[0],
+            "corta": corta * 100 // len(uni) if uni else 0,
+            "posicion": sesgo_posicion(sub)[0],
+            "desvio": round(max(abs(c.get(d, 0) / len(sub) * 100 - w) for d, w in ex[e]["w"].items()), 1),
+            "abs_clave": round(ab_k * 100 / n_k), "abs_distractor": round(ab_d * 100 / n_d),
+            "sin_pregunta": len(sin_q),
+            "con_apuntes": sum(1 for x in sub if seccion_de(x, e, scope)),
+        }
+    return out
+
+
+MET_T = {
+ "es": {
+  "tit": "Metodología y límites",
+  "lead": "Qué hay detrás de cada ítem, qué se comprueba de forma automática y qué no puede prometer este material. Los números de esta página los calcula el build a partir del banco: no se escriben a mano.",
+  "h_quien": "Quién lo mantiene",
+  "quien": "Lo escribe y lo mantiene Álvaro Zamorano. Es un proyecto independiente: no está afiliado a Anthropic ni avalado por ella, y su autor no tiene acceso al banco real del examen.",
+  "h_item": "Cómo se escribe un ítem",
+  "item": ["<b>Nada que proceda del examen real.</b> Ni recordado, ni parafraseado, ni reconstruido.",
+           "<b>Ningún ítem sin una URL oficial que lo respalde.</b> El build se detiene si falta.",
+           "<b>No se reproducen las guías de examen</b>, que Anthropic distribuye bajo acuerdo a sus partners. Los ítems se escriben contra sus objetivos; los pesos por dominio que usa el simulador salen de esas guías y no se pueden contrastar desde fuera."],
+  "h_ver": "Cómo se verifica",
+  "ver": "Cada ítem enlaza la página de documentación en la que se apoya. Eso dice de qué va el ítem, pero no demuestra que la clave sea correcta, así que el banco está pasando a un segundo nivel: <b>cita literal de la fuente y fecha de verificación</b>. Hoy lo llevan <b>{cit} de {tot} ítems</b>; el resto tiene fuente pero no cita. Cuando un ítem la tiene, el simulador la muestra junto a la explicación.",
+  "ver2": "Los enlaces se comprueban con una herramienta del repositorio que avisa de las fuentes que dejan de responder o cambian de dirección. El banco se generó por última vez el <b>{gen}</b>.",
+  "h_ctrl": "Controles automáticos del banco",
+  "ctrl": "Tres formas de acertar sin saber, que el build mide en cada compilación. Las dos primeras, además, lo detienen si pasan del umbral.",
+  "th": ["Examen", "Ítems", "Con cita y fecha", "Fuentes distintas", "Clave más larga", "Clave más corta", "Misma posición", "Desvío máx. del blueprint", "Absolutos clave / distractor", "Enunciado sin pregunta"],
+  "leyenda": ["<b>Clave más larga / más corta:</b> % de ítems donde la respuesta correcta es la opción más larga o la más corta. Con cuatro opciones, el azar es 25%. Un valor muy bajo en «más larga» junto a uno alto en «más corta» indica distractores alargados, y también es una pista.",
+              "<b>Misma posición:</b> % de claves en el índice más repetido antes de barajar. El simulador baraja las opciones en cada aparición.",
+              "<b>Desvío del blueprint:</b> puntos de diferencia entre el reparto del banco por dominio y el peso oficial.",
+              "<b>Absolutos:</b> % de opciones con «siempre», «nunca», «todos»… Si aparecen mucho más en distractores que en claves, descartarlos es una estrategia.",
+              "<b>Enunciado sin pregunta:</b> ítems cuyo enunciado no termina preguntando nada."],
+  "h_score": "Cómo se calcula el score proyectado",
+  "score": ["Cuenta <b>ítems distintos</b> y solo el <b>último intento</b> de cada uno: repetir un ítem ya explicado no sube la nota.",
+            "Pondera el acierto de cada dominio por su peso en el examen.",
+            "<b>No proyecta por debajo de {min} ítems distintos</b> y, a partir de ahí, da un intervalo del 95% además del número.",
+            "La conversión a la escala 100–1000 es <b>lineal y aproximada</b>. La escala real del examen no es pública y no es lineal; el corte está en 720."],
+  "h_rep": "Repetición espaciada",
+  "rep": "Las tarjetas usan cinco niveles con intervalos de 0, 1, 3, 7 y 21 días; fallar una la devuelve al primero y repasarla antes de tiempo no la sube. En el simulador, un fallo entra en la cola de repaso al momento y sale tras dos aciertos seguidos separados por dos días.",
+  "h_lim": "Límites que conviene conocer",
+  "lim": ["<b>La dificultad no está calibrada.</b> No se recogen respuestas de usuarios, así que no hay índice de dificultad ni de discriminación por ítem. Todo el progreso vive en tu navegador.",
+          "<b>El examen real agrupa preguntas por escenario</b>; aquí los ítems son independientes, aunque muchos describen su propio escenario.",
+          "<b>La documentación de Anthropic cambia deprisa.</b> Un ítem correcto el día que se verificó puede dejar de serlo. Contrasta cualquier dato con la fuente enlazada.",
+          "<b>Sacar buena nota aquí no garantiza aprobar.</b> El material mide si dominas lo que cubre, no predice el examen."],
+  "h_err": "Erratas y correcciones",
+  "err": "Si un ítem tiene la clave mal, una fuente que no lo respalda o un dato desfasado, <a href=\"https://github.com/alvaro-zamorano/claude-certs/issues\">abre un issue</a> con el enunciado y la fuente que lo contradice. Las correcciones quedan en el historial público del repositorio.",
+ },
+ "en": {
+  "tit": "Methodology and limits",
+  "lead": "What sits behind each item, what is checked automatically and what this material cannot promise. The numbers on this page are computed by the build from the bank: nobody types them in.",
+  "h_quien": "Who maintains it",
+  "quien": "It is written and maintained by Álvaro Zamorano. It is an independent project: it is neither affiliated with nor endorsed by Anthropic, and its author has no access to the live exam bank.",
+  "h_item": "How an item is written",
+  "item": ["<b>Nothing that comes from the real exam.</b> Not remembered, not paraphrased, not reconstructed.",
+           "<b>No item without an official URL behind it.</b> The build stops if one is missing.",
+           "<b>The exam guides are not reproduced.</b> Anthropic distributes them to its partners under agreement. Items are written against their objectives; the domain weights the simulator uses come from those guides and cannot be checked from outside."],
+  "h_ver": "How it is verified",
+  "ver": "Every item links the documentation page it rests on. That says what the item is about, but it does not prove the key is right, so the bank is moving to a second level: a <b>verbatim quote from the source and a verification date</b>. Today <b>{cit} of {tot} items</b> carry them; the rest have a source but no quote. When an item has one, the simulator shows it next to the explanation.",
+  "ver2": "Links are checked with a tool in the repository that reports sources that stop responding or move. The bank was last generated on <b>{gen}</b>.",
+  "h_ctrl": "Automatic checks on the bank",
+  "ctrl": "Three ways of getting an item right without knowing the answer, measured by the build on every run. The first two also stop it when they pass a threshold.",
+  "th": ["Exam", "Items", "With quote and date", "Distinct sources", "Key is longest", "Key is shortest", "Same position", "Max. blueprint deviation", "Absolutes key / distractor", "Stem without a question"],
+  "leyenda": ["<b>Key is longest / shortest:</b> % of items where the correct answer is the longest or the shortest option. With four options, chance is 25%. A very low «longest» with a high «shortest» points to padded distractors, which is also a cue.",
+              "<b>Same position:</b> % of keys at the most common index before shuffling. The simulator reshuffles options every time an item appears.",
+              "<b>Blueprint deviation:</b> points of difference between the bank's spread across domains and the official weight.",
+              "<b>Absolutes:</b> % of options containing «always», «never», «all»… If they show up far more in distractors than in keys, ruling them out becomes a strategy.",
+              "<b>Stem without a question:</b> items whose stem does not end by asking anything."],
+  "h_score": "How the projected score is computed",
+  "score": ["It counts <b>distinct items</b> and only the <b>latest attempt</b> on each: repeating an item you have already seen explained does not raise the score.",
+            "It weights accuracy in each domain by that domain's share of the exam.",
+            "<b>It projects nothing below {min} distinct items</b> and, from there on, gives a 95% range as well as the number.",
+            "The conversion to the 100–1000 scale is <b>linear and approximate</b>. The real exam scale is not public and is not linear; the cut score is 720."],
+  "h_rep": "Spaced repetition",
+  "rep": "Cards use five levels with intervals of 0, 1, 3, 7 and 21 days; missing one sends it back to the first and reviewing it early does not move it up. In the simulator, a miss joins the review queue at once and leaves after two correct answers in a row, two days apart.",
+  "h_lim": "Limits worth knowing",
+  "lim": ["<b>Difficulty is not calibrated.</b> No user responses are collected, so there is no difficulty or discrimination index per item. All progress lives in your browser.",
+          "<b>The real exam groups questions by scenario</b>; here items stand alone, though many describe their own scenario.",
+          "<b>Anthropic's documentation changes fast.</b> An item that was right the day it was verified can stop being right. Check any fact against the linked source.",
+          "<b>A good score here does not guarantee a pass.</b> The material measures whether you master what it covers; it does not predict the exam."],
+  "h_err": "Errata and corrections",
+  "err": "If an item has the wrong key, a source that does not support it or an outdated fact, <a href=\"https://github.com/alvaro-zamorano/claude-certs/issues\">open an issue</a> with the stem and the source that contradicts it. Corrections stay in the repository's public history.",
+ },
+}
+
+MET_CSS = """
+.wrap{max-width:860px;margin:0 auto;padding:26px 18px 60px}
+h1{margin:0 0 8px}
+.lead{color:var(--ink-2);margin:0 0 6px}
+h2{font-size:var(--t-sub);margin:34px 0 10px;letter-spacing:-.015em}
+table{display:block;overflow-x:auto;margin:6px 0 12px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--surface-2);font-size:var(--t-micro);font-weight:600}
+td.n{text-align:right;font-family:var(--mono);white-space:nowrap}
+ul.leg li{font-size:var(--t-dato);color:var(--ink-2)}
+.volver{display:inline-block;margin-bottom:14px;font-size:var(--t-dato)}
+a{color:var(--accent-ink)}
+"""
+
+
+def metodologia(lang, q, generado):
+    t = MET_T[lang]
+    m = re.search(r"CC_MIN=(\d+)", SCORE_JS)
+    minimo = m.group(1) if m else "30"
+    li = lambda xs, cls="": f'<ul class="{cls}">' + "".join(f"<li>{x}</li>" for x in xs) + "</ul>"
+    filas = "".join(
+        f'<tr><td>{e}</td><td class="n">{v["items"]}</td><td class="n">{v["citados"]}</td>'
+        f'<td class="n">{v["fuentes"]}</td><td class="n">{v["larga"]}%</td><td class="n">{v["corta"]}%</td>'
+        f'<td class="n">{v["posicion"]}%</td><td class="n">{str(v["desvio"]).replace(".", "," if lang == "es" else ".")} pts</td>'
+        f'<td class="n">{v["abs_clave"]}% / {v["abs_distractor"]}%</td><td class="n">{v["sin_pregunta"]}</td></tr>'
+        for e, v in q.items())
+    cit, tot = sum(v["citados"] for v in q.values()), sum(v["items"] for v in q.values())
+    volver = SELECTOR_T[lang][0]
+    return f"""<title>{t['tit']}</title>
+<style>{MET_CSS}</style>
+<div class="wrap">
+<a class="volver" href="{ruta(lang, 'index')}">← {volver}</a>
+<h1>{t['tit']}</h1>
+<p class="lead">{t['lead']}</p>
+<h2>{t['h_quien']}</h2><p>{t['quien']}</p>
+<h2>{t['h_item']}</h2>{li(t['item'])}
+<h2>{t['h_ver']}</h2><p>{t['ver'].format(cit=cit, tot=tot)}</p><p>{t['ver2'].format(gen=generado)}</p>
+<h2>{t['h_ctrl']}</h2><p>{t['ctrl']}</p>
+<table><tr>{''.join(f'<th>{h}</th>' for h in t['th'])}</tr>{filas}</table>
+{li(t['leyenda'], 'leg')}
+<h2>{t['h_score']}</h2>{li([x.replace('{min}', minimo) for x in t['score']])}
+<h2>{t['h_rep']}</h2><p>{t['rep']}</p>
+<h2>{t['h_lim']}</h2>{li(t['lim'])}
+<h2>{t['h_err']}</h2><p>{t['err']}</p>
+</div>
+"""
+
+
 def valida_tipografia(construidas):
     """Cuenta los tamaños de letra distintos declarados en cada página."""
     errores = []
@@ -1101,7 +1271,7 @@ def envuelve(lang, slug, cert, fragmento):
         bar = (f'<div class="cc-bar"><div><span class="sep"></span><nav></nav>'
                f'<a class="lang" href="{alt}" hreflang="{otro}">{LANGS[otro]["name"]}</a>'
                f'</div></div>')
-    foot = FOOT[lang].replace("{ALT}", alt)
+    foot = FOOT[lang].replace("{ALT}", alt).replace("{MET}", ruta(lang, "metodo"))
     return head + bar + '\n<main id="main">\n' + raw.strip() + "\n</main>\n" + foot + "\n</body>\n</html>\n"
 
 
@@ -1285,6 +1455,17 @@ def main():
                       open(os.path.join(cbase, "item-bank.json"), "w", encoding="utf-8"),
                       ensure_ascii=False, indent=2)
 
+        # Metodología: los números del banco, publicados como salen
+        # se mide una vez, sobre el banco español: es el mismo banco traducido y
+        # la lista de absolutos está en español
+        q = calidad(it["items"], ex, scope) if lang == "es" else calidad_es
+        emite(os.path.join(base, "metodologia" if lang == "es" else "methodology", "index.html"),
+              envuelve(lang, "metodo", None, metodologia(lang, q, it["generated"])))
+        if lang == "es":
+            json.dump(q, open(os.path.join(OUT, "quality.json"), "w", encoding="utf-8"),
+                      ensure_ascii=False, indent=1)
+            calidad_es = q
+
         # Portada: elegir certificación
         emite(os.path.join(base, "index.html"),
               envuelve(lang, "index", None, portada(lang, ex, conteos, T)))
@@ -1342,6 +1523,7 @@ def main():
     hoy = datetime.date.today().isoformat()
     def todas(l):
         yield ("index", None)
+        yield ("metodo", None)
         for c in CERTS:
             yield ("home", c)
             for sl in PAGES:
@@ -1368,6 +1550,10 @@ def main():
         peor = max(((d, abs(c.get(d, 0) / len(sub) * 100 - w)) for d, w in cfgx["w"].items()),
                    key=lambda t: t[1]) if sub else ("-", 0)
         print(f"  {e_:<8} {len(sub):>3} ítems · mayor desvío: {peor[0]} ({peor[1]:.0f} pts)")
+    print("\nCalidad del banco (detalle en /metodologia/ y quality.json):")
+    for e_, v in calidad_es.items():
+        print(f"  {e_:<8} cita+fecha {v['citados']}/{v['items']} · clave más larga {v['larga']}% · "
+              f"más corta {v['corta']}% · sin pregunta {v['sin_pregunta']} · con apuntes {v['con_apuntes']}")
     print()
     for lang, n_it, n_cd, _, _ in resumen:
         print(f"  {lang}  {ruta(lang, 'index'):<6} {n_it} ítems · {n_cd} tarjetas · {len(CERTS)} certificaciones")
