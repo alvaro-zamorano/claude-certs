@@ -1,0 +1,322 @@
+<title>Developer Foundations</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{
+  --bg:#f7f6f3; --surface:#fffefb; --surface-2:#f0eee8; --line:#e0ddd4; --line-strong:#c9c5b8;
+  --ink:#20201d; --ink-2:#57544c; --ink-3:#8b8779;
+  --accent:#b5541f; --accent-soft:#f6e8de; --accent-ink:#8c3f16;
+  --ok:#2f6b46; --ok-soft:#e2efe7; --bad:#a32f28; --bad-soft:#f8e5e3;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+  --sans:ui-sans-serif,-apple-system,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#16161a; --surface:#1e1e23; --surface-2:#26262c; --line:#33333b; --line-strong:#4a4a55;
+  --ink:#eceae4; --ink-2:#a8a49b; --ink-3:#7b776e;
+  --accent:#e0834c; --accent-soft:#3a2617; --accent-ink:#f0a274;
+  --ok:#6dbb8e; --ok-soft:#1c2f24; --bad:#e0817a; --bad-soft:#33201e;
+}}
+:root[data-theme="dark"]{
+  --bg:#16161a; --surface:#1e1e23; --surface-2:#26262c; --line:#33333b; --line-strong:#4a4a55;
+  --ink:#eceae4; --ink-2:#a8a49b; --ink-3:#7b776e;
+  --accent:#e0834c; --accent-soft:#3a2617; --accent-ink:#f0a274;
+  --ok:#6dbb8e; --ok-soft:#1c2f24; --bad:#e0817a; --bad-soft:#33201e;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:780px;margin:0 auto;padding:26px 20px 80px}
+header.top{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:15px;margin-bottom:22px}
+h1{font-size:var(--t-tit);margin:0;letter-spacing:-.02em}
+.sub{color:var(--ink-3);font-size:var(--t-menor);margin-top:3px}
+.nav{display:flex;gap:14px;font-size:var(--t-menor)}
+a{color:var(--accent-ink)}
+.lead{font-size:var(--t-dato);color:var(--ink-2);border-left:3px solid var(--accent);padding-left:14px;margin:0 0 26px}
+section{margin-bottom:36px;scroll-margin-top:16px}
+h2{font-size:var(--t-base);margin:0 0 12px;letter-spacing:-.01em}
+h3{font-size:var(--t-dato);margin:20px 0 6px}
+p{margin:0 0 11px}
+ul,ol{margin:0 0 12px;padding-left:20px}li{margin-bottom:5px}
+code{font-family:var(--mono);font-size:var(--t-dato);background:var(--surface-2);padding:1px 5px;border-radius:4px;border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;font-size:var(--t-menor);margin:0 0 14px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+th{background:var(--surface-2);font-weight:600;font-size:var(--t-micro);white-space:nowrap}
+td.n{font-family:var(--mono);white-space:nowrap;text-align:right}
+tr.p1 td:first-child{border-left:3px solid var(--accent)}
+tr.p3 td{color:var(--ink-3)}
+.key,.trap,.win{border-radius:8px;padding:13px 15px;margin:0 0 14px;font-size:var(--t-dato)}
+.key{background:var(--accent-soft)} .key b:first-child{display:block;font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px;color:var(--accent-ink)}
+.trap{background:var(--bad-soft)} .trap b:first-child{display:block;font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px;color:var(--bad)}
+.win{background:var(--ok-soft)} .win b:first-child{display:block;font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px;color:var(--ok)}
+.src{font-size:var(--t-micro);color:var(--ink-3);margin-top:9px;word-break:break-all}
+.day{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:9px}
+.day b{display:block;font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.09em;color:var(--accent-ink);margin-bottom:5px}
+.day p{margin:0;font-size:var(--t-dato);color:var(--ink-2)}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:15px 17px;margin-bottom:12px;font-size:var(--t-dato)}
+.q .stem{font-weight:520;margin-bottom:9px}
+.q ol{margin:0 0 9px;padding-left:22px}
+.q .ans{border-top:1px solid var(--line);padding-top:9px;margin-top:9px;color:var(--ink-2);font-size:var(--t-dato)}
+@media(max-width:640px){
+  .wrap{padding:16px 14px calc(50px + env(safe-area-inset-bottom))}
+  h1{font-size:var(--t-sub)} h2{font-size:var(--t-base)} p,li{font-size:var(--t-dato)}
+  table{font-size:var(--t-menor)} th,td{padding:5px 7px}
+  .lead{font-size:var(--t-dato)}
+}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div><h1>Developer – Foundations</h1><div class="sub">CCDV-F · plan detallado a partir de la guía oficial v1.0 y de la documentación viva</div></div>
+  <div class="nav"><a href="../architect/">Architect</a><a href="../referencia/">Referencia</a><a href="../tarjetas/">Tarjetas</a><a href="../apuntes/">Apuntes</a><a href="../">Test</a></div>
+</header>
+
+<p class="lead">Este examen es el único de los cuatro cuya guía publica el peso <b>de cada skill</b>, no solo de cada dominio. Con 53 ítems y los pesos oficiales se puede calcular cuántas preguntas caen por tema, y eso cambia por completo dónde merece la pena invertir el tiempo. El resto de la página parte de ese cálculo.</p>
+
+<section id="ficha">
+<h2>La ficha</h2>
+<table>
+<tr><th>Código</th><td>CCDV-F</td><th>Ítems</th><td>53</td></tr>
+<tr><th>Tiempo</th><td>120 minutos (≈2 min 15 s por ítem)</td><th>Corte</th><td>720 sobre 100-1.000</td></tr>
+<tr><th>Formato</th><td colspan="3">Opción múltiple y respuesta múltiple; cada ítem indica cuántas hay que marcar</td></tr>
+<tr><th>Tasa</th><td>125 $</td><th>Validez</th><td>12 meses</td></tr>
+</table>
+<p>Criterio-referenciado: compites contra un estándar fijo, no contra otros candidatos. El informe te da el escalado total y el <b>% de acierto por dominio</b>, pero el aprobado depende solo del total.</p>
+</section>
+
+<section id="mapa">
+<h2>Mapa de skills: cuántos ítems vale cada tema</h2>
+<p>Los 25 skills del blueprint, ordenados por peso, con la conversión a ítems esperados sobre 53. La columna de prioridad es mía, no de la guía: cruza el peso con lo que ya sabes por tu trabajo diario.</p>
+<table>
+<tr><th>Skill</th><th>Dominio</th><th>Peso</th><th>Ítems</th><th>Prioridad</th></tr>
+<tr class="p1"><td>Claude Application Design</td><td>2</td><td class="n">8,6%</td><td class="n">4,6</td><td>Máxima</td></tr>
+<tr class="p1"><td>Software Engineering Foundations</td><td>2</td><td class="n">7,4%</td><td class="n">3,9</td><td>Repaso rápido</td></tr>
+<tr class="p1"><td>Claude API Mechanics</td><td>2</td><td class="n">6,8%</td><td class="n">3,6</td><td>Máxima</td></tr>
+<tr class="p1"><td>Technical Fundamentals</td><td>5</td><td class="n">6,1%</td><td class="n">3,2</td><td>Repaso rápido</td></tr>
+<tr class="p1"><td>Agent Construction with Claude</td><td>1</td><td class="n">5,3%</td><td class="n">2,8</td><td>Alta</td></tr>
+<tr class="p1"><td>LLM Fundamentals</td><td>5</td><td class="n">5,2%</td><td class="n">2,8</td><td>Alta</td></tr>
+<tr><td>Agent Patterns and Frameworks</td><td>1</td><td class="n">4,9%</td><td class="n">2,6</td><td>Alta</td></tr>
+<tr><td>Prompt Engineering</td><td>6</td><td class="n">4,6%</td><td class="n">2,4</td><td>Media</td></tr>
+<tr><td>Agent Architecture</td><td>1</td><td class="n">4,5%</td><td class="n">2,4</td><td>Media</td></tr>
+<tr><td>Tool Implementation</td><td>8</td><td class="n">4,4%</td><td class="n">2,3</td><td>Media</td></tr>
+<tr><td>Configuration Management</td><td>2</td><td class="n">4,1%</td><td class="n">2,2</td><td>Media</td></tr>
+<tr><td>Agentic Customization</td><td>8</td><td class="n">4,1%</td><td class="n">2,2</td><td>Media</td></tr>
+<tr><td>Context Engineering</td><td>6</td><td class="n">3,8%</td><td class="n">2,0</td><td>Media</td></tr>
+<tr><td>Understanding Requirements</td><td>2</td><td class="n">3,4%</td><td class="n">1,8</td><td>Baja</td></tr>
+<tr><td>AI Application Security</td><td>7</td><td class="n">3,2%</td><td class="n">1,7</td><td>Media</td></tr>
+<tr><td>Claude Code Operation</td><td>3</td><td class="n">3,1%</td><td class="n">1,6</td><td class="n">Ignorar</td></tr>
+<tr class="p3"><td>Systems Life Cycle</td><td>2</td><td class="n">2,8%</td><td class="n">1,5</td><td>Baja</td></tr>
+<tr class="p3"><td>Cost and Token Management</td><td>5</td><td class="n">2,8%</td><td class="n">1,5</td><td>Media</td></tr>
+<tr class="p3"><td>Model Selection and Tradeoffs</td><td>5</td><td class="n">2,7%</td><td class="n">1,4</td><td>Baja</td></tr>
+<tr class="p3"><td>Output Handling</td><td>6</td><td class="n">2,6%</td><td class="n">1,4</td><td>Baja</td></tr>
+<tr class="p3"><td>Debugging and Error Handling</td><td>4</td><td class="n">2,6%</td><td class="n">1,4</td><td>Baja</td></tr>
+<tr class="p3"><td>Guardrails and Safe Deployment</td><td>7</td><td class="n">2,3%</td><td class="n">1,2</td><td>Baja</td></tr>
+<tr class="p3"><td>MCP Server Development</td><td>8</td><td class="n">2,1%</td><td class="n">1,1</td><td>Baja</td></tr>
+<tr class="p3"><td>Identity, Secrets, Key Management</td><td>7</td><td class="n">1,6%</td><td class="n">0,8</td><td>Baja</td></tr>
+<tr class="p3"><td>Claude Hooks</td><td>7</td><td class="n">1,0%</td><td class="n">0,5</td><td>Ignorar</td></tr>
+</table>
+
+<div class="key"><b>Las tres conclusiones que cambian el plan</b>
+<b>1.</b> Los <b>seis primeros skills son el 39,4%</b> del examen — casi 21 de 53 ítems. Si dominas esos seis y respondes al azar el resto, te quedas cerca del corte.<br>
+<b>2.</b> <b>Claude Code vale 3,1% y Claude Hooks 1,0%</b>: entre los dos, dos ítems. Es exactamente lo que más usas a diario y lo que menos te renta estudiar. Resiste la tentación.<br>
+<b>3.</b> <b>Software Engineering Foundations + Technical Fundamentals = 13,5%</b>, siete ítems, y es ingeniería de software genérica: REST, JSON, asincronía, control de versiones, code review, refactor, websockets, SDKs que envuelven APIs REST. Puntos casi gratis para ti.</div>
+
+<div class="win"><b>Aritmética del aprobado</b>El corte es 720/1000 y la conversión no es lineal, pero como regla de trabajo apunta a <b>40 de 53</b> con margen. Los seis skills grandes (21 ítems) más los dos de ingeniería genérica ya son 28. Los 12-13 restantes salen de repartir bien el tiempo entre los skills medios: <b>no hace falta dominar los 25 temas</b>.</div>
+</section>
+
+<section id="design">
+<h2>1 · Claude Application Design — 8,6%, el skill más pesado</h2>
+<p>El objetivo literal habla de «cómo interpreta Claude las instrucciones a través de las interfaces, límites de contenido, diseño de esquemas, higiene de sesión y gestión de plugins». No existe una página oficial con ese título: es una síntesis del examinador sobre cinco áreas distintas. Aquí están las cinco.</p>
+
+<h3>Cómo cambia la interpretación según la interfaz</h3>
+<ul>
+<li><b>API cruda</b>: no hay más system prompt que el tuyo, <b>con una excepción</b> — si mandas <code>tools</code>, la API construye automáticamente un system prompt con el bloque de instrucciones de tool use, los esquemas JSON, tu system prompt y la configuración de tools, en ese orden. Cuesta cientos de tokens que no escribiste tú.</li>
+<li>Si incluyes el <b>memory tool</b>, la API añade sola su protocolo de memoria al system prompt. No hay que reenviarlo.</li>
+<li><b>claude.ai, móvil y escritorio</b> tienen system prompt propio (fecha, formato, comportamiento de producto) que <b>no se aplica a la API</b>. Anthropic lo publica íntegro en sus release notes.</li>
+<li><b>Agent SDK</b>: tres puntos de partida — sin system prompt (mínimo, solo tool calling), con el preset de Claude Code (prompt completo del CLI), o con el tuyo.</li>
+</ul>
+<div class="trap"><b>La trampa portátil</b><code>claude -p</code> usa el prompt completo <b>por defecto</b>; el Agent SDK <b>no</b>. Al portar algo del CLI al SDK hay que fijar el preset explícitamente o el agente pierde toda la guía de comportamiento y parece «tonto» sin motivo aparente. Y en el SDK, <b>CLAUDE.md no va al system prompt</b>: se inyecta como contexto de conversación y su carga depende de los setting sources.</div>
+
+<h3>Content boundaries</h3>
+<p>Separar instrucciones, contexto, ejemplos y entrada variable en etiquetas XML propias, con nombres consistentes. En contextos largos (20k+ tokens): <b>los documentos arriba, la pregunta al final</b> — hasta un 30% de mejora en las pruebas de Anthropic. Y la regla dura ya conocida: el contenido de terceros va <b>solo en bloques <code>tool_result</code></b>, nunca en el system prompt ni en texto de usuario.</p>
+
+<h3>Diseño de esquemas: los límites que se preguntan</h3>
+<table><tr><th>Límite</th><th>Valor</th></tr>
+<tr><td>Tools con <code>strict: true</code> por request</td><td class="n">20</td></tr>
+<tr><td>Parámetros opcionales, total del request</td><td class="n">24</td></tr>
+<tr><td>Parámetros con tipos unión (<code>anyOf</code>)</td><td class="n">16</td></tr>
+<tr><td>Timeout de compilación de la gramática</td><td class="n">180 s</td></tr></table>
+<p><b>Soportado</b>: tipos básicos, <code>enum</code> escalar, <code>const</code>, <code>anyOf</code>, <code>$ref</code> interno, <code>default</code>, <code>required</code>, formatos de string. <b>No soportado</b> (400 si lo usas): esquemas recursivos, <code>$ref</code> externo, restricciones numéricas como <code>minimum</code>/<code>maximum</code>, <code>minLength</code>/<code>maxLength</code>, y lookahead en <code>pattern</code>.</p>
+<p>Para reducir complejidad, el orden oficial es: marcar strict solo las tools críticas → convertir opcionales en required (cada opcional casi duplica parte del espacio de estados) → aplanar anidamientos → repartir en varios requests o subagentes.</p>
+
+<h3>Higiene de sesión</h3>
+<div class="key"><b>Heurística oficial de reinicio</b>Si has corregido a Claude <b>más de dos veces sobre el mismo problema</b> en una sesión, el contexto está contaminado con enfoques fallidos: limpia y vuelve a plantear con más precisión. No sigas insistiendo en el mismo hilo.</div>
+<p>Qué sobrevive a la compactación y qué no: el system prompt queda intacto y el CLAUDE.md de raíz se reinyecta desde disco; <b>se pierden</b> las reglas con <code>paths:</code> y los CLAUDE.md anidados hasta que se vuelva a leer un fichero que las active. Los cuerpos de skills invocadas se reinyectan con tope por skill y total, descartando las más antiguas.</p>
+<p>Y una recomendación que suena contraintuitiva: <b>a menudo es mejor empezar en limpio que compactar</b>, porque el modelo puede reconstruir el estado desde el filesystem si le das un arranque prescriptivo («revisa progress.txt, tests.json y el git log»).</p>
+
+<h3>Plugins</h3>
+<p>Un plugin es un directorio autocontenido con skills, agents, hooks, servidores MCP y ajustes por defecto. Solo el manifiesto va dentro de <code>.claude-plugin/</code>; el resto de carpetas van en la raíz. Cuatro <b>scopes de instalación</b>: user (por defecto), project (compartido por git), local (gitignored) y managed (solo lectura). El <b>versionado</b> es la clave de caché de las actualizaciones, y se resuelve en cascada: versión del manifiesto → versión del marketplace → SHA del commit → digest → desconocido.</p>
+<div class="src">platform.claude.com/docs/en/build-with-claude/structured-outputs · code.claude.com/docs/en/agent-sdk/modifying-system-prompts · .../context-window · .../best-practices · .../plugins-reference</div>
+</section>
+
+<section id="terceros">
+<h2>2 · Claude a través de terceros — dentro de API Mechanics, 6,8%</h2>
+<p>El objetivo dice «invoking Claude through third-party vendors». Hoy son <b>cinco</b> plataformas, no tres, y la distinción que más se puede preguntar es <b>quién procesa los datos</b>.</p>
+<table>
+<tr><th>Plataforma</th><th>Quién opera</th><th>Cliente del SDK</th><th>Auth</th></tr>
+<tr><td>Claude API</td><td>Anthropic</td><td><code>Anthropic</code></td><td>API key</td></tr>
+<tr><td>Amazon Bedrock</td><td><b>AWS</b></td><td><code>AnthropicBedrock</code> / <code>AnthropicBedrockMantle</code></td><td>Credenciales AWS</td></tr>
+<tr><td>Claude Platform on AWS</td><td><b>Anthropic</b></td><td><code>AnthropicAWS</code></td><td>IAM o API key</td></tr>
+<tr><td>Google Cloud / Vertex</td><td><b>Google</b></td><td><code>AnthropicVertex</code></td><td>Credenciales Google</td></tr>
+<tr><td>Microsoft Foundry</td><td><b>Anthropic</b> sobre Azure</td><td><code>AnthropicFoundry</code></td><td>API key de Azure o Entra ID</td></tr>
+</table>
+<div class="key"><b>La regla de decisión que publica la doc</b>Quien necesite <b>FedRAMP High, IL4, IL5, HIPAA-ready</b>, o que <b>AWS sea el único data processor</b>, debe usar Claude en Amazon Bedrock. Consecuencia: en Bedrock el programa ZDR de Anthropic <b>no aplica</b>, porque Anthropic no es el procesador.</div>
+<p>Lo que cambia en el código es <b>solo la clase del cliente y la autenticación</b>: <code>client.messages.create(...)</code> es idéntico.</p>
+
+<h3>Diferencias que caen</h3>
+<ul>
+<li><b>Vertex</b>: el <code>model</code> <b>no va en el body</b> (va en la URL) y en cambio <code>anthropic_version</code> <b>sí va en el body</b>. Es la diferencia de formato más citable.</li>
+<li>Tamaño máximo de petición: <b>Bedrock 20 MB, Vertex 30 MB</b>.</li>
+<li><b>Batch processing</b> y <b>data residency</b> existen solo en la Claude API y en Claude Platform on AWS. En Bedrock, Vertex y Foundry no hay Batches.</li>
+<li>Bedrock exige <b>inference profiles</b> para los modelos nuevos: invocar con el model ID base devuelve 400. Prefijos <code>global.</code>, <code>us.</code>, <code>eu.</code>…</li>
+<li>Global vs regional: el enrutado regional garantiza residencia y cuesta <b>un 10% más</b>.</li>
+</ul>
+<div class="trap"><b>Contradicción real en la documentación</b>Sobre si <b>structured outputs</b> funciona en Bedrock, la página de la integración nueva dice que no y la tabla general de features dice que sí. Si te cae un ítem sobre esto, no hay respuesta limpia: apuesta por la opción que no dependa de ese detalle.</div>
+<div class="src">platform.claude.com/docs/en/build-with-claude/overview · .../claude-in-amazon-bedrock · .../claude-on-vertex-ai · .../claude-in-microsoft-foundry</div>
+</section>
+
+<section id="frameworks">
+<h2>3 · Frameworks agénticos — 4,9%</h2>
+<p>El blueprint nombra tres explícitamente: <b>Strands, LangGraph y PydanticAI</b>. No hace falta saber programarlos; hay que saber <b>para qué se elige cada uno</b>.</p>
+<table>
+<tr><th>Framework</th><th>Idea central</th><th>Se elige cuando</th></tr>
+<tr><td><b>Strands</b> (AWS)</td><td>Bucle agéntico «model-driven» ya hecho, agnóstico de modelo, con MCP nativo y patrones multi-agente</td><td>Quieres un bucle sin escribirlo y despliegas en AWS</td></tr>
+<tr><td><b>LangGraph</b></td><td>Orquestación de bajo nivel por <b>grafo de estado</b>: nodos hacen el trabajo, edges deciden el siguiente</td><td>Necesitas ejecución durable y reanudable, human-in-the-loop y topología auditable</td></tr>
+<tr><td><b>PydanticAI</b></td><td>Bucle <b>tipado</b>: el modelo Pydantic genera el esquema y valida cada ejecución; si falla, re-prompta al modelo</td><td>El valor está en el <b>contrato de datos</b> y en la portabilidad de proveedor</td></tr>
+</table>
+<p>De LangGraph, dos conceptos con nombre propio que se prestan a pregunta: los <b>reducers</b> (sin reducer, el update de un nodo <b>sobrescribe</b> la clave del estado) y la diferencia entre <b>checkpointer</b> (snapshots de un hilo, memoria a corto plazo, time travel) y <b>store</b> (clave-valor entre hilos, memoria a largo plazo). Los checkpoints se guardan en fronteras de paso, no a mitad de nodo, así que al reanudar <b>el nodo se re-ejecuta entero</b>: los nodos deben ser idempotentes.</p>
+
+<div class="key"><b>La postura de Anthropic, que es lo que puntúa</b>Literal: «las implementaciones con más éxito <b>no usaban frameworks complejos</b>, construían con patrones simples y componibles». Recomendación: empezar llamando a la API directamente y, si usas framework, entender el código de debajo — «las suposiciones incorrectas sobre lo que hay bajo el capó son una fuente habitual de error». Ante un ítem que ofrezca «adopta el framework X» frente a «empieza simple y mide», la respuesta del examen es la segunda.</div>
+
+<h3>Matriz oficial de producto</h3>
+<ul>
+<li><b>Client SDK</b> (Messages API): acceso directo, <b>tú implementas el bucle</b>. Máximo control.</li>
+<li><b>Agent SDK</b>: agente sin implementar el tool loop, corre <b>en tu proceso</b>.</li>
+<li><b>Claude Code CLI</b>: uso interactivo o puntual en terminal.</li>
+<li><b>Managed Agents</b>: agentes largos y asíncronos sin gestionar sandbox ni sesiones. Es un <b>producto separado del Agent SDK</b>, con API REST hospedada.</li>
+</ul>
+</section>
+
+<section id="managed">
+<h2>4 · Despliegue: self-hosted vs Anthropic-hosted — dentro de Agent Construction, 5,3%</h2>
+<p>El objetivo menciona «managed agent deployment models (self-hosted vs. Anthropic-hosted)». La distinción exacta:</p>
+<ul>
+<li><b>Self-hosting del Agent SDK</b>: el SDK lanza un <b>subproceso por sesión</b> con shell, directorio de trabajo y transcripciones en disco local. N sesiones son N subprocesos. El estado local <b>no sobrevive a reinicios</b>, así que en producción hace falta un almacén de sesiones externo que espeje las transcripciones.</li>
+<li><b>Managed Agents (Anthropic-hosted)</b>: harness preconstruido sobre infraestructura gestionada. Cuatro conceptos: <b>Agent</b> (modelo, prompt, tools), <b>Environment</b> (dónde corre), <b>Session</b> (instancia en ejecución) y <b>Events</b> (historial persistido en servidor). Cada sesión recibe su <b>propio sandbox aislado</b>.</li>
+</ul>
+<div class="key"><b>La consecuencia de compliance</b>Managed Agents es <b>stateful por diseño</b>, así que <b>no es elegible para Zero Data Retention ni para HIPAA BAA</b>. Es el tipo de conexión entre dos dominios distintos (despliegue y gobernanza) que estos exámenes premian.</div>
+<p>Hay un tercer modelo intermedio: <b>self-hosted sandbox dentro de Managed Agents</b>, donde la orquestación sigue en Anthropic y solo la ejecución de tools se mueve a tu infraestructura. Ojo al matiz: los inputs y outputs de las tools <b>siguen fluyendo al plano de control de Anthropic</b>.</p>
+</section>
+
+<section id="generico">
+<h2>5 · Los dos skills «gratis» — 13,5% juntos</h2>
+<p><b>Software Engineering Foundations (7,4%)</b> y <b>Technical Fundamentals (6,1%)</b> no van de Claude: van de ingeniería de software. REST y JSON, programación asíncrona, control de versiones, integración en el ciclo de desarrollo, code review, refactorización a pequeña y gran escala, y SDKs que envuelven APIs REST y websockets. Son siete ítems que ya sabes responder; no gastes tiempo aquí más allá de una lectura.</p>
+<p><b>Understanding Requirements (3,4%)</b> y <b>Systems Life Cycle (2,8%)</b> tampoco son técnicos de Claude: requisitos funcionales y de infraestructura derivados de necesidades de negocio, y gestión del ciclo de vida de sistemas. Responde con criterio de ingeniería clásica: primero requisitos y criterios de aceptación, después arquitectura; y nada llega a producción sin observabilidad ni plan de reversión.</p>
+</section>
+
+<section id="modulo">
+<h2>6 · Cómo enseña el módulo oficial (y qué implica para los ítems)</h2>
+<p>El módulo <i>Production-grade prompting, Agents &amp; tool use</i> no enseña definiciones: enseña <b>diagnóstico</b>. Cada takeaway tiene la forma «este síntoma significa que falta esta técnica». Los ítems se escriben contra ese molde, así que la pregunta típica no será «¿qué es X?» sino «esto está fallando, ¿qué falta?».</p>
+
+<h3>La tabla de diagnóstico que hay que saber en frío</h3>
+<table>
+<tr><th>Síntoma</th><th>Lo que falta</th></tr>
+<tr><td>La salida no tiene la forma esperada</td><td>Una <b>restricción de salida</b></td></tr>
+<tr><td>Deriva de comportamiento entre turnos</td><td><b>System prompt poco especificado</b></td></tr>
+<tr><td>Estructura alucinada</td><td><b>Ejemplos few-shot</b></td></tr>
+<tr><td>Entradas no probadas siguen rompiendo el parser</td><td>Salir del prompt: <b>salida estructurada en la API</b></td></tr>
+<tr><td>La selección de tool se degrada tras N turnos</td><td>La <b>ventana de contexto</b>, no el esquema</td></tr>
+<tr><td>Se elige la tool equivocada desde el primer turno</td><td>La <b>descripción</b> de la tool</td></tr>
+<tr><td>Error de tool use al reintentar tras un stream caído</td><td>Un <b>bloque a medio construir</b>, no el esquema</td></tr>
+</table>
+<div class="key"><b>El principio que lo une</b>«El instinto de reformular la instrucción y volver a probar casi nunca funciona, porque ninguno de esos fallos es un problema de redacción.» Ante un ítem cuyas opciones incluyen «reescribe el prompt con más detalle», suele ser el distractor.</div>
+
+<h3>Cifras y reglas nuevas que aporta el módulo</h3>
+<ul>
+<li><b>Condición de exclusión</b>: cada descripción de tool debe incluir una línea que diga <b>cuándo NO llamarla</b>, escrita al diseñar el esquema y no después del primer fallo en un log. Es la frase que resuelve la mayoría de bugs de tool equivocada: dos tools que dicen «úsala para buscar información» son indistinguibles para Claude por muy distintos que sean sus esquemas.</li>
+<li><b>Las salidas de tools en producción ocupan de 3 a 5 veces más</b> que los fixtures de desarrollo. Una sesión que aguanta 50 turnos en pruebas puede tocar techo <b>en el turno 8</b> al desplegarse.</li>
+<li><b>Un servidor MCP conectado gasta contexto aunque no uses sus tools.</b> La doc pone cifra: un montaje típico de cinco servidores consume <b>~55.000 tokens</b> en definiciones antes de que Claude haga nada. Tool search lo reduce más de un 85%.</li>
+<li><b>Coste de imagen</b>: <code>⌈ancho / 28⌉ × ⌈alto / 28⌉</code> visual tokens — Claude ve parches de 28×28 px, no píxeles.</li>
+<li><b>El refactor de memoria en contexto a almacenamiento externo</b> bajo presión de producción cuesta una hora; tomar la misma decisión a conciencia en diseño cuesta veinte minutos.</li>
+</ul>
+
+<h3>El techo de tokens de imagen es por tier, no por modelo</h3>
+<table><tr><th>Tier</th><th>Lado máximo</th><th>Visual tokens máx.</th></tr>
+<tr><td>Alta resolución (modelos 4.7 y posteriores)</td><td class="n">2576 px</td><td class="n">4784</td></tr>
+<tr><td>Estándar (todos los demás)</td><td class="n">1568 px</td><td class="n">1568</td></tr></table>
+<p>Las imágenes que superan cualquiera de los dos límites <b>se reescalan automáticamente</b> al mayor tamaño que respeta la proporción, lo que acota el coste. Después se aplica padding al siguiente múltiplo de 28 px. Una imagen de alta resolución puede costar <b>unas tres veces más</b> que la misma en un modelo de tier estándar, así que la fórmula hay que correrla contra la entrada más grande que esperas en producción, no contra las de tu set de pruebas.</p>
+<div class="trap"><b>El error que nombra el módulo</b>Llamar a la API síncrona en un bucle y llamarlo «batching». Las tres vías son: <b>base64 inline</b> para imágenes de un solo uso, <b>Files API</b> para activos reutilizados entre peticiones, y <b>Message Batches</b> para trabajo offline a menor coste por token a cambio de latencia no determinista.</div>
+
+<h3>Streaming: dónde el módulo y la documentación no coinciden</h3>
+<p>En lo básico coinciden, y es lo que hay que llevar sabido: <b>un bloque solo está cerrado en su <code>content_block_stop</code></b> y <b>el mensaje solo termina en <code>message_stop</code></b>. Los deltas de un tool use son cadenas JSON parciales: no se parsean hasta que el bloque cierra.</p>
+<div class="trap"><b>Discrepancia real, y conviene conocer las dos versiones</b>El módulo dice: ante un stream interrumpido, <b>descartar el turno parcial y reintentar</b>.<br>La documentación viva dice otra cosa: <b>reanudar</b>, no descartar — y en los modelos recientes hacerlo añadiendo un mensaje de usuario que pida continuar, no metiendo la respuesta parcial como mensaje del asistente.<br>Punto en el que sí coinciden y que probablemente sea el examinable: <b>los bloques de tool use y de thinking no se pueden recuperar parcialmente</b>. Solo se puede reanudar desde el último bloque de texto. Si un ítem te ofrece «acumula y reintenta el <code>tool_use</code> parcial», es el distractor.</div>
+
+<h3>Los cuatro alcances de memoria, elegidos por la forma de la sesión</h3>
+<table><tr><th>Alcance</th><th>Coste</th><th>Cuándo</th></tr>
+<tr><td>En contexto</td><td>El más fácil de escribir</td><td>El primero que falla si las sesiones reales son cortas y numerosas</td></tr>
+<tr><td>Almacenamiento externo</td><td>Añade latencia</td><td>El estado debe sobrevivir entre sesiones</td></tr>
+<tr><td>Memoria resumida</td><td>Baja el coste</td><td>Se pierde lo que el prompt del resumidor no preservó</td></tr>
+<tr><td>Sin estado</td><td>Ninguno</td><td>Trabajos que se completan y se cierran</td></tr></table>
+<div class="key"><b>Distinción que se presta a ítem</b>Llevar <b>estado</b> entre tareas y llevar <b>instrucciones repetibles</b> son problemas distintos. El estado es memoria; las instrucciones repetibles son una <b>Skill</b>: un markdown que Claude carga bajo demanda al casar su descripción, no instrucciones inyectadas en cada sesión.</div>
+
+<h3>Workflow o agente, en la formulación del módulo</h3>
+<p><b>Workflow</b> cuando puedes escribir los pasos exactos en código. <b>Agente</b> cuando puedes especificar el objetivo y las tools pero <b>no el camino</b> entre ellos. Equivocarse solo se ve en producción: agentes donde bastaba un workflow añaden coste de contexto y comportamiento que vive en transcripciones; workflows donde hacía falta un agente se rompen con la primera entrada que se sale del camino.</p>
+<div class="key"><b>Regla de human-in-the-loop</b>Si una tool puede ejecutar una <b>acción irreversible</b>, el checkpoint humano entra <b>antes de cablear el bucle</b>, no después de que la primera escritura llegue al entorno de un cliente.</div>
+
+<h3>Razonamiento</h3>
+<p>Activarlo <b>solo donde una pasada de razonamiento cambia la respuesta</b>, y calibrar el effort al problema en vez de subirlo en todas las llamadas. Los bloques de thinking vuelven a la API <b>sin modificar</b> o la siguiente petición falla. Ojo a la distinción del módulo: <b>elegir qué modelo ejecutar</b> es un tema distinto de <b>si activar el razonamiento</b>, y se enseña en un módulo anterior.</p>
+<div class="src">platform.claude.com/docs/en/build-with-claude/vision · .../streaming · .../agents-and-tools/tool-use/define-tools · .../tool-use/tool-search-tool</div>
+</section>
+
+<section id="plan">
+<h2>Plan de 10 días</h2>
+<p>Ordenado por peso, no por temario. Cada día cierra con una tanda de tarjetas del tema, y los tres últimos días son solo simulacro y fallos.</p>
+<div class="day"><b>Día 1 · Claude Application Design, parte I</b><p>Interfaces y qué inyecta cada una. Lee la página de modificación de system prompts del Agent SDK y las release notes de system prompts. Porta un prompt tuyo del CLI al SDK y observa la diferencia.</p></div>
+<div class="day"><b>Día 2 · Claude Application Design, parte II</b><p>Esquemas: límites de complejidad, qué admite y qué no el JSON Schema estricto. Higiene de sesión y qué sobrevive a la compactación. Plugins: scopes y versionado.</p></div>
+<div class="day"><b>Día 3 · Claude API Mechanics</b><p>Messages, streaming y sus errores, batch con sus límites y estados, y las cinco plataformas con su data processor. Escribe una llamada por batch de verdad y mira el ciclo completo.</p></div>
+<div class="day"><b>Día 4 · Model Selection y Optimization</b><p>Los cuatro skills del dominio 5: fundamentos de LLM, fundamentos técnicos, tradeoffs de modelo y gestión de coste. Prompt caching a fondo: TTL, invalidación y el fallo silencioso del mínimo de tokens.</p></div>
+<div class="day"><b>Día 5 · Agentes</b><p>Arquitectura, construcción con el Agent SDK, y los tres frameworks con su criterio de elección. Self-hosted vs Managed Agents y la consecuencia de compliance.</p></div>
+<div class="day"><b>Día 6 · Tools y MCP</b><p>Implementación de tools, desarrollo de servidores MCP, y los tradeoffs entre tool built-in, tool propia, Skill y MCP. Monta un servidor MCP mínimo si no lo has hecho nunca.</p></div>
+<div class="day"><b>Día 7 · Prompt y contexto, seguridad</b><p>Ingeniería de prompt y de contexto, manejo de salida, y el dominio 7 entero: inyección indirecta, guardrails, secretos. Salta los hooks: valen medio ítem.</p></div>
+<div class="day"><b>Día 8 · Primer simulacro completo</b><p>53 ítems cronometrados a 120 minutos. Sin pausas y sin consultar. Anota el acierto por dominio.</p></div>
+<div class="day"><b>Día 9 · Solo fallos</b><p>Repaso dirigido de los dominios rojos del simulacro. Nada de material nuevo.</p></div>
+<div class="day"><b>Día 10 · Segundo simulacro y cifras</b><p>Simulacro y repaso de la tabla de números. Si el ponderado no pasa del 85%, mueve la fecha.</p></div>
+</section>
+
+<section id="samples">
+<h2>Las tres preguntas de muestra oficiales</h2>
+<p>Vienen en la guía. No salen del banco real, pero fijan el nivel cognitivo: todas son de escenario y todas se resuelven con un principio, no con memoria.</p>
+
+<div class="q"><div class="stem">Dominio 2 · Procesar 10.000 documentos durante la noche para un informe no urgente. El coste es lo prioritario.</div>
+<ol type="A"><li>Enviar todo síncrono en paralelo para acabar cuanto antes.</li><li>Usar la Message Batches API.</li><li>Bajar <code>max_tokens</code> en las llamadas síncronas.</li><li>Cambiar al modelo más pequeño sea cual sea la calidad.</li></ol>
+<div class="ans"><b>B.</b> Carga tolerante a latencia y de alto volumen a coste reducido. El paralelismo síncrono no baja el precio por token, y ni recortar <code>max_tokens</code> ni reducir el modelo atacan el tradeoff batch-vs-tiempo real.</div></div>
+
+<div class="q"><div class="stem">Dominio 7 · Un agente resume páginas web enviadas por usuarios. Una página lleva texto oculto que le ordena ignorar instrucciones previas y revelar su system prompt.</div>
+<ol type="A"><li>Subir la temperatura para que sea menos predecible.</li><li>Tratar el contenido recuperado como entrada no confiable, mantenerlo separado de las instrucciones y usar guardrails o hooks para que lo inyectado no dispare acciones sensibles.</li><li>Pedir en el system prompt que no incluyan instrucciones maliciosas.</li><li>Cambiar a un modelo mayor que siga mejor las instrucciones.</li></ol>
+<div class="ans"><b>B.</b> Aislamiento del contenido no confiable más mínimo privilegio. La temperatura es irrelevante, una petición cortés no es un control, y un modelo que sigue mejor las instrucciones puede ser <b>más</b> susceptible, no menos.</div></div>
+
+<div class="q"><div class="stem">Dominio 8 · Llamar a un servicio interno de inventario expuesto como API REST, con la capacidad reutilizable entre varias aplicaciones Claude y mantenida de forma independiente.</div>
+<ol type="A"><li>Meter la lógica en el system prompt de cada aplicación.</li><li>Construir un servidor MCP que exponga las operaciones como tools.</li><li>Pegar los datos de inventario en el contexto en cada petición.</li><li>Confiar en una tool built-in, que puede alcanzar cualquier API REST interna.</li></ol>
+<div class="ans"><b>B.</b> Las palabras clave son <b>reutilizable</b> y <b>mantenida de forma independiente</b>: eso es exactamente un servidor MCP. Y ojo con la D, que contiene una afirmación falsa: las tools built-in no alcanzan APIs internas arbitrarias.</div></div>
+
+<div class="key"><b>Patrón de los tres</b>En los tres casos, la correcta es la que <b>nombra el mecanismo diseñado para ese problema</b>, y los distractores son medidas que suenan razonables pero atacan otra cosa: un parámetro irrelevante, una petición en lenguaje natural donde hace falta un control, o una solución que no escala. Cuando dudes, pregúntate qué opción sigue siendo correcta dentro de seis meses y con diez veces más volumen.</div>
+</section>
+
+<section id="ultimas">
+<h2>Las 48 horas de antes</h2>
+<ul>
+<li>Repasa la <a href="../apuntes/#numeros">tabla de números</a> y la <a href="../apuntes/#trampas">sección de trampas por versión</a>. Ahí está casi toda la parte memorística.</li>
+<li>Haz una pasada completa de <a href="../tarjetas/">tarjetas</a> de los temas API y batch, Caching, Modelos y coste. Son los que más cifras exactas tienen.</li>
+<li>Un simulacro cronometrado, no dos. Descansar rinde más que un repaso de última hora.</li>
+<li>Prepara el DNI con el nombre <b>idéntico</b> al del registro, y despeja la mesa: nada de notas, móvil, reloj ni segundo monitor.</li>
+</ul>
+</section>
+
+</div>

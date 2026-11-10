@@ -1,0 +1,160 @@
+<title>Repaso Flash</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{
+  --bg:#f7f6f3;--surface:#fffefb;--surface-2:#f0eee8;--line:#e0ddd4;
+  --ink:#20201d;--ink-2:#57544c;--ink-3:#8b8779;
+  --accent:#b5541f;--accent-soft:#f6e8de;--accent-ink:#8c3f16;
+  --ok:#2f6b46;--ok-soft:#e2efe7;--bad:#a32f28;--bad-soft:#f8e5e3;
+  --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:ui-sans-serif,-apple-system,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#16161a;--surface:#1e1e23;--surface-2:#26262c;--line:#33333b;
+  --ink:#eceae4;--ink-2:#a8a49b;--ink-3:#7b776e;
+  --accent:#e0834c;--accent-soft:#3a2617;--accent-ink:#f0a274;
+  --ok:#6dbb8e;--ok-soft:#1c2f24;--bad:#e0817a;--bad-soft:#33201e;}}
+:root[data-theme="dark"]{
+  --bg:#16161a;--surface:#1e1e23;--surface-2:#26262c;--line:#33333b;
+  --ink:#eceae4;--ink-2:#a8a49b;--ink-3:#7b776e;
+  --accent:#e0834c;--accent-soft:#3a2617;--accent-ink:#f0a274;
+  --ok:#6dbb8e;--ok-soft:#1c2f24;--bad:#e0817a;--bad-soft:#33201e;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:680px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom))}
+h1{font-size:var(--t-sub);margin:0 0 2px;letter-spacing:-.02em}
+.sub{color:var(--ink-3);font-size:var(--t-micro);margin-bottom:18px}
+h2{font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.12em;color:var(--accent-ink);margin:26px 0 9px;font-weight:700;
+   border-bottom:1px solid var(--line);padding-bottom:5px}
+.r{background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:11px 13px;margin-bottom:7px;font-size:var(--t-dato)}
+.r b{color:var(--ink)}
+.r .k{display:block;font-weight:640;margin-bottom:3px;letter-spacing:-.01em}
+.r .v{color:var(--ink-2)}
+.hot{background:var(--accent-soft);border-color:transparent}
+.no{background:var(--bad-soft);border-color:transparent}
+.no .k{color:var(--bad)}
+.si{background:var(--ok-soft);border-color:transparent}
+.si .k{color:var(--ok)}
+code{font-family:var(--mono);font-size:var(--t-dato);background:var(--surface-2);padding:1px 4px;border-radius:4px;border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;font-size:var(--t-dato);margin:0 0 8px;display:block;overflow-x:auto}
+td{border:1px solid var(--line);padding:5px 8px;vertical-align:top}
+td:first-child{font-weight:560;white-space:nowrap;background:var(--surface-2)}
+.top-nav{font-size:var(--t-micro);margin-bottom:16px;display:flex;gap:12px;flex-wrap:wrap}
+a{color:var(--accent-ink)}
+.fin{margin-top:30px;padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-radius:10px;font-size:var(--t-dato);color:var(--ink-2)}
+</style>
+
+<div class="wrap">
+<h1>Repaso Flash</h1>
+<div class="sub">Lo que hay que tener fresco. En orden de peso, no de temario.</div>
+<div class="top-nav"><a href="../architect/">Architect</a><a href="../">Test</a><a href="../tarjetas/">Tarjetas</a><a href="../referencia/">Referencia</a><a href="../apuntes/">Apuntes</a></div>
+
+<h2>Si solo lees una cosa</h2>
+<div class="r hot"><span class="k">El molde de casi todos los ítems</span><span class="v">Síntoma → qué técnica falta. La opción «reformula el prompt con más detalle» casi siempre es el distractor. Y ante dos opciones válidas, gana la que <b>quita la capacidad</b> o <b>verifica contra la fuente</b>, no la que audita después.</span></div>
+<div class="r hot"><span class="k">Ante cualquier duda de modelo o arquitectura</span><span class="v">Lo más pequeño y simple que pase la eval. Nunca «usa el más capaz». Nunca «adopta el framework». Nunca «añade un agente» si un workflow lo hace.</span></div>
+
+<h2>Diagnóstico: síntoma → qué falta</h2>
+<table>
+<tr><td>Forma equivocada</td><td>Restricción de salida</td></tr>
+<tr><td>Deriva entre turnos</td><td>System prompt poco especificado</td></tr>
+<tr><td>Estructura alucinada</td><td>Ejemplos few-shot</td></tr>
+<tr><td>El parser sigue rompiéndose</td><td>Salida estructurada en la API</td></tr>
+<tr><td>Tool errónea <b>desde el turno 1</b></td><td>La descripción (condición de exclusión)</td></tr>
+<tr><td>Tool errónea <b>tras N turnos</b></td><td>La ventana de contexto</td></tr>
+<tr><td>Error de tool al reintentar tras corte</td><td>Bloque a medio construir</td></tr>
+<tr><td>Units pasan, e2e falla</td><td>La costura → test de integración</td></tr>
+<tr><td>Inconsistente entre ejecuciones</td><td>Alucinación</td></tr>
+<tr><td>Fallo reproducible</td><td>Prompt o capacidad del modelo</td></tr>
+</table>
+
+<h2>Bucle agéntico</h2>
+<div class="r"><span class="k">Control del bucle</span><span class="v"><code>stop_reason</code>: sigue en <code>tool_use</code>, termina en <code>end_turn</code>. Nunca parsear lenguaje natural ni usar tope de iteraciones como criterio.</span></div>
+<div class="r"><span class="k">Devolver resultados</span><span class="v">Mensaje <code>role: user</code> con bloques <code>tool_result</code> + <code>tool_use_id</code>. <b>No existe rol tool.</b> Van <b>primeros</b> en content, texto después, o 400.</span></div>
+<div class="r"><span class="k">Fallo de tool</span><span class="v"><code>is_error: true</code>. Nunca excepción, nunca resultado vacío (el modelo lo lee como dato).</span></div>
+<div class="r"><span class="k">Subagentes</span><span class="v">Contexto <b>fresco</b>: solo cruza el string del prompt. Vuelve solo el mensaje final. <b>No precargan skills.</b> Paralelizar = varias llamadas de spawn <b>en una sola respuesta</b>.</span></div>
+<div class="r"><span class="k">Coste</span><span class="v">Agente ~4× un chat · multi-agente ~<b>15×</b>. Solo se gana en tareas que <b>se dividen en partes paralelas independientes</b>.</span></div>
+
+<h2>Workflow o agente</h2>
+<div class="r"><span class="k">La frase</span><span class="v"><b>Workflow</b> si puedes escribir los pasos exactos en código. <b>Agente</b> si puedes dar objetivo y tools pero <b>no el camino</b>.</span></div>
+<div class="r"><span class="k">Parallelization vs orchestrator-workers</span><span class="v">La única diferencia: <b>si las subtareas estaban predefinidas</b>. En orchestrator las decide el modelo en runtime.</span></div>
+<div class="r"><span class="k">Human-in-the-loop</span><span class="v">Si una tool hace algo <b>irreversible</b>, el checkpoint entra <b>antes de cablear el bucle</b>. Un log es forense, no preventivo.</span></div>
+
+<h2>Cifras</h2>
+<table>
+<tr><td>Corte</td><td>720 / 1000</td></tr>
+<tr><td>Batch</td><td><b>50%</b> descuento · 100.000 req o 256 MB · expira 24 h · resultados 29 días · sin streaming</td></tr>
+<tr><td>Estados de batch</td><td>Solo <code>in_progress</code> y <code>ended</code></td></tr>
+<tr><td>Caché TTL</td><td>5 min · 1 h extendido</td></tr>
+<tr><td>Caché precio</td><td>escritura 1,25× / 2× · lectura <b>0,1×</b> → amortiza a la <b>1ª</b> lectura (5 min), 2ª (1 h)</td></tr>
+<tr><td>Breakpoints</td><td>Máximo <b>4</b></td></tr>
+<tr><td>Invalida todo</td><td>Cambiar <code>tools</code> · también el <b>effort</b> (se renderiza en el prompt)</td></tr>
+<tr><td>Tools</td><td>Degrada por encima de <b>30-50</b> · descripción mín. 3-4 frases</td></tr>
+<tr><td>MCP conectados</td><td>5 servidores ≈ <b>55.000 tokens</b> antes de trabajar</td></tr>
+<tr><td>Strict outputs</td><td>20 tools · 24 opcionales · 16 uniones · 180 s compilación</td></tr>
+<tr><td>Imagen</td><td><code>⌈an/28⌉ × ⌈al/28⌉</code> · alta res 2576px/4784 · estándar 1568px/1568</td></tr>
+<tr><td>Timeout no-streaming</td><td>10 minutos</td></tr>
+<tr><td>Reintentos SDK</td><td>2 por defecto, backoff exponencial</td></tr>
+<tr><td>RAG sin RAG</td><td>Cabe bajo <b>200k tokens</b> → todo al prompt con caché</td></tr>
+<tr><td>Contextual retrieval</td><td>−35% · −49% con BM25 · <b>−67%</b> con reranking · top-20 de top-150</td></tr>
+<tr><td>Tool outputs producción</td><td><b>3-5×</b> más que los fixtures</td></tr>
+</table>
+
+<h2>Errores</h2>
+<div class="r"><span class="k">429 vs 529</span><span class="v">429 = tu cuota. <b>529 = sobrecarga global de la API</b>, no tuya. Ambos con backoff.</span></div>
+<div class="r"><span class="k">Streaming</span><span class="v">Errores como <code>event: error</code> <b>tras HTTP 200</b>. Bloque cerrado en <code>content_block_stop</code>, turno en <code>message_stop</code>. <b>Tool use y thinking no se recuperan parcialmente.</b></span></div>
+<div class="r"><span class="k">Clasificar fallos</span><span class="v">¿Lo resolvería esperar? Sí → backoff <b>con tope y presupuesto</b>, nunca bucle. No → <b>fallback con nombre</b>, o la excepción se convierte en el comportamiento por defecto.</span></div>
+<div class="r"><span class="k">Ventana de contexto</span><span class="v">No cabe → <b>error antes de generar</b>. Se agota a mitad → <b>truncado</b> con <code>model_context_window_exceeded</code>. Gestionar el historial es <b>trabajo de la app</b>.</span></div>
+
+<h2>Seguridad — el patrón de respuesta</h2>
+<div class="r si"><span class="k">Correcto</span><span class="v"><b>Quitar la capacidad.</b> Contenido no confiable <b>solo en <code>tool_result</code></b>. JSON-encodear. Hook <code>PreToolUse</code> que <b>bloquea y registra antes</b>.</span></div>
+<div class="r no"><span class="k">Distractores</span><span class="v">Loggear para auditar después · pedir confirmación · instruir en el system prompt · «nuestros usuarios son de confianza» (la inyección llega por el <b>contenido que lee</b>) · un modelo más capaz (puede ser <b>más</b> susceptible).</span></div>
+<div class="r"><span class="k">Cliente regulado</span><span class="v">Identidad → OAuth · credenciales → variables de entorno · auditoría → hook <code>PostToolUse</code> · configuración → managed settings. Y plantearlo <b>en scoping</b>, no tras suspender la revisión.</span></div>
+
+<h2>Claude Code y MCP</h2>
+<div class="r"><span class="k">Permisos</span><span class="v">Orden <b>deny → ask → allow</b>, primer match decide, la especificidad no altera el orden. El modo es una <b>decisión de riesgo</b>; la regla deny cubre lo que el modo no.</span></div>
+<div class="r"><span class="k">CLAUDE.md</span><span class="v"><b>Se concatena</b>, no se sobrescribe. Se reinyecta en cada request (por eso sobrevive a la compactación).</span></div>
+<div class="r"><span class="k">4 mecanismos, 4 problemas</span><span class="v">CLAUDE.md = memoria (se diluye) · reglas = ámbito · hooks = determinismo · subagentes = contexto aparte. <b>Meterlo todo en CLAUDE.md es el anti-patrón.</b></span></div>
+<div class="r"><span class="k">Transporte y scope</span><span class="v">stdio = local · HTTP = remoto o multi-desarrollador. <b>Un stdio en <code>.mcp.json</code> parece compartible y no lo es.</b> Equipo = HTTP <b>y</b> scope de proyecto.</span></div>
+<div class="r"><span class="k">Primitivas MCP</span><span class="v">Tools → el <b>modelo</b> · Resources → la <b>aplicación</b> · Prompts → el <b>usuario</b>.</span></div>
+
+<h2>Evals</h2>
+<div class="r"><span class="k">Cuándo</span><span class="v"><b>Antes de construir.</b> Define el éxito mientras el diseño puede cambiar.</span></div>
+<div class="r"><span class="k">Grader según la salida</span><span class="v">Una forma correcta → exact match · estructurada → código · abierta → juez <b>calibrado antes</b> contra casos humanos. Orden: código → LLM → humano («evítalo si puedes»).</span></div>
+<div class="r"><span class="k">Volumen sobre calidad</span><span class="v">Más casos con grading automático > pocos calificados a mano. Contraintuitivo y literal.</span></div>
+<div class="r"><span class="k">Niveles</span><span class="v">Unit = dentro · integración = <b>la costura</b> · e2e = dice que falla, no dónde. La traza dice <b>qué paso</b>.</span></div>
+
+<h2>Despliegue y empaquetado</h2>
+<div class="r"><span class="k">Pin, no alias</span><span class="v">Fijar la <b>versión concreta</b> del modelo y <b>mantener la anterior disponible</b>. Un alias es «la edición actual del libro»: el texto puede cambiar. Con pin, adoptas el cambio <b>deliberadamente</b> y tienes vuelta atrás.</span></div>
+<div class="r"><span class="k">Elegir plataforma</span><span class="v">Por la <b>nube y la postura de cumplimiento del cliente</b>. Se defiende midiendo: latencia <b>desde la región del cliente</b>, cumplimiento contra <b>su certificación</b>, y coste <b>total por llamada</b>, no precio por token.</span></div>
+<div class="r"><span class="k">Compliance</span><span class="v">En cliente regulado es <b>pasa o no pasa</b>. Se plantea en <b>scoping</b>, o rechaza el build en la revisión de contrato.</span></div>
+<div class="r"><span class="k">Data processor</span><span class="v">Bedrock → <b>AWS</b> (por eso el ZDR de Anthropic no aplica) · Claude Platform on AWS → <b>Anthropic</b> · Vertex → Google · Foundry → Anthropic. FedRAMP/IL4/IL5 o «AWS único procesador» → <b>Bedrock</b>.</span></div>
+<div class="r"><span class="k">Empaquetar en caliente</span><span class="v">Un acelerador guarda la lógica reutilizable, expone lo específico del cliente como <b>parámetros documentados</b>, y trae la <b>eval y el log de auditoría</b>. Saber qué era específico del cliente es lo más caro de reconstruir después.</span></div>
+<div class="r"><span class="k">Contribuir</span><span class="v">Un maintainer acepta <b>lo que puede verificar</b>: código acotado, ejemplo ejecutable, un test y las asunciones escritas. Derechos de licencia confirmados <b>antes</b> de la revisión técnica.</span></div>
+<div class="r"><span class="k">Costuras</span><span class="v">Una aplicación es tan contenida como su costura <b>más privilegiada</b>. La confianza <b>no se hereda</b> del componente que envía el dato. Costura que no se puede asegurar → <b>dueño humano</b>, no se despliega.</span></div>
+
+<h2>Los nueve patrones que se repiten</h2>
+<div class="r hot"><span class="k">1 · Causa raíz sobre síntoma</span><span class="v">Prevenir en la generación gana a filtrar después. Si una opción arregla el origen y otra limpia el resultado, gana la primera.</span></div>
+<div class="r"><span class="k">2 · Tres mecanismos, tres problemas</span><span class="v">Convenciones del proyecto → <b>contexto persistente</b>. Criterio y generalización → <b>ejemplos few-shot</b>. Garantías estructurales → <b>contratos</b> (tool use, JSON Schema, tools por propósito).</span></div>
+<div class="r"><span class="k">3 · El mecanismo correcto de la plataforma</span><span class="v">Añadir al prompt por defecto en vez de reemplazarlo · forzar la tool y dejar el enriquecimiento para turnos posteriores · topes de iteraciones y de gasto · batch solo cuando la latencia lo permite.</span></div>
+<div class="r"><span class="k">4 · Recuperación dirigida sobre carga masiva</span><span class="v">Buscar para localizar, leer solo los aciertos, seguir referencias. Nunca volcar el repositorio entero «para que tenga contexto».</span></div>
+<div class="r"><span class="k">5 · Preservar información, no aplanarla</span><span class="v">Metadatos separados del contenido · cada tipo de dato en su formato · la incertidumbre explícita · un índice de fuentes en vez de las fuentes enteras.</span></div>
+<div class="r no"><span class="k">6 · Nunca fabricar datos para que pase la validación</span><span class="v">Recalcular un total a partir de las líneas es la trampa más clara: genera un dato falso que ahora sí valida. Peor que revisión manual.</span></div>
+<div class="r"><span class="k">7 · Los esquemas fijos envejecen</span><span class="v">Si la distribución evoluciona, prefiere el juicio del modelo o una válvula de escape («other» más detalle) a una lista cerrada o un clasificador entrenado.</span></div>
+<div class="r"><span class="k">8 · Contexto aislado en subagentes</span><span class="v">No hay herencia automática ni memoria compartida. Todo viaja en el prompt.</span></div>
+<div class="r"><span class="k">9 · Paralelismo y observabilidad</span><span class="v">Paralelizar es emitir varias llamadas en un mismo mensaje, y el coordinador sigue siendo quien lanza y agrega. Si la ejecución se sale de él, pierdes la traza.</span></div>
+
+<h2>Errores recurrentes en los distractores</h2>
+<div class="r no"><span class="k">Confundir entrada con salida</span><span class="v"><code>max_tokens</code> limita el <b>output</b>. No arregla un documento que no cabe ni un error de contexto excedido.</span></div>
+<div class="r no"><span class="k">Premisas técnicas falsas</span><span class="v">La concurrencia no baja el precio por token · el orden del array de tools no da prioridad · hay flags de CLI que sencillamente no existen.</span></div>
+<div class="r no"><span class="k">Ocultar el fallo en vez de resolverlo</span><span class="v">Hacer opcionales los campos que no se extraen · documentar la limitación · aceptar el comportamiento como normal.</span></div>
+<div class="r no"><span class="k">Reintentar con el mismo prompt</span><span class="v">Sin feedback del error concreto, se reproduce el mismo fallo de forma determinista.</span></div>
+<div class="r no"><span class="k">Keywords o regex donde hace falta criterio</span><span class="v">Filtrar por palabras suprime también los casos en que el patrón sí es un problema real.</span></div>
+<div class="r no"><span class="k">Añadir infraestructura cuando piden evitarla</span><span class="v">Si el enunciado dice «antes de añadir complejidad», la respuesta no es un clasificador.</span></div>
+
+<h2>Trampas de versión</h2>
+<div class="r no"><span class="k">Ya no son válidas</span><span class="v">Prefill con <code>{</code> para forzar JSON · <code>budget_tokens</code> de extended thinking · sampling y roots en MCP · «descarta el turno parcial» (la doc dice <b>reanudar</b>).</span></div>
+<div class="r no"><span class="k">Cuidado</span><span class="v">La guía llama <code>Task</code> a la tool de subagentes; la doc actual la llama <code>Agent</code>. En el examen, <b>ancla en la guía</b>.</span></div>
+<div class="r"><span class="k">Salida que no cumple el esquema</span><span class="v">Solo dos casos: <code>refusal</code> (200 y se factura) y <code>max_tokens</code>. Los <code>enum</code> no garantizan mayúsculas.</span></div>
+
+<div class="fin"><b>En el examen:</b> 120 minutos. Marca y sigue: no te atasques. Lee cuántas respuestas pide cada ítem. Si aparece código, léelo como <b>forma</b> (qué pasa y qué falla), no como sintaxis. Y ante el empate, elige la opción que sigue siendo correcta dentro de seis meses y con diez veces más volumen.</div>
+</div>

@@ -1,0 +1,702 @@
+<title>Apuntes de Certificación</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{
+  --bg:#f7f6f3; --surface:#fffefb; --surface-2:#f0eee8; --line:#e0ddd4; --line-strong:#c9c5b8;
+  --ink:#20201d; --ink-2:#57544c; --ink-3:#8b8779;
+  --accent:#b5541f; --accent-soft:#f6e8de; --accent-ink:#8c3f16;
+  --ok:#2f6b46; --ok-soft:#e2efe7; --bad:#a32f28; --bad-soft:#f8e5e3;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+  --sans:ui-sans-serif,-apple-system,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#16161a; --surface:#1e1e23; --surface-2:#26262c; --line:#33333b; --line-strong:#4a4a55;
+  --ink:#eceae4; --ink-2:#a8a49b; --ink-3:#7b776e;
+  --accent:#e0834c; --accent-soft:#3a2617; --accent-ink:#f0a274;
+  --ok:#6dbb8e; --ok-soft:#1c2f24; --bad:#e0817a; --bad-soft:#33201e;
+}}
+:root[data-theme="dark"]{
+  --bg:#16161a; --surface:#1e1e23; --surface-2:#26262c; --line:#33333b; --line-strong:#4a4a55;
+  --ink:#eceae4; --ink-2:#a8a49b; --ink-3:#7b776e;
+  --accent:#e0834c; --accent-soft:#3a2617; --accent-ink:#f0a274;
+  --ok:#6dbb8e; --ok-soft:#1c2f24; --bad:#e0817a; --bad-soft:#33201e;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased}
+.layout{max-width:1120px;margin:0 auto;padding:28px 20px 90px;display:grid;grid-template-columns:212px 1fr;gap:38px}
+@media(max-width:860px){.layout{grid-template-columns:1fr;gap:20px}nav.toc{position:static!important;max-height:none!important}}
+header.top{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:6px}
+h1{font-size:var(--t-tit);margin:0;letter-spacing:-.02em}
+.sub{color:var(--ink-3);font-size:var(--t-menor);margin-top:3px}
+a{color:var(--accent-ink)}
+nav.toc{position:sticky;top:20px;align-self:start;max-height:calc(100vh - 60px);overflow-y:auto;font-size:var(--t-menor)}
+nav.toc a{display:block;padding:3px 0;color:var(--ink-2);text-decoration:none;border-left:2px solid transparent;padding-left:9px}
+nav.toc a:hover{color:var(--ink);border-left-color:var(--line-strong)}
+nav.toc .grp{font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);margin:14px 0 4px;font-weight:600}
+section{margin-bottom:38px;scroll-margin-top:20px}
+h2{font-size:var(--t-sub);margin:0 0 4px;letter-spacing:-.01em}
+.weights{font-size:var(--t-micro);color:var(--ink-3);margin-bottom:14px;display:flex;flex-wrap:wrap;gap:5px}
+.w{background:var(--surface-2);border:1px solid var(--line);padding:1px 7px;border-radius:99px;font-family:var(--mono);font-size:var(--t-micro)}
+h3{font-size:var(--t-dato);margin:20px 0 6px;color:var(--ink)}
+p{margin:0 0 11px}
+ul{margin:0 0 12px;padding-left:20px}
+li{margin-bottom:5px}
+code{font-family:var(--mono);font-size:var(--t-dato);background:var(--surface-2);padding:1px 5px;border-radius:4px;border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;font-size:var(--t-dato);margin:0 0 14px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{background:var(--surface-2);font-weight:600;font-size:var(--t-micro);white-space:nowrap}
+.box{border-radius:8px;padding:13px 15px;margin:0 0 14px;font-size:var(--t-dato);border:1px solid var(--line)}
+.box b:first-child{display:block;font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px}
+.trap{background:var(--bad-soft);border-color:transparent;border-radius:8px;padding:13px 15px;margin:0 0 14px;font-size:var(--t-dato)}
+.trap b:first-child{display:block;font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px;color:var(--bad)}
+.key{background:var(--accent-soft);border-color:transparent;border-radius:8px;padding:13px 15px;margin:0 0 14px;font-size:var(--t-dato)}
+.key b:first-child{display:block;font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px;color:var(--accent-ink)}
+.src{font-size:var(--t-micro);color:var(--ink-3);margin-top:10px;word-break:break-all}
+.lead{font-size:var(--t-dato);color:var(--ink-2);border-left:3px solid var(--accent);padding-left:14px;margin:0 0 26px}
+
+/* ---------- Barra de modo ---------- */
+.modebar{grid-column:1/-1;display:flex;gap:8px;align-items:center;margin:0 0 20px}
+button{font-family:inherit;cursor:pointer}
+.mbtn{display:inline-block;text-decoration:none;background:var(--surface);border:1px solid var(--line-strong);color:var(--ink);padding:9px 16px;border-radius:8px;font-size:var(--t-dato);font-weight:520}
+.mbtn:hover{background:var(--surface-2)}
+.mbtn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* ---------- Móvil ---------- */
+@media (max-width:860px){
+  .layout{padding:16px 14px calc(60px + env(safe-area-inset-bottom))}
+  h1{font-size:var(--t-sub)}
+  .sub{font-size:var(--t-micro)}
+  header.top{padding-bottom:12px;gap:8px}
+  /* índice como fila deslizable, no como columna larga */
+  nav.toc{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+          margin:0 -14px 6px;padding:0 14px 6px;border-bottom:1px solid var(--line)}
+  nav.toc::-webkit-scrollbar{display:none}
+  nav.toc .grp{display:none}
+  nav.toc a{flex:0 0 auto;border:1px solid var(--line);border-left:1px solid var(--line);border-radius:99px;
+            padding:6px 12px;font-size:var(--t-micro);white-space:nowrap;background:var(--surface)}
+  .lead{font-size:var(--t-dato);margin-bottom:20px}
+  section{margin-bottom:30px}
+  h2{font-size:var(--t-base)}
+  h3{font-size:var(--t-dato);margin-top:18px}
+  p,li{font-size:var(--t-dato)}
+  table{font-size:var(--t-menor)}
+  th,td{padding:6px 8px}
+  .trap,.key,.box{font-size:var(--t-dato);padding:12px 13px}
+  .mbtn{flex:1;text-align:center;font-size:max(16px,.86rem);padding:11px 8px}
+  .modebar{margin-bottom:14px}
+  .card{padding:22px 18px;min-height:200px;border-radius:12px}
+  .cfront{font-size:var(--t-base)}
+  .cback{font-size:var(--t-dato)}
+}
+</style>
+
+<div class="layout">
+<header class="top">
+  <div><h1>Apuntes de Certificación</h1>
+  <div class="sub">Lo que hay que saber en frío para los cuatro exámenes Claude · verificado contra doc oficial, agosto 2026</div></div>
+  <div class="nav" style="display:flex;gap:12px;flex-wrap:wrap;font-size:var(--t-menor);font-weight:520"><a href="../architect/">Architect</a><a href="../developer/">Developer</a><a href="../referencia/">Referencia</a><a href="../tarjetas/">Tarjetas</a><a href="../">Test</a></div>
+</header>
+
+<div class="modebar">
+  <a class="mbtn primary" href="../tarjetas/">Estudiar con tarjetas →</a>
+</div>
+
+<nav class="toc">
+  <div class="grp">Agentes</div>
+  <a href="#loop">1 · Bucle agéntico y tool use</a>
+  <a href="#subagentes">2 · Subagentes y orquestación</a>
+  <a href="#patrones">3 · Workflow vs agente</a>
+  <a href="#contexto">4 · Context engineering</a>
+  <div class="grp">Plataforma</div>
+  <a href="#claudecode">5 · Claude Code</a>
+  <a href="#mcp">6 · MCP</a>
+  <a href="#quecosa">7 · Skill, MCP, hook o CLAUDE.md</a>
+  <div class="grp">API</div>
+  <a href="#api">8 · Messages, errores, batch</a>
+  <a href="#modelos">9 · Modelos, thinking y coste</a>
+  <a href="#caching">10 · Prompt caching</a>
+  <a href="#structured">11 · Salida estructurada</a>
+  <div class="grp">Calidad y riesgo</div>
+  <a href="#evals">12 · Evals y alucinaciones</a>
+  <a href="#seguridad">13 · Seguridad</a>
+  <a href="#rag">14 · RAG</a>
+  <a href="#compliance">15 · Compliance</a>
+  <div class="grp">Associate</div>
+  <a href="#criterio">16 · Criterio de negocio</a>
+  <div class="grp">Integración</div>
+  <a href="#equipo">17 · Claude Code en equipo</a>
+  <a href="#despliegue">18 · MCP: transporte y scope</a>
+  <div class="grp">Repaso</div>
+  <a href="#numeros">19 · Números que caen</a>
+  <a href="#trampas">20 · Trampas por versión</a>
+</nav>
+
+<main>
+<p class="lead">Estos apuntes cubren el núcleo común de los cuatro exámenes. Cada sección lleva el peso que tiene en cada uno, para que decidas dónde gastar el tiempo. Las secciones 1-4 y 6 valen para tres exámenes a la vez: son la mejor inversión del temario.</p>
+<p class="lead" style="border-color:var(--line-strong)">¿Vas con prisa? Empieza por las <a href="../tarjetas/">tarjetas</a>: tandas de 10 en tres minutos, con repetición espaciada. Estos apuntes son la referencia larga a la que volver cuando una tarjeta no te cuadre.</p>
+
+<section id="loop">
+<h2>1 · Bucle agéntico y tool use</h2>
+<div class="weights"><span class="w">CCAR-F 27%</span><span class="w">CCAR-P 17%</span><span class="w">CCDV-F 14,7%</span></div>
+
+<p>Un agente es, en la definición que usa Anthropic, <b>un LLM usando herramientas en bucle de forma autónoma</b>. El ciclo tiene cinco pasos: recibir prompt → el modelo evalúa y responde → se ejecutan las tools que ha pedido → los resultados vuelven → repetir. Termina cuando el modelo produce una respuesta sin llamadas a tools.</p>
+
+<h3>Cómo se sabe que hay que seguir</h3>
+<p>A nivel de API, cuando Claude quiere usar una tool la respuesta trae <code>stop_reason: "tool_use"</code> y uno o más bloques <code>tool_use</code> con <code>id</code>, <code>name</code> e <code>input</code>. Cuando ha terminado, <code>stop_reason: "end_turn"</code>. Ese campo es el control de flujo del bucle.</p>
+<p>Valores posibles de <code>stop_reason</code>: <code>end_turn</code>, <code>max_tokens</code>, <code>stop_sequence</code>, <code>tool_use</code>, <code>pause_turn</code>, <code>refusal</code>, <code>model_context_window_exceeded</code>.</p>
+
+<h3>Cómo vuelven los resultados</h3>
+<p>En un mensaje con <code>role: "user"</code> que contiene bloques <code>tool_result</code>. Campos: <code>tool_use_id</code> (obligatorio), <code>content</code> (opcional) e <code>is_error</code> (opcional). <b>No existe rol <code>tool</code> ni <code>function</code> en la API de Claude</b>, a diferencia de otras APIs de chat.</p>
+<p>Dos reglas de formato que devuelven 400 si se incumplen: el mensaje con los <code>tool_result</code> debe ir <b>inmediatamente después</b> del assistant que emitió el <code>tool_use</code>, y los bloques <code>tool_result</code> deben ir <b>los primeros</b> del array <code>content</code>. Cualquier texto va detrás.</p>
+
+<h3>Errores de tool</h3>
+<p>Un fallo de tool no es una excepción de tu aplicación: es información para el modelo. Se devuelve como <code>tool_result</code> con <code>is_error: true</code> y una causa legible, para que el agente pueda reintentar con otros parámetros, escalar o informar.</p>
+
+<h3>Definir tools</h3>
+<p>Tres campos obligatorios: <code>name</code> (regex <code>^[a-zA-Z0-9_-]{1,64}$</code>), <code>description</code> e <code>input_schema</code> (JSON Schema).</p>
+<div class="key"><b>Frase literal de la doc</b>«Provide extremely detailed descriptions. <b>This is by far the most important factor in tool performance</b>». El objetivo es al menos 3-4 frases por descripción. En las pruebas de Anthropic, reescribir descripciones de tools con un agente de testing redujo un <b>40%</b> el tiempo de completado de tareas.</div>
+
+<p>Buenas prácticas oficiales: <b>consolidar</b> operaciones relacionadas en menos tools con un parámetro de acción, en vez de <code>create_pr</code>/<code>review_pr</code>/<code>merge_pr</code>; <b>namespacing</b> por servicio (<code>github_list_prs</code>); devolver identificadores semánticos estables, no referencias internas opacas.</p>
+<p><b>La capacidad de elegir bien la tool se degrada por encima de 30-50 tools disponibles.</b> Con catálogos grandes se recomienda tool search. Repartir las tools entre varios servidores MCP conectados a la vez no soluciona nada: el modelo sigue viendo el total.</p>
+
+<h3><code>tool_choice</code>: cuatro valores</h3>
+<table><tr><th>Valor</th><th>Efecto</th></tr>
+<tr><td><code>auto</code></td><td>Por defecto cuando hay <code>tools</code>. El modelo decide.</td></tr>
+<tr><td><code>any</code></td><td>Obliga a usar alguna tool.</td></tr>
+<tr><td><code>tool</code></td><td>Obliga a una concreta, con <code>name</code>.</td></tr>
+<tr><td><code>none</code></td><td>Por defecto cuando no hay <code>tools</code>.</td></tr></table>
+<p>Con <code>any</code> o <code>tool</code> la API hace prefill del mensaje del asistente, así que <b>no habrá texto natural antes del <code>tool_use</code></b>. Si tu interfaz muestra ese texto como razonamiento visible, desaparece.</p>
+<p>El uso paralelo de tools está <b>activado por defecto</b>; se desactiva con <code>disable_parallel_tool_use: true</code> dentro de <code>tool_choice</code>.</p>
+
+<h3>Client tools vs server tools</h3>
+<p><b>Client tools</b>: las defines tú, la respuesta llega con <code>stop_reason: "tool_use"</code>, tú ejecutas y devuelves <code>tool_result</code>. Incluye también las de esquema Anthropic como <code>bash</code>, <code>text_editor</code>, <code>memory</code> o <code>computer</code>.<br>
+<b>Server tools</b>: se ejecutan en la infraestructura de Anthropic dentro de la misma request, sin ida y vuelta por tu parte — búsqueda web, web fetch, ejecución de código, conector MCP.</p>
+
+<div class="trap"><b>Anti-patrones que caen como distractores</b>
+<ul><li>Parsear lenguaje natural («he terminado») para decidir si el bucle para.</li>
+<li>Usar un tope de iteraciones como <i>mecanismo principal</i> de parada (como red de seguridad sí, como criterio no).</li>
+<li>Comprobar si hay texto del asistente para dar por terminada la tarea: puede haber texto junto a un <code>tool_use</code>.</li>
+<li>Lanzar excepción o devolver 500 desde una tool en vez de <code>is_error</code>.</li></ul></div>
+<div class="src">platform.claude.com/docs/en/agents-and-tools/tool-use/handle-tool-calls · .../define-tools · code.claude.com/docs/en/agent-sdk/agent-loop</div>
+</section>
+
+<section id="subagentes">
+<h2>2 · Subagentes y orquestación multi-agente</h2>
+<div class="weights"><span class="w">CCAR-F 27%</span><span class="w">CCAR-P 17%</span><span class="w">CCDV-F 14,7%</span></div>
+
+<p>Arquitectura <b>hub-and-spoke</b>: un coordinador gestiona toda la comunicación entre subagentes, el manejo de errores y el enrutado de información. Se elige por <b>observabilidad y control</b>, no por ahorro — los sistemas multi-agente consumen del orden de <b>15×</b> los tokens de un chat (los agentes simples, ~4×). Por eso solo se justifican en tareas de alto valor.</p>
+
+<h3>Lo que más se pregunta: el aislamiento de contexto</h3>
+<div class="key"><b>Regla central</b>Un subagente arranca con contexto <b>fresco</b>. Lo único que cruza la frontera es el <b>string del prompt</b> con el que se le invoca, más su propio system prompt, el CLAUDE.md del proyecto y las definiciones de tools. <b>No hereda</b> el historial ni los tool results del padre. Y de vuelta, solo el <b>mensaje final</b> del subagente llega al padre como tool result.</div>
+<p>Consecuencia práctica: si el subagente de síntesis produce informes vacíos de detalle, casi siempre es porque el coordinador no incluyó los hallazgos previos en su prompt. Y al pasar contexto entre agentes conviene usar formatos estructurados que separen contenido de metadatos (URLs de origen, nombres de documento, páginas) para no perder la atribución.</p>
+
+<h3>Spawning y paralelismo</h3>
+<ul>
+<li>La tool de spawn debe estar en <code>allowedTools</code> o la invocación se deniega.</li>
+<li><b>Paralelizar = emitir varias llamadas de spawn en una sola respuesta</b> del coordinador. Una por turno es ejecución secuencial disfrazada.</li>
+<li><code>AgentDefinition</code>: obligatorios <code>description</code> y <code>prompt</code>. Opcionales: <code>tools</code>, <code>disallowedTools</code>, <code>model</code> (incluido <code>'inherit'</code>), <code>skills</code>, <code>memory</code>, <code>mcpServers</code>, <code>maxTurns</code>, <code>effort</code>, <code>permissionMode</code>. Si omites <code>tools</code>, hereda todas las disponibles.</li>
+<li>Los agentes definidos programáticamente tienen precedencia sobre los del filesystem con el mismo nombre.</li>
+</ul>
+
+<h3>Diseño del coordinador</h3>
+<p>Prompts de <b>objetivos y criterios de calidad</b>, no de pasos procedimentales, para que los subagentes se adapten. El coordinador debe seleccionar dinámicamente qué subagentes invocar según la complejidad de la consulta, en vez de recorrer siempre el pipeline completo, y particionar el alcance para minimizar duplicación. El fallo típico es una descomposición demasiado estrecha que deja lagunas: se corrige con un bucle donde el coordinador evalúa la síntesis, detecta huecos y re-delega con queries dirigidas.</p>
+
+<h3>Cifras del sistema de investigación de Anthropic</h3>
+<ul>
+<li>Multi-agente (Opus como lead, Sonnet como subagentes) superó al single-agent en <b>90,2%</b> en su eval interna.</li>
+<li>Tres factores explican el <b>95%</b> de la varianza de rendimiento; el <b>uso de tokens por sí solo explica el 80%</b>. Los otros dos: número de tool calls y elección de modelo.</li>
+<li>Reglas de escalado del prompt del lead: dato simple = 1 agente y 3-10 tool calls; comparación directa = 2-4 subagentes con 10-15 calls cada uno; investigación compleja = más de 10 subagentes.</li>
+<li>El lead lanza <b>3-5 subagentes en paralelo</b> y cada uno usa 3+ tools en paralelo: hasta <b>90% menos tiempo</b> en consultas complejas.</li>
+<li>Cada subagente puede gastar decenas de miles de tokens y devolver un resumen destilado de <b>1.000-2.000 tokens</b>.</li>
+</ul>
+<div class="src">code.claude.com/docs/en/agent-sdk/subagents · anthropic.com/engineering/multi-agent-research-system</div>
+</section>
+
+<section id="patrones">
+<h2>3 · Workflow vs agente: los cinco patrones</h2>
+<div class="weights"><span class="w">CCAR-F 27%</span><span class="w">CCAR-P 17%</span><span class="w">CCDV-F 14,7%</span></div>
+
+<div class="key"><b>Definiciones canónicas</b><b>Workflow</b> = LLMs y tools orquestados por <b>rutas de código predefinidas</b>. <b>Agente</b> = el LLM <b>dirige dinámicamente</b> su propio proceso y uso de tools. Ambos son «sistemas agénticos».</div>
+
+<p>Criterio: los workflows dan <b>predictibilidad y consistencia</b> en tareas bien definidas; los agentes se eligen cuando hace falta <b>flexibilidad y decisión dirigida por el modelo a escala</b>. Y la recomendación previa a todo: para muchas aplicaciones basta con <b>optimizar una sola llamada</b> con retrieval y ejemplos in-context. Añadir complejidad solo cuando mejore el resultado de forma demostrable.</p>
+
+<p>El bloque base de todo es el <b>augmented LLM</b>: modelo + retrieval + tools + memoria.</p>
+
+<table>
+<tr><th>Patrón</th><th>Cuándo</th><th>Marca distintiva</th></tr>
+<tr><td>Prompt chaining</td><td>Tarea descomponible en subtareas fijas</td><td>Cambia latencia por precisión; permite «gates» programáticos entre pasos</td></tr>
+<tr><td>Routing</td><td>Inputs de categorías distintas</td><td>Requiere categorías separables y clasificación fiable</td></tr>
+<tr><td>Parallelization</td><td>Subtareas independientes (<i>sectioning</i>) o varias pasadas de lo mismo (<i>voting</i>)</td><td>Las subtareas <b>están predefinidas</b></td></tr>
+<tr><td>Orchestrator-workers</td><td>La descomposición no se conoce de antemano</td><td>Las subtareas <b>las decide el modelo en runtime</b></td></tr>
+<tr><td>Evaluator-optimizer</td><td>Hay criterios claros y el feedback mejora demostrablemente</td><td>Un LLM genera, otro evalúa, se itera</td></tr>
+</table>
+
+<div class="trap"><b>La confusión que buscan</b>Parallelization vs orchestrator-workers. La diferencia no es cuántos agentes hay ni si corren a la vez: es <b>si las subtareas estaban definidas antes de empezar</b>.</div>
+<p>Tres principios de cierre: simplicidad, transparencia (mostrar los pasos de planificación) y diseño cuidadoso de la ACI (agent-computer interface).</p>
+<div class="src">anthropic.com/engineering/building-effective-agents</div>
+</section>
+
+<section id="contexto">
+<h2>4 · Context engineering</h2>
+<div class="weights"><span class="w">CCAR-F 15%</span><span class="w">CCAR-P 13%</span><span class="w">CCDV-F 11%</span></div>
+
+<p><b>Context engineering</b> = curar y mantener el conjunto óptimo de tokens durante la inferencia. Es la progresión natural del prompt engineering, que se limitaba a escribir instrucciones. Principio guía: <b>el conjunto más pequeño posible de tokens de alta señal</b>.</p>
+
+<div class="key"><b>Context rot</b>A mayor número de tokens en la ventana, menor capacidad del modelo de recordar con precisión. Causa: atención cuadrática sobre n tokens y una distribución de entrenamiento sesgada a secuencias cortas. Es un <b>gradiente de degradación, no un acantilado</b> — cabe en la ventana y aun así rinde peor.</div>
+
+<h3>Las tres técnicas para tareas largas, y cuándo cada una</h3>
+<table><tr><th>Técnica</th><th>Cuándo</th></tr>
+<tr><td>Compaction</td><td>Flujo conversacional con mucho ida y vuelta</td></tr>
+<tr><td>Structured note-taking (memoria agéntica)</td><td>Desarrollo iterativo con hitos claros</td></tr>
+<tr><td>Arquitecturas multi-agente</td><td>Investigación y análisis con exploración paralela</td></tr></table>
+
+<h3>Compaction</h3>
+<p>Se pasa el historial al modelo para que lo resuma. <b>Preserva</b> decisiones arquitectónicas, bugs sin resolver y detalles de implementación; <b>descarta</b> tool outputs redundantes. En Claude Code continúa con el contexto comprimido más los cinco archivos accedidos más recientemente. Al afinarla: primero maximizar recall, después iterar precisión.</p>
+<div class="key"><b>Consecuencia práctica que cae en el examen</b>La compactación <b>puede perder instrucciones del prompt inicial</b>. Lo que debe persistir va en CLAUDE.md, porque se reinyecta en cada request.</div>
+
+<h3>Tool result pruning</h3>
+<p>«La forma más segura y ligera de compactación es el <i>tool result clearing</i>». El razonamiento oficial: una vez que una tool se llamó hace mucho, el agente no necesita volver a ver su resultado crudo.</p>
+
+<h3>Just-in-time vs monolítico</h3>
+<p>En JIT el agente mantiene <b>identificadores ligeros</b> (rutas, queries guardadas, links) y carga los datos en runtime con tools, en vez de precargarlo todo. Ventajas: descubrimiento progresivo, y los metadatos como señal (nombres, jerarquía de carpetas, timestamps). <b>Contrapartida reconocida: la exploración en runtime es más lenta</b> que el retrieval precomputado. Claude Code usa un <b>modelo híbrido</b>: CLAUDE.md se carga por adelantado, glob y grep recuperan just-in-time.</p>
+<div class="src">anthropic.com/engineering/effective-context-engineering-for-ai-agents</div>
+</section>
+
+<section id="claudecode">
+<h2>5 · Claude Code: memoria, permisos, hooks, sesiones</h2>
+<div class="weights"><span class="w">CCAR-F 20%</span><span class="w">CCAR-P 7%</span><span class="w">CCDV-F 3,1%</span></div>
+<p class="sub" style="margin:-8px 0 14px">Ojo al reparto: en el Developer pesa solo 3,1%. Si es tu terreno diario, es justo donde <b>no</b> debes gastar tiempo de estudio.</p>
+
+<h3>Jerarquía de CLAUDE.md</h3>
+<p>Orden de alcance: <b>managed policy</b> → <b>usuario</b> (<code>~/.claude/CLAUDE.md</code>) → <b>proyecto</b> (<code>./CLAUDE.md</code>) → <b>local</b> (<code>./CLAUDE.local.md</code>).</p>
+<div class="key"><b>Se concatenan, no se sobrescriben</b>El de proyecto no sustituye al de usuario: se suman. Por eso instrucciones contradictorias entre niveles producen comportamiento errático — hay que eliminarlas, no confiar en que una gane.</div>
+
+<h3>Precedencia de settings (distinta de la de CLAUDE.md)</h3>
+<p>Managed (no anulable) → argumentos de CLI → local → proyecto → usuario. Las <b>reglas de permisos se fusionan</b> entre scopes en vez de sobrescribirse.</p>
+
+<h3>Permisos</h3>
+<p>Tres tipos: <b>allow / ask / deny</b>. Se evalúan en orden <b>deny → ask → allow</b>; el primero que casa decide y <b>la especificidad no altera ese orden</b>. Un deny con nombre desnudo (<code>Bash</code>) elimina la tool del contexto; con specifier (<code>Bash(rm *)</code>) bloquea solo las coincidencias.</p>
+<p>Modos: <code>default</code>, <code>acceptEdits</code>, <code>plan</code>, <code>auto</code>, <code>dontAsk</code>, <code>bypassPermissions</code>. <b>Plan mode</b> bloquea ediciones hasta que apruebas el plan: su valor está en tareas de alto impacto con incertidumbre sobre el alcance del cambio.</p>
+
+<h3>Hooks</h3>
+<p>Eventos principales: <code>PreToolUse</code>, <code>PostToolUse</code>, <code>UserPromptSubmit</code>, <code>Stop</code>, <code>SubagentStart</code>/<code>SubagentStop</code>, <code>PreCompact</code>, <code>SessionStart</code>/<code>SessionEnd</code>, <code>Notification</code>, <code>Setup</code>.</p>
+<ul>
+<li><code>PreToolUse</code> devuelve <code>permissionDecision</code>: <code>allow</code>, <code>deny</code>, <code>ask</code> o <code>defer</code>. Un <b>deny impide la ejecución</b> y Claude recibe el rechazo como tool result.</li>
+<li><code>PostToolUse</code> puede añadir contexto o <b>reemplazar</b> la salida antes de que Claude la vea.</li>
+<li><b>Los hooks corren en tu proceso, fuera del context window</b>: no consumen contexto salvo lo que devuelvan.</li>
+<li>Exit code 2 = error bloqueante, no anulable ni con un <code>allow</code>.</li>
+<li>Silencio no es aprobación: un hook puede denegar, pero callarse deja seguir el flujo normal de permisos.</li>
+</ul>
+
+<h3>Sesiones: tres mecanismos distintos</h3>
+<table><tr><th>Mecanismo</th><th>Qué hace</th></tr>
+<tr><td><b>continue</b></td><td>Retoma la sesión más reciente del directorio, sin ID</td></tr>
+<tr><td><b>resume</b></td><td>Retoma una sesión concreta por ID</td></tr>
+<tr><td><b>fork</b></td><td>Crea una sesión <b>nueva con copia del historial</b>, con ID propio, dejando intacta la original</td></tr></table>
+<div class="trap"><b>Matiz del fork</b>Ramifica <b>la conversación, no el filesystem</b>. Las ediciones de archivos del fork son reales y visibles para otras sesiones. Para revertir archivos hace falta checkpointing.</div>
+
+<h3>Headless</h3>
+<p><code>-p</code>/<code>--print</code> con <code>--output-format text|json|stream-json</code>, <code>--allowedTools</code>, <code>--continue</code>/<code>--resume</code>. Es la vía para CI y automatización.</p>
+<div class="src">code.claude.com/docs/en/memory · .../settings · .../permissions · .../hooks · .../headless</div>
+</section>
+
+<section id="mcp">
+<h2>6 · Model Context Protocol</h2>
+<div class="weights"><span class="w">CCAR-P 19%</span><span class="w">CCAR-F 18%</span><span class="w">CCDV-F 10,6%</span></div>
+
+<h3>Arquitectura</h3>
+<p>Un <b>MCP Host</b> (la aplicación de IA) crea <b>un MCP Client por cada MCP Server</b>, con conexión dedicada 1:1. Dos capas: <b>data layer</b> (JSON-RPC 2.0, primitivas, notificaciones) y <b>transport layer</b> (framing, canales, autorización).</p>
+
+<h3>Las tres primitivas de servidor y quién las controla</h3>
+<div class="key"><b>Es la pregunta más repetible de MCP</b><b>Tools</b> → las controla el <b>modelo</b>. <b>Resources</b> → los controla la <b>aplicación</b> (son de solo lectura). <b>Prompts</b> → los controla el <b>usuario</b> (a menudo expuestos como slash commands).</div>
+<p>Métodos: <code>tools/list</code>, <code>tools/call</code>; <code>resources/list</code>, <code>resources/read</code>; <code>prompts/list</code>, <code>prompts/get</code>. Los recursos llevan URI única y MIME type, en dos patrones: <b>Direct Resources</b> (URI fija) y <b>Resource Templates</b> (URI parametrizada).</p>
+
+<h3>Transportes</h3>
+<p>Dos estándar: <b>stdio</b> (JSON-RPC delimitado por newline sobre un subproceso que lanza el cliente) y <b>Streamable HTTP</b> (POST a un endpoint único; respuesta JSON o stream SSE).</p>
+
+<h3>Autorización</h3>
+<ul>
+<li>Es <b>opcional</b> y aplica a transportes HTTP. <b>stdio no debería usarla</b>: toma credenciales del entorno.</li>
+<li>El MCP Server actúa como <b>OAuth 2.1 Resource Server</b>; el cliente como OAuth 2.1 Client.</li>
+<li>PKCE obligatorio. El token va siempre en cabecera <code>Authorization: Bearer</code>, <b>nunca en query string</b>.</li>
+<li>Códigos: <b>401</b> no autorizado o token inválido, <b>403</b> scopes insuficientes, <b>400</b> request malformado.</li>
+</ul>
+
+<h3>MCP dentro de Claude Code</h3>
+<p>Tres scopes: <b>local</b> (por defecto, por máquina), <b>project</b> (<code>.mcp.json</code> versionado en el repo, requiere aprobación interactiva la primera vez), <b>user</b> (todos tus proyectos). Precedencia local &gt; project &gt; user.</p>
+<p>Nomenclatura: tools = <code>mcp__servidor__tool</code>; prompts = slash commands <code>/mcp__servidor__prompt</code>; resources = menciones <code>@servidor:protocolo://ruta</code>.</p>
+<div class="trap"><b>Aviso de seguridad oficial</b>Anthropic revisa los connectors contra sus criterios de listado pero <b>no audita ni gestiona la seguridad de ningún MCP server</b>. La responsabilidad de lo que expones es tuya.</div>
+<div class="src">modelcontextprotocol.io/docs/learn/architecture · .../server-concepts · /specification/latest/basic/authorization · code.claude.com/docs/en/mcp</div>
+</section>
+
+<section id="quecosa">
+<h2>7 · Skill, MCP, hook o CLAUDE.md: el árbol de decisión</h2>
+<div class="weights"><span class="w">CCAR-F 18%</span><span class="w">CCDV-F 10,6%</span><span class="w">CCAR-P 7%</span></div>
+
+<table><tr><th>Síntoma</th><th>Respuesta</th></tr>
+<tr><td>Convención mal aplicada dos veces</td><td>CLAUDE.md</td></tr>
+<tr><td>Mismo prompt retecleado</td><td>Skill invocable por el usuario</td></tr>
+<tr><td>Mismo playbook pegado por tercera vez</td><td>Skill</td></tr>
+<tr><td>Copiar datos de una pestaña que Claude no ve</td><td>MCP server</td></tr>
+<tr><td>Tarea lateral que inunda el contexto</td><td>Subagente</td></tr>
+<tr><td>«Que pase siempre, sin preguntar»</td><td>Hook</td></tr>
+<tr><td>Segundo repo con el mismo setup</td><td>Plugin</td></tr></table>
+
+<div class="key"><b>MCP vs Skill, en la frase oficial</b>«MCP le da a Claude <b>herramientas</b> para un sistema externo, con conexión y autenticación gestionadas por el server. Las Skills le dan <b>conocimiento sobre cómo usar esas herramientas</b>». Son complementarias, no alternativas.</div>
+<div class="key"><b>Hook vs Skill: determinismo</b>«Una instrucción como "nunca edites .env" en CLAUDE.md o en una skill <b>es una petición, no una garantía</b>. Un hook PreToolUse que bloquea la edición es enforcement».</div>
+
+<h3>Coste de contexto de cada mecanismo</h3>
+<ul><li><b>CLAUDE.md</b>: contenido completo en cada request.</li>
+<li><b>Skills</b>: solo las descripciones al inicio.</li>
+<li><b>MCP</b>: nombres de tools al inicio, esquemas diferidos.</li>
+<li><b>Subagentes</b>: contexto aislado.</li>
+<li><b>Hooks</b>: cero, salvo que devuelvan output.</li></ul>
+
+<h3>Agent Skills: progressive disclosure en tres niveles</h3>
+<table><tr><th>Nivel</th><th>Qué</th><th>Coste</th></tr>
+<tr><td>L1 Metadata</td><td><code>name</code> + <code>description</code></td><td>Siempre cargado, ~100 tokens por skill</td></tr>
+<tr><td>L2 Instructions</td><td>Cuerpo del SKILL.md</td><td>Al activarse; objetivo por debajo de 5k tokens</td></tr>
+<tr><td>L3 Resources</td><td>Ficheros empaquetados</td><td>Cero hasta que se acceden</td></tr></table>
+<p>Frontmatter obligatorio del estándar: <b>solo <code>name</code> y <code>description</code></b>. <code>description</code> ≤1024 caracteres, en tercera persona, y debe decir <b>qué hace y cuándo usarla</b>. Cuerpo por debajo de 500 líneas.</p>
+<div class="src">code.claude.com/docs/en/features-overview · docs.claude.com/en/docs/agents-and-tools/agent-skills/overview</div>
+</section>
+
+<section id="api">
+<h2>8 · Messages API, errores, streaming y batch</h2>
+<div class="weights"><span class="w">CCDV-F 33,1%</span><span class="w">CCAR-P 19%</span></div>
+<p class="sub" style="margin:-8px 0 14px">El dominio más pesado del Developer con diferencia. Buena parte es ingeniería de software genérica: puntos baratos.</p>
+
+<h3>Estructura básica</h3>
+<p><code>POST /v1/messages</code>. Obligatorios: <code>model</code>, <code>messages</code>, <code>max_tokens</code>.</p>
+<div class="key"><b>No existe el rol <code>system</code></b>El array <code>messages</code> solo admite <code>user</code> y <code>assistant</code>. El system prompt va en el <b>parámetro top-level <code>system</code></b>, como string o array de bloques de texto — esto último es lo que permite poner ahí un breakpoint de caché. Turnos consecutivos del mismo rol se combinan en uno.</div>
+
+<h3>Errores</h3>
+<table><tr><th>Código</th><th>Tipo</th><th>Qué hacer</th></tr>
+<tr><td>400</td><td><code>invalid_request_error</code></td><td>Arreglar la request</td></tr>
+<tr><td>401 / 403</td><td>auth / permisos</td><td>Credencial</td></tr>
+<tr><td>413</td><td><code>request_too_large</code></td><td>Trocear (Messages 32 MB · Batch 256 MB · Files 500 MB)</td></tr>
+<tr><td><b>429</b></td><td><code>rate_limit_error</code></td><td>Tu cuota. También salta por subidas bruscas de tráfico: la mitigación es rampa gradual</td></tr>
+<tr><td><b>529</b></td><td><code>overloaded_error</code></td><td><b>Sobrecarga global de la API, no tuya.</b> Backoff exponencial</td></tr></table>
+<p>Los SDK oficiales reintentan fallos transitorios con backoff exponencial, <b>2 reintentos por defecto</b>, respetando <code>retry-after</code>. Toda respuesta trae cabecera <code>request-id</code>.</p>
+
+<h3>Streaming</h3>
+<p>Secuencia: <code>message_start</code> → por cada bloque <code>content_block_start</code> + N <code>content_block_delta</code> + <code>content_block_stop</code> → <code>message_delta</code> → <code>message_stop</code>. Los <code>usage</code> del <code>message_delta</code> son <b>acumulativos</b>.</p>
+<div class="trap"><b>Trampa de manejo de errores</b>Los errores de stream llegan como <code>event: error</code> <b>después de un HTTP 200</b>, porque la cabecera ya se envió. Un manejador que solo mire el status code no los ve nunca.</div>
+<p>Las llamadas no-streaming están limitadas a un <b>timeout de 10 minutos</b>. Para operaciones largas: streaming o Batch.</p>
+
+<h3>Message Batches API</h3>
+<ul>
+<li><b>Descuento del 50%</b> sobre input y output.</li>
+<li>Límite: <b>100.000 requests o 256 MB</b>, lo que se alcance primero.</li>
+<li>La mayoría termina en <b>menos de 1 hora</b>; los resultados están disponibles al completar o <b>a las 24 h</b>, lo que ocurra antes. Los batches <b>expiran</b> si no completan en 24 h.</li>
+<li>Resultados descargables durante <b>29 días</b>.</li>
+<li>Estados del batch: solo <code>in_progress</code> y <code>ended</code>. Por request: <code>succeeded</code>, <code>errored</code>, <code>canceled</code>, <code>expired</code> (los tres últimos no se facturan).</li>
+<li><b>No soporta <code>stream: true</code></b>. El progreso se sigue por los contadores del batch.</li>
+<li>Se recomienda TTL de caché de 1 hora, porque suelen tardar más de 5 minutos.</li>
+</ul>
+<div class="src">docs.claude.com/en/api/messages · /en/api/errors · /en/build-with-claude/streaming · /en/build-with-claude/batch-processing</div>
+</section>
+
+<section id="modelos">
+<h2>9 · Modelos, thinking, effort y tokens</h2>
+<div class="weights"><span class="w">CCDV-F 16,8%</span><span class="w">CCAR-P 13%</span><span class="w">CCAO-F 12%</span></div>
+
+<h3>Criterio de selección</h3>
+<div class="key"><b>La respuesta correcta casi siempre</b>Ajustar el modelo a la tarea. <b>Nunca</b> «usa siempre el más capaz». Haiku para volumen, velocidad y coste; Sonnet como equilibrio; Opus para razonamiento complejo y trabajo agéntico largo. Los distractores típicos son usar el modelo tope para todo, desactivar features para ahorrar, o cambiar de plataforma: ninguno ataca el trade-off.</div>
+
+<h3>Thinking</h3>
+<ul>
+<li><b>Adaptive thinking</b>: el modelo decide cuándo y cuánto pensar. En los modelos actuales está siempre activo sin configuración.</li>
+<li><b>Extended thinking</b> con <code>budget_tokens</code> es el mecanismo <b>antiguo</b>, deprecado y rechazado con 400 en los modelos recientes.</li>
+<li><b>Facturación:</b> los tokens de razonamiento se facturan como <b>output</b> y cuentan contra <code>max_tokens</code>, aunque el texto no se devuelva. Se cobran los tokens generados, no los del resumen visible.</li>
+<li>Los bloques <code>thinking</code> llevan <code>signature</code> y deben devolverse <b>sin modificar</b>, o 400.</li>
+</ul>
+
+<h3>Effort</h3>
+<p>Niveles <code>max</code>, <code>xhigh</code>, <code>high</code>, <code>medium</code>, <code>low</code>, con <b>default <code>high</code></b>. Es una señal conductual, no un presupuesto estricto, y afecta a todos los tokens incluidas las llamadas a tools.</p>
+<div class="trap"><b>Interacción con caché</b>El effort <b>se renderiza en el prompt</b>, así que cambiarlo entre requests rompe el prefijo cacheado. En sesiones largas hay que mantenerlo constante.</div>
+
+<h3>Tokens y límites</h3>
+<ul>
+<li><code>POST /v1/messages/count_tokens</code> es <b>gratuito</b>, con rate limits independientes de los de creación de mensajes. Devuelve una estimación.</li>
+<li>Rate limits por organización y usage tier, medidos en <b>RPM, ITPM y OTPM</b>.</li>
+<li><b>ITPM es cache-aware</b>: cuentan <code>input_tokens</code> + <code>cache_creation_input_tokens</code>; <b><code>cache_read_input_tokens</code> no cuenta</b> en la mayoría de modelos.</li>
+<li><code>max_tokens</code> <b>no influye</b> en el cálculo de OTPM: se cuentan los tokens realmente generados.</li>
+</ul>
+<div class="src">docs.claude.com/en/about-claude/models/overview · /en/build-with-claude/thinking · /en/api/rate-limits</div>
+</section>
+
+<section id="caching">
+<h2>10 · Prompt caching</h2>
+<div class="weights"><span class="w">CCDV-F 16,8%</span><span class="w">CCAR-P 13%</span></div>
+
+<table><tr><th>Parámetro</th><th>Valor</th></tr>
+<tr><td>TTL por defecto</td><td><b>5 minutos</b></td></tr>
+<tr><td>TTL extendido</td><td><b>1 hora</b></td></tr>
+<tr><td>Breakpoints máximos</td><td><b>4</b> (el automático consume uno)</td></tr>
+<tr><td>Ventana de lookback</td><td>20 bloques por breakpoint</td></tr>
+<tr><td>Escritura 5 min</td><td><b>1,25×</b> el input base</td></tr>
+<tr><td>Escritura 1 h</td><td><b>2×</b></td></tr>
+<tr><td>Lectura (hit)</td><td><b>0,1×</b></td></tr></table>
+
+<div class="key"><b>Cuándo amortiza</b>Con TTL de 5 minutos: sobrecoste de 0,25× y ahorro de 0,9× por lectura → <b>amortiza con la primera lectura</b>. Con TTL de 1 hora hacen falta <b>dos</b>. Se acumula con el descuento del Batch API.</div>
+
+<h3>Jerarquía del prefijo</h3>
+<p><code>tools</code> → <code>system</code> → <code>messages</code>, hasta el bloque marcado inclusive. Consecuencia: <b>cambiar las <code>tools</code> invalida todo</b> lo que hay por debajo. De ahí la disciplina de mantener el catálogo de tools estable en sesiones largas.</p>
+<p>Otras invalidaciones: cambios de <code>thinking</code> o de effort invalidan messages; <code>tool_choice</code> e imágenes, solo messages. Poner un parámetro explícitamente en su valor por defecto equivale a omitirlo y <b>no</b> invalida.</p>
+
+<div class="trap"><b>El fallo silencioso</b>Cada modelo tiene un <b>mínimo de tokens cacheables</b> (entre 512 y 4.096 según el modelo). Por debajo del mínimo <b>no se cachea y no se devuelve error</b>. El síntoma es que <code>cache_creation_input_tokens</code> y <code>cache_read_input_tokens</code> están <b>ambos a cero</b>.</div>
+<p>La vida de la caché se mide desde el <b>inicio</b> de la request, y cada uso la refresca sin coste extra.</p>
+<div class="src">docs.claude.com/en/build-with-claude/prompt-caching</div>
+</section>
+
+<section id="structured">
+<h2>11 · Salida estructurada</h2>
+<div class="weights"><span class="w">CCAR-F 20%</span><span class="w">CCDV-F 11%</span></div>
+
+<p>Dos features: <b>JSON outputs</b> (schema en la configuración de salida) y <b>strict tool use</b>. El mecanismo es <b>constrained decoding</b>: la gramática garantiza el cumplimiento del schema, sin reintentos.</p>
+
+<div class="trap"><b>Prefill ya no vale</b>Rellenar el turno del asistente con <code>{</code> para forzar JSON era la técnica clásica. Hoy <b>no está soportado en Claude 4.6 y posteriores</b> y es <b>incompatible</b> con JSON outputs. Si aparece como opción, es un distractor histórico.</div>
+
+<div class="key"><b>Cuándo la salida puede no cumplir el schema igualmente</b><b><code>stop_reason: "refusal"</code></b> — devuelve 200, te facturan, y el rechazo prevalece sobre el schema.<br><b><code>stop_reason: "max_tokens"</code></b> — salida truncada.<br>Además, <b>el casing de los valores <code>enum</code> no está garantizado</b>: compara sin distinguir mayúsculas.<br>→ <b>La validación defensiva sigue siendo obligatoria.</b></div>
+
+<h3>Detalles finos</h3>
+<ul>
+<li>Orden de propiedades: se respeta el del schema, pero <b>las requeridas van primero</b>. Si el orden importa, márcalo todo como required.</li>
+<li>Grammar caching: la primera request con un schema nuevo tiene latencia extra de compilación; se cachea 24 h desde el último uso. Cambiar solo <code>name</code> o <code>description</code> <b>no</b> la invalida.</li>
+<li>Structured outputs inyecta un system prompt adicional y <b>cambiar el formato invalida el prompt cache</b> del hilo.</li>
+<li><b>Citations + structured outputs = 400.</b> Son incompatibles.</li>
+</ul>
+
+<h3>Consistencia sin schema</h3>
+<p>Cuando no hay schema, la técnica más efectiva es <b>restringir con ejemplos</b>: la doc dice explícitamente que es más efectivo que las instrucciones abstractas. Los adjetivos describen una aspiración; los ejemplos la definen.</p>
+<div class="src">platform.claude.com/docs/en/build-with-claude/structured-outputs · .../strengthen-guardrails/increase-consistency</div>
+</section>
+
+<section id="evals">
+<h2>12 · Evals y alucinaciones</h2>
+<div class="weights"><span class="w">CCAO-F 21%</span><span class="w">CCAR-P 16%</span><span class="w">CCDV-F 2,6%</span></div>
+
+<h3>Criterios de éxito</h3>
+<p>Deben ser <b>específicos, medibles, alcanzables y relevantes</b>. Ejemplo oficial de criterio bueno: «menos del 0,1% de las salidas sobre 10.000 pruebas marcadas por el filtro de contenido». El malo: «salidas seguras».</p>
+
+<div class="key"><b>Los tres principios, uno contraintuitivo</b>1. Ser específico de la tarea (reflejar la distribución real, incluir edge cases).<br>2. Automatizar siempre que se pueda.<br>3. <b>Priorizar volumen sobre calidad</b> — literal: «más preguntas con señal algo peor y grading automático es mejor que menos preguntas calificadas a mano con alta calidad».</div>
+
+<h3>Métodos de grading, en orden de preferencia oficial</h3>
+<table><tr><th>Método</th><th>Cuándo</th></tr>
+<tr><td><b>Código</b> (exact match, string match)</td><td>El más rápido y fiable. Corrección binaria y literal</td></tr>
+<tr><td><b>LLM-as-judge</b></td><td>Juicios con matiz. «Probar fiabilidad primero, luego escalar»</td></tr>
+<tr><td><b>Humano</b></td><td>La doc dice literalmente <b>«Avoid if possible»</b></td></tr></table>
+
+<p>Tres consejos para LLM-as-judge: <b>rúbricas detalladas y claras</b>; <b>salida empírica y acotada</b> (solo correcto/incorrecto, o escala 1-5); y <b>pedir que razone antes de puntuar y después descartar el razonamiento</b>. En el sistema de investigación de Anthropic, un solo juez con una sola llamada resultó más consistente que varios jueces.</p>
+<p>Métodos por criterio, según la doc: fidelidad → exact match; consistencia → similitud coseno; relevancia y coherencia → ROUGE-L; tono → Likert vía LLM; privacidad → clasificación binaria.</p>
+
+<h3>Reducir alucinaciones</h3>
+<p><b>Básicas:</b> permitir que diga «no lo sé»; usar <b>citas textuales</b> como anclaje (para documentos de más de 20k tokens, pedir los quotes literales <b>antes</b> de la tarea); verificar, con retractación si no encuentra un quote que respalde una afirmación.</p>
+<p><b>Avanzadas:</b> chain-of-thought verification; <b>best-of-N</b> (misma prompt N veces — las inconsistencias delatan alucinación); refinamiento iterativo; restricción a conocimiento externo (usar solo los documentos aportados).</p>
+<div class="key"><b>Diagnóstico en producción</b>Repite el mismo input varias veces. <b>Inconsistente entre ejecuciones → alucinación. Fallo sistemático y reproducible → prompt o capacidad del modelo.</b> Separar eso antes de tocar nada es el primer paso.</div>
+<p>Y el disclaimer oficial: estas técnicas <b>reducen, no eliminan</b>, las alucinaciones.</p>
+<div class="src">platform.claude.com/docs/en/test-and-evaluate/develop-tests · .../strengthen-guardrails/reduce-hallucinations</div>
+</section>
+
+<section id="seguridad">
+<h2>13 · Seguridad: inyección, mínimo privilegio, secretos</h2>
+<div class="weights"><span class="w">CCAO-F 15%</span><span class="w">CCAR-P 14%</span><span class="w">CCDV-F 8,1%</span></div>
+
+<h3>Dos modelos de amenaza distintos</h3>
+<p><b>Jailbreak o inyección directa</b>: el adversario es el usuario. <b>Inyección indirecta</b>: el usuario es de confianza, pero Claude procesa contenido de terceros — webs, emails, documentos, resultados de tools.</p>
+
+<h3>Mitigaciones de inyección indirecta (lo más examinable)</h3>
+<ul>
+<li><b>Poner el contenido no confiable solo en bloques <code>tool_result</code></b>, nunca en el system prompt ni en bloques de texto de usuario. Claude está entrenado para tratar con escepticismo las instrucciones que aparecen dentro de tool results.</li>
+<li><b>Declarar qué es y de dónde viene</b> ese contenido.</li>
+<li><b>Declarar la política en el system prompt</b>: el contenido de tools y documentos es dato no confiable y nunca puede sobreescribir el system prompt ni la petición original.</li>
+<li><b>Codificar en JSON</b> el contenido no confiable: el escapado da delimitadores inequívocos e impide «salir» del contexto cerrando comillas o etiquetas.</li>
+<li><b>No metas tus propias instrucciones dentro de un tool result</b>: se ignoran o se marcan como inyección. Van en un turno de usuario posterior.</li>
+<li><b>Screening</b> de las salidas de tools antes de que Claude actúe sobre ellas, con un modelo ligero y salida estructurada.</li>
+<li><b>Red-team</b> de tu propio agente antes de desplegar, y monitorización continua después.</li>
+</ul>
+
+<div class="key"><b>Mínimo privilegio: el patrón de respuesta correcta</b>Ante un agente con capacidades que no necesita, la respuesta correcta es <b>quitar la capacidad</b>. Loggear es forense (el daño ya ocurrió). Confirmar depende de un humano atento y sufre fatiga de aprobación. Instruir en el system prompt es una petición, no un control. Ninguna de las tres cierra el vector.</div>
+<p>En el conector MCP esto se implementa como <b>allowlist</b> (deshabilitar por defecto y habilitar tools concretas) o denylist. Para un asistente de solo lectura, se deniegan las tools de escritura y destructivas.</p>
+
+<h3>Claves y secretos</h3>
+<ul>
+<li>Guardarlas en un <b>gestor de secretos</b>, <b>rotarlas</b> periódicamente y <b>revocar</b> cualquiera que se sospeche filtrada.</li>
+<li>Usar <b>workspaces</b> para segmentar claves por proyecto y entorno — así un incidente se aísla.</li>
+<li>La <b>expiración se elige al crear la clave y no se puede cambiar después</b>. Tras expirar: 401, y no se pueden reactivar.</li>
+<li>La expiración <b>no sustituye</b> a la higiene de secretos.</li>
+<li><b>CORS no está soportado</b> con zero data retention: hay que enrutar por un backend proxy, nunca llamar a la API desde el navegador.</li>
+</ul>
+<div class="src">platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/mitigate-jailbreaks · .../manage-claude/authentication · .../agents-and-tools/mcp-connector</div>
+</section>
+
+<section id="rag">
+<h2>14 · RAG y estrategias de recuperación</h2>
+<div class="weights"><span class="w">CCAR-P 19%</span></div>
+<p class="sub" style="margin:-8px 0 14px">Casi exclusivo del Architect Professional. Si vas solo a por los Foundations, puedes saltarlo.</p>
+
+<div class="key"><b>La decisión previa a montar RAG</b>Si la base de conocimiento cabe por debajo de <b>~200.000 tokens (unas 500 páginas)</b>, se puede meter <b>entera en el prompt sin RAG</b>. Con prompt caching, la latencia baja más de 2× y el coste hasta un <b>90%</b>. Montar un pipeline de recuperación sobre un corpus que cabe en la ventana es complejidad injustificada.</div>
+
+<h3>Por qué embeddings solos no bastan</h3>
+<p>Los embeddings capturan semántica y <b>pierden coincidencias léxicas exactas</b>: identificadores, códigos de error, nombres propios raros. El ejemplo de la doc es «Error code TS-999». <b>BM25</b> las recupera. Se combinan con rank fusion, y esa es la línea base recomendada.</p>
+
+<h3>Contextual Retrieval y sus cifras</h3>
+<p>Consiste en anteponer a cada chunk un contexto explicativo generado por el modelo (típicamente 50-100 tokens) antes de embeberlo y de indexarlo en BM25. Medido como reducción de fallos de recuperación sobre una línea base del 5,7%:</p>
+<table><tr><th>Configuración</th><th>Reducción de fallos</th></tr>
+<tr><td>Contextual embeddings solo</td><td><b>−35%</b> (5,7% → 3,7%)</td></tr>
+<tr><td>+ Contextual BM25</td><td><b>−49%</b> (→ 2,9%)</td></tr>
+<tr><td>+ Reranking</td><td><b>−67%</b> (→ 1,9%)</td></tr></table>
+<p><b>Los beneficios se acumulan.</b> Reranking: recuperar top-150, rerankear y pasar <b>top-20</b> al modelo. Top-20 rinde mejor que top-10 y que top-5.</p>
+<div class="trap"><b>Enfoques que Anthropic probó y descartó</b>Añadir <b>resúmenes genéricos del documento</b> a cada chunk («ganancias muy limitadas») e <b>indexación basada en resúmenes</b> («bajo rendimiento»). Son distractores perfectos porque suenan razonables.</div>
+<p>Anthropic <b>no ofrece modelo de embeddings propio</b>: la doc recomienda proveedores externos. Y la regla final del post: <b>«Always run evals»</b>.</p>
+<div class="src">anthropic.com/engineering/contextual-retrieval · platform.claude.com/docs/en/build-with-claude/embeddings</div>
+</section>
+
+<section id="compliance">
+<h2>15 · Compliance: ZDR, HIPAA, retención</h2>
+<div class="weights"><span class="w">CCAO-F 15%</span><span class="w">CCAR-P 14%</span></div>
+
+<h3>Certificaciones</h3>
+<p>HIPAA-ready (con BAA), ISO 27001:2022, ISO/IEC 42001:2023 (gestión de sistemas de IA), SOC 2 Tipo I y II. FedRAMP no está en esa lista corporativa: llega por terceros (Bedrock en GovCloud, Claude for Government).</p>
+
+<div class="key"><b>La distinción que más cae</b>Bajo <b>HIPAA</b>, la API <b>bloquea con 400</b> una feature no elegible.<br>Bajo <b>ZDR</b>, la API <b>no bloquea</b>: usar una feature no elegible es <b>optar por salir</b> del acuerdo para ese dato concreto.</div>
+
+<h3>Zero Data Retention</h3>
+<ul>
+<li>Se habilita <b>por organización</b> y no se extiende automáticamente a otras organizaciones de la misma cuenta.</li>
+<li><b>No elegibles</b>: procesamiento por lotes (retiene resultados), Files API, ejecución de código, conector MCP, Agent Skills, y CORS.</li>
+<li>Los datos retenidos <b>nunca se usan para entrenar sin permiso expreso</b>.</li>
+</ul>
+
+<h3>HIPAA</h3>
+<ul>
+<li>Requiere <b>BAA firmado</b>, se aplica <b>a nivel de organización</b> y una vez habilitado <b>es permanente</b>: un admin no puede desactivarlo. Para cargas HIPAA y no-HIPAA hacen falta <b>organizaciones separadas</b>.</li>
+<li>Si tienes HIPAA, <b>no necesitas además ZDR</b>.</li>
+</ul>
+<div class="trap"><b>Regla concreta y fácil de violar</b>Bajo HIPAA, <b>no incluir PHI en definiciones de JSON schema</b> — ni en nombres de propiedades, ni en <code>enum</code>, <code>const</code> o <code>pattern</code>. Los schemas se cachean aparte y no reciben las protecciones. Es facilísimo caer modelando un campo como enum de valores reales.</div>
+<p>Retención pese a cualquier acuerdo: si el contenido lo marcan los sistemas automáticos de trust &amp; safety o hay requerimiento legal, se puede retener hasta <b>2 años</b>.</p>
+<p>En <b>Bedrock o Google Cloud</b> el <b>proveedor cloud es el data processor</b>, no Anthropic: hay que consultar su documentación.</p>
+<div class="src">support.claude.com/en/articles/10015870 · platform.claude.com/docs/en/manage-claude/api-and-data-retention</div>
+</section>
+
+<section id="criterio">
+<h2>16 · Criterio de negocio (Associate)</h2>
+<div class="weights"><span class="w">CCAO-F entero</span></div>
+<p class="sub" style="margin:-8px 0 14px">Aquí el examen no mide conocimiento técnico sino <b>juicio</b>. Cambia el chip: la respuesta correcta suele ser la prudente y verificable, nunca la más rápida ni la más sofisticada.</p>
+
+<h3>Heurísticas que resuelven la mayoría de ítems</h3>
+<ul>
+<li>Ante un dato con pinta de preciso (número de artículo, cifra, referencia) → <b>verificar contra la fuente autoritativa</b> antes de usarlo. La confianza declarada por el modelo <b>no es señal de exactitud</b>.</li>
+<li>Ante datos personales regulados → <b>anonimizar o eliminar antes de subir</b>. Que el uso sea interno no exime de la política, y «instruir al modelo para que no retenga» no es un control de cumplimiento.</li>
+<li>Ante volumen alto y tarea sencilla → <b>modelo rápido y barato</b>.</li>
+<li>Ante «automatiza este proceso» → <b>analizar el proceso antes</b>. Automatizar un proceso malo da un proceso malo más rápido. Integrar no es rediseñar.</li>
+<li>Ante un stakeholder que pregunta si puede fiarse → <b>valor y límites</b>, con el control de verificación que lleva incorporado. Ni sobreventa ni rechazo.</li>
+<li>Ante una decisión de alto impacto sobre personas → <b>no la delegues en la salida del modelo</b>. Revisión humana antes de que nada tenga efecto.</li>
+<li>Ante una conversación larga que se vuelve incoherente → <b>resumir y reiniciar</b> con ese resumen.</li>
+<li>Ante una corrección que haces siempre a mano → eso <b>es configuración</b>, no trabajo: súbela a las instrucciones del Project.</li>
+<li>Ante un prompt que empeora al añadirle requisitos → <b>aislar</b>, quitando y reintroduciendo de uno en uno.</li>
+</ul>
+<p>Y un objetivo que se olvida: <b>mantener</b>. Un Project que funcionaba y se degrada a los seis meses casi siempre tiene fuentes de conocimiento e instrucciones obsoletas que nadie actualizó.</p>
+</section>
+
+<section id="equipo">
+<h2>17 · Claude Code en equipo: permisos, revisión y portabilidad</h2>
+<div class="weights"><span class="w">CCAR-F 20%</span><span class="w">CCAR-P 7%</span><span class="w">CCDV-F 3,1%</span></div>
+<p class="sub" style="margin:-8px 0 14px">Este bloque vale <b>casi cuatro veces más en el Architect Foundations que en el Developer</b>. Estúdialo pensando en el CCAR-F.</p>
+
+<div class="key"><b>El modo de permisos es una decisión de riesgo, no de velocidad</b>Se elige por el <b>perfil de riesgo</b> del trabajo y del entorno, no por la preferencia de que pregunte menos. Un modo bypass en una máquina de desarrollo contra un repositorio vivo <b>elimina todos los puntos de control</b> entre el agente y tus ficheros.</div>
+<p>Y el matiz que completa la respuesta: <b>una regla deny sobre la ruta que no se debe tocar, puesta a nivel de proyecto o de empresa, cubre el hueco que el modo por sí solo no cubre</b>. Modo y reglas son capas distintas: el modo decide cuánto pregunta, la regla decide qué es directamente inalcanzable.</p>
+
+<h3>Revisión de código con IA</h3>
+<div class="key"><b>Findings para triar, no un veredicto para aplicar</b>Fíate de lo que el revisor <b>puede probar desde el diff que tiene delante</b> — un null check que falta, un recurso sin cerrar — y confírmalo en las líneas que cita. Trata cualquier afirmación sobre <b>comportamiento en ejecución o sobre otro sistema</b> como una hipótesis a verificar, porque la hizo sin la evidencia que la probaría.</div>
+<p>Dos consecuencias de diseño: la <b>puerta humana va donde un hallazgo se convierte en una acción difícil de revertir</b>, no en cada comentario; y la forma de subir la precisión del revisor es <b>darle las convenciones del equipo</b> que si no tendría que adivinar. Es exactamente el escenario 5 del CCAR-F (Claude Code en CI/CD), donde el objetivo declarado es dar feedback accionable y minimizar falsos positivos.</p>
+
+<h3>Portabilidad de skills</h3>
+<p>El mismo SKILL.md corre en Claude Code, en la Messages API y a través del Agent SDK, pero <b>cada runtime lo carga y lo aísla distinto</b>: descubrimiento por filesystem en Claude Code, beta headers y contenedor de ejecución de código en la API, y setting sources en el SDK.</p>
+<ul>
+<li>Una skill acotada a una descripción clara y <b>libre de suposiciones sobre el entorno local</b> se porta limpia. Una que da por hecho la terminal en la que se escribió, no.</li>
+<li><b>En todos los runtimes, los subagentes arrancan limpios: no precargan skills automáticamente.</b></li>
+</ul>
+
+<h3>Los cuatro mecanismos de contexto duradero</h3>
+<table><tr><th>Mecanismo</th><th>Problema que resuelve</th></tr>
+<tr><td><b>CLAUDE.md</b></td><td>Memoria de proyecto persistente entre sesiones. <b>Se diluye con el tamaño.</b></td></tr>
+<tr><td><b>Ficheros de reglas</b></td><td>Acotan la guía <b>al sitio donde aplica</b></td></tr>
+<tr><td><b>Hooks</b></td><td>Aplican guardarraíles de forma <b>determinista, no probabilística</b></td></tr>
+<tr><td><b>Subagentes</b></td><td>Mantienen el trabajo de exploración <b>fuera del contexto principal</b></td></tr></table>
+<div class="trap"><b>El anti-patrón</b>Meter los cuatro en CLAUDE.md. Produce <b>un único fichero más difícil de mantener y más fácil de ignorar</b>. Cada mecanismo resuelve un problema distinto; si un ítem te ofrece «documéntalo todo en CLAUDE.md», desconfía.</div>
+
+<h3>Que el montaje sea compartible</h3>
+<p>Un plugin que referencia una <b>ruta absoluta al directorio personal del autor</b> se instala en una máquina y falla en todas las demás. Reglas: rutas <b>relativas a la raíz del proyecto</b> en todo lo que se vaya a compartir, requisitos de variables de entorno <b>documentados o validados en la instalación</b>, y <b>probar la instalación desde una máquina limpia</b> antes de distribuir.</p>
+<div class="src">code.claude.com/docs/en/permissions · .../permission-modes · .../plugins-reference · docs.claude.com/en/docs/agents-and-tools/agent-skills/overview</div>
+</section>
+
+<section id="despliegue">
+<h2>18 · MCP: transporte, scope y requisitos de empresa</h2>
+<div class="weights"><span class="w">CCAR-P 19%</span><span class="w">CCAR-F 18%</span><span class="w">CCDV-F 10,6%</span></div>
+
+<div class="key"><b>Transporte y scope son decisiones independientes con consecuencias dependientes</b><b>stdio</b> para servidores que corren en tu máquina. <b>HTTP</b> para cualquier cosa hospedada en remoto o usada por varios desarrolladores.<br><b>Scope local</b> deja el servidor personal. <b>Scope de proyecto</b> lo comparte con el repositorio vía <code>.mcp.json</code>.<br>La combinación tiene que casar con la intención de despliegue.</div>
+<p>De ahí sale la frase que más se presta a ítem: <b>un servidor stdio declarado en <code>.mcp.json</code> es una configuración que parece compartible y no lo es</b>. El fichero viaja con el repo, pero el proceso que lanza solo existe en la máquina del que lo escribió. Un servidor de equipo requiere <b>transporte HTTP y scope de proyecto o de empresa</b>: las dos cosas a la vez.</p>
+
+<h3>Los cuatro requisitos que trae un cliente regulado</h3>
+<table><tr><th>Pregunta del cliente</th><th>Respuesta técnica</th></tr>
+<tr><td>Identidad</td><td><b>OAuth</b> para servicios con identidad de usuario</td></tr>
+<tr><td>Credenciales de servicio</td><td><b>Variables de entorno</b>, nunca en el repositorio</td></tr>
+<tr><td>Registro de accesos</td><td>Hooks <b><code>PostToolUse</code></b> para auditoría</td></tr>
+<tr><td>Control de configuración</td><td><b>Managed settings</b> de empresa, que no se pueden anular</td></tr></table>
+<div class="key"><b>Por qué esto se pregunta</b>Ninguno de los cuatro es difícil de implementar, pero <b>todos son difíciles de meter con calzador</b> después de que un despliegue en producción haya suspendido una revisión de seguridad. La respuesta correcta en un ítem de escenario suele ser «identificar los requisitos de seguridad antes de desplegar», no la mitigación concreta.</div>
+<div class="src">code.claude.com/docs/en/mcp · modelcontextprotocol.io/specification/latest/basic/transports · .../basic/authorization · code.claude.com/docs/en/hooks</div>
+</section>
+
+<section id="numeros">
+<h2>19 · Números que caen</h2>
+<p>Repaso rápido la víspera. Si te sabes esta tabla, tienes cubierta la parte memorística de los cuatro exámenes.</p>
+<table>
+<tr><th>Concepto</th><th>Valor</th></tr>
+<tr><td>Corte de aprobado</td><td><b>720</b> sobre 100-1.000</td></tr>
+<tr><td>Duración de todos los exámenes</td><td>120 minutos</td></tr>
+<tr><td>Validez de la credencial</td><td>12 meses</td></tr>
+<tr><td>Descuento del Batch API</td><td>50% input y output</td></tr>
+<tr><td>Límite de un batch</td><td>100.000 requests o 256 MB</td></tr>
+<tr><td>Ventana del batch</td><td>menos de 1 h la mayoría; expira a las 24 h</td></tr>
+<tr><td>Resultados de batch descargables</td><td>29 días</td></tr>
+<tr><td>TTL de caché</td><td>5 min por defecto · 1 h extendido</td></tr>
+<tr><td>Breakpoints de caché</td><td>Máximo 4</td></tr>
+<tr><td>Coste de caché</td><td>escritura 1,25× (5 min) / 2× (1 h) · lectura 0,1×</td></tr>
+<tr><td>Degradación en selección de tools</td><td>Por encima de 30-50 tools</td></tr>
+<tr><td>Descripción de tool recomendada</td><td>Al menos 3-4 frases</td></tr>
+<tr><td>Umbral de long-context sin RAG</td><td>~200.000 tokens (~500 páginas)</td></tr>
+<tr><td>Contextual retrieval + BM25 + reranking</td><td>−67% de fallos de recuperación</td></tr>
+<tr><td>Reranking: qué se pasa al modelo</td><td>Top-20, de top-150 recuperados</td></tr>
+<tr><td>Quotes literales para grounding</td><td>Documentos de más de 20k tokens</td></tr>
+<tr><td>Consumo de agentes vs chat</td><td>~4× agente simple · ~15× multi-agente</td></tr>
+<tr><td>Resumen que devuelve un subagente</td><td>1.000-2.000 tokens</td></tr>
+<tr><td>Reintentos por defecto de los SDK</td><td>2, con backoff exponencial</td></tr>
+<tr><td>Timeout de llamadas no-streaming</td><td>10 minutos</td></tr>
+<tr><td>Descripción de una Skill</td><td>máx. 1024 caracteres, en tercera persona</td></tr>
+<tr><td>Metadata de Skill siempre cargada</td><td>~100 tokens por skill</td></tr>
+</table>
+</section>
+
+<section id="trampas">
+<h2>20 · Trampas por versión</h2>
+<p>La documentación de Anthropic se reescribe deprisa. Estos puntos aparecen en material de terceros con la respuesta antigua, que hoy es incorrecta. Son los ítems donde más gente falla por haber estudiado en blogs.</p>
+
+<div class="trap"><b>Prefill para forzar JSON</b><b>Antes:</b> rellenar el turno del asistente con <code>{</code>.<br><b>Ahora:</b> no soportado en Claude 4.6+ e incompatible con JSON outputs. Se usa structured outputs.</div>
+
+<div class="trap"><b>Extended thinking con <code>budget_tokens</code></b><b>Antes:</b> se fijaba un presupuesto explícito de razonamiento.<br><b>Ahora:</b> deprecado y rechazado con 400 en los modelos recientes. Adaptive thinking está activo por defecto.</div>
+
+<div class="trap"><b>Sampling y roots en MCP</b><b>Antes:</b> primitivas de cliente estándar.<br><b>Ahora:</b> deprecadas en la spec vigente. La primitiva de cliente viva es <b>elicitation</b>. Y el handshake <code>initialize</code> desaparece en la spec moderna, que es stateless.</div>
+
+<div class="trap"><b>El nombre de la tool de subagentes</b>La guía del examen la llama <code>Task</code>; la documentación actual la ha renombrado a <code>Agent</code>, y ambos nombres <b>conviven</b> en releases recientes. Si un ítem te obliga a elegir entre los dos sin contexto de versión, el ítem está mal escrito — en el examen real, ancla la respuesta en la guía.</div>
+
+<div class="trap"><b><code>stop_reason: "tool_use"</code></b>Es un concepto de la <b>Messages API</b>. En el resultado del Agent SDK no aparece como valor posible, porque el bucle del SDK no termina en <code>tool_use</code>. Si la pregunta va de control de bucle, piensa a nivel de API.</div>
+
+<div class="trap"><b>El Evaluation Tool de la Console</b>Su página se retiró y se fusionó con la guía de evals. Los detalles de su interfaz que circulan por blogs no se pueden confirmar en documentación viva. No estudies la UI: estudia el método.</div>
+</section>
+
+</main>
+</div>
+
+

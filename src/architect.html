@@ -1,0 +1,411 @@
+<title>Architect Foundations</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{
+  --bg:#f7f6f3;--surface:#fffefb;--surface-2:#f0eee8;--line:#e0ddd4;--line-strong:#c9c5b8;
+  --ink:#20201d;--ink-2:#57544c;--ink-3:#8b8779;
+  --accent:#b5541f;--accent-soft:#f6e8de;--accent-ink:#8c3f16;
+  --ok:#2f6b46;--ok-soft:#e2efe7;--bad:#a32f28;--bad-soft:#f8e5e3;
+  --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:ui-sans-serif,-apple-system,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#16161a;--surface:#1e1e23;--surface-2:#26262c;--line:#33333b;--line-strong:#4a4a55;
+  --ink:#eceae4;--ink-2:#a8a49b;--ink-3:#7b776e;
+  --accent:#e0834c;--accent-soft:#3a2617;--accent-ink:#f0a274;
+  --ok:#6dbb8e;--ok-soft:#1c2f24;--bad:#e0817a;--bad-soft:#33201e;}}
+:root[data-theme="dark"]{
+  --bg:#16161a;--surface:#1e1e23;--surface-2:#26262c;--line:#33333b;--line-strong:#4a4a55;
+  --ink:#eceae4;--ink-2:#a8a49b;--ink-3:#7b776e;
+  --accent:#e0834c;--accent-soft:#3a2617;--accent-ink:#f0a274;
+  --ok:#6dbb8e;--ok-soft:#1c2f24;--bad:#e0817a;--bad-soft:#33201e;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:calc(20px + env(safe-area-inset-top)) 18px calc(70px + env(safe-area-inset-bottom))}
+header.top{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:13px;margin-bottom:14px}
+h1{font-size:var(--t-sub);margin:0;letter-spacing:-.02em}
+.sub{color:var(--ink-3);font-size:var(--t-micro);margin-top:3px}
+.nav{display:flex;gap:11px;font-size:var(--t-micro);flex-wrap:wrap}
+a{color:var(--accent-ink)}
+button{font-family:inherit;cursor:pointer}
+.jump{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 20px}
+.jump a{background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:5px 11px;font-size:var(--t-micro);text-decoration:none;color:var(--ink-2)}
+.lead{font-size:var(--t-dato);color:var(--ink-2);border-left:3px solid var(--accent);padding-left:14px;margin:0 0 22px}
+section{margin-bottom:34px;scroll-margin-top:14px}
+h2{font-size:var(--t-base);margin:0 0 10px;letter-spacing:-.01em}
+h3{font-size:var(--t-dato);margin:20px 0 7px}
+h4{font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.09em;color:var(--accent-ink);margin:14px 0 5px;font-weight:700}
+p{margin:0 0 10px;font-size:var(--t-dato)}
+ul,ol{margin:0 0 12px;padding-left:20px;font-size:var(--t-dato)}li{margin-bottom:5px}
+code{font-family:var(--mono);font-size:var(--t-dato);background:var(--surface-2);padding:1px 5px;border-radius:4px;border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;font-size:var(--t-menor);margin:0 0 13px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+th{background:var(--surface-2);font-weight:600;font-size:var(--t-micro);white-space:nowrap}
+.key,.trap,.win{border-radius:8px;padding:12px 14px;margin:0 0 13px;font-size:var(--t-dato)}
+.key{background:var(--accent-soft)}.key b:first-child{display:block;font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px;color:var(--accent-ink)}
+.trap{background:var(--bad-soft)}.trap b:first-child{display:block;font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px;color:var(--bad)}
+.win{background:var(--ok-soft)}.win b:first-child{display:block;font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px;color:var(--ok)}
+.ts{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:13px 15px;margin-bottom:9px}
+.ts .n{font-family:var(--mono);font-size:var(--t-micro);color:var(--ink-3)}
+.ts .t{font-weight:600;font-size:var(--t-dato);margin:2px 0 7px;letter-spacing:-.01em}
+.ts ul{margin-bottom:0;font-size:var(--t-dato)}
+.dom{display:flex;align-items:baseline;gap:9px;margin:24px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--accent)}
+.dom h3{margin:0;font-size:var(--t-base);flex:1}
+.dom .w{font-family:var(--mono);font-size:var(--t-menor);color:var(--accent-ink);font-weight:600}
+.esc{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:16px 17px;margin-bottom:12px}
+.esc h3{margin:0 0 3px;font-size:var(--t-base)}
+.escdom{font-size:var(--t-micro);color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:9px}
+.ctx{background:var(--surface-2);border-radius:7px;padding:10px 12px;font-size:var(--t-dato);color:var(--ink-2);margin-bottom:11px}
+.qa{border-top:1px solid var(--line);padding-top:9px;margin-top:9px;font-size:var(--t-dato)}
+.qa .p{font-weight:520;margin-bottom:4px}
+.qa .r{color:var(--ink-2)}
+.qa .r b{color:var(--ok)}
+/* Journey */
+.prog{position:sticky;top:0;z-index:10;background:var(--bg);padding:9px 0 11px;margin-bottom:14px;border-bottom:1px solid var(--line)}
+.ptop{display:flex;justify-content:space-between;align-items:baseline;font-size:var(--t-micro);color:var(--ink-3);margin-bottom:5px}
+.ptop b{color:var(--ink);font-size:var(--t-dato)}
+.track{height:6px;background:var(--surface-2);border-radius:99px;overflow:hidden}
+.fill{height:100%;background:var(--accent);border-radius:99px;transition:width .4s}
+.fill.done{background:var(--ok)}
+.etapa{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:15px 16px;margin-bottom:10px}
+.etapa.hecha{border-color:var(--ok);background:var(--ok-soft)}
+.eh{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px}
+.enum{font-family:var(--mono);font-size:var(--t-micro);background:var(--surface-2);border:1px solid var(--line);border-radius:99px;padding:3px 9px;color:var(--ink-3);white-space:nowrap;flex:0 0 auto;margin-top:2px}
+.etapa.hecha .enum{background:var(--ok);border-color:var(--ok);color:#fff}
+.et{font-size:var(--t-dato);font-weight:600;flex:1;min-width:0}
+.emeta{font-size:var(--t-micro);color:var(--ink-3);text-transform:uppercase;letter-spacing:.07em;margin-top:2px;font-weight:400}
+.tarea{display:flex;gap:9px;align-items:flex-start;padding:7px 0;font-size:var(--t-dato);border-top:1px solid var(--line);cursor:pointer}
+.tarea input{margin:3px 0 0;width:17px;height:17px;flex:0 0 auto;accent-color:var(--accent)}
+.tarea span{flex:1}
+.tarea.ok span{text-decoration:line-through;color:var(--ink-3)}
+.salida{margin-top:10px;padding-top:9px;border-top:1px dashed var(--line-strong);font-size:var(--t-menor);color:var(--ink-2)}
+.salida b{color:var(--ink);font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.09em;display:block;margin-bottom:3px}
+.reset{background:none;border:none;color:var(--ink-3);font-size:var(--t-micro);text-decoration:underline;padding:0}
+.dos{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:700px){.dos{grid-template-columns:1fr}}
+@media(max-width:640px){
+  .wrap{padding:15px 14px calc(60px + env(safe-area-inset-bottom))}
+  h1{font-size:var(--t-sub)}h2{font-size:var(--t-base)}p,li{font-size:var(--t-dato)}
+  table{font-size:var(--t-micro)}th,td{padding:5px 7px}
+  .etapa,.esc,.ts{padding:13px}
+}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div><h1>Architect – Foundations</h1><div class="sub">CCAR-F · ruta de estudio por escenarios, con criterio de salida verificable</div></div>
+  <div class="nav"><a href="../flash/">Flash</a><a href="../referencia/">Referencia</a><a href="../tarjetas/">Tarjetas</a><a href="../apuntes/">Apuntes</a><a href="../">Test</a></div>
+</header>
+
+<div class="jump">
+<a href="#alcance">Delimitar</a><a href="#ficha">Ficha</a><a href="#patron">Cómo razonar los ítems</a><a href="#objetivos">Qué evalúa cada dominio</a><a href="#escenarios">Los seis escenarios</a><a href="#ejercicios">Laboratorios</a><a href="#journey">Ruta</a>
+</div>
+
+<p class="lead">Es el examen más predecible del programa: presenta cuatro escenarios extraídos de un banco de seis, y la guía oficial describe los seis. Por eso esta ruta va <b>escenario por escenario</b> y no por temario, que es como está construido el examen. La guía es la fuente para el temario y los pesos; esta página es la ruta de trabajo.</p>
+
+<section id="alcance">
+<h2>Empieza por aquí: delimita el temario</h2>
+<p>La guía oficial cierra con un apéndice que enumera <b>qué queda explícitamente fuera del examen</b>.
+Es lo primero que hay que leer, porque ahorra más tiempo que cualquier otra cosa — y porque buena parte
+de lo que se estudia para el Developer no cuenta aquí.</p>
+<div class="key"><b>El criterio, en una frase</b>Este examen mide <b>decisiones de arquitectura</b>, no mecánica
+de API. Todo lo que sea implementación de bajo nivel, infraestructura de nube, tarifas o protocolos de
+autenticación queda fuera; lo que entra es cuándo elegir cada mecanismo y por qué.</div>
+<p>Consulta el apéndice de la guía para la lista completa antes de planificar. Como regla práctica derivada
+de ella: de nuestra <a href="/referencia/">referencia técnica</a> aquí solo aplican <code>tool_use</code> con
+JSON schemas, los valores de <code>tool_choice</code>, <code>stop_reason</code>, <code>max_tokens</code>,
+los system prompts y el Batch API. El resto de secciones son para el Developer.</p>
+<div class="trap"><b>El error propio de este examen</b>Arrastrar el temario del Developer. Cada hora dedicada
+a streaming, caching, conteo de tokens, límites de cuota o plataformas de terceros es una hora perdida.</div>
+</section>
+
+<section id="ficha">
+<h2>La ficha</h2>
+<table>
+<tr><th>Código</th><td>CCAR-F</td><th>Ítems</th><td>60</td></tr>
+<tr><th>Estructura</th><td colspan="3"><b>4 escenarios</b> de un banco de <b>6 publicados</b></td></tr>
+<tr><th>Tiempo</th><td>120 min</td><th>Corte</th><td>720 / 1000</td></tr>
+</table>
+<table>
+<tr><th>Dominio</th><th>Peso</th><th>Ítems</th><th>Task statements</th></tr>
+<tr><td>1 · Agentic Architecture &amp; Orchestration</td><td>27%</td><td>16</td><td>7</td></tr>
+<tr><td>3 · Claude Code Configuration &amp; Workflows</td><td>20%</td><td>12</td><td>6</td></tr>
+<tr><td>4 · Prompt Engineering &amp; Structured Output</td><td>20%</td><td>12</td><td>6</td></tr>
+<tr><td>2 · Tool Design &amp; MCP Integration</td><td>18%</td><td>11</td><td>5</td></tr>
+<tr><td>5 · Context Management &amp; Reliability</td><td>15%</td><td>9</td><td>6</td></tr>
+</table>
+</section>
+
+<section id="patron">
+<h2>Cómo razonar los ítems</h2>
+<p>Los ítems son escenarios de producción con cuatro opciones que suenan todas razonables. Tras trabajar
+el material, estas son las heurísticas que más veces deciden entre dos opciones defendibles.</p>
+
+<div class="key"><b>La regla que más ítems resuelve</b><b>La respuesta proporcionada, no la más sofisticada.</b>
+Cuando una opción propone un clasificador entrenado, una capa de routing, análisis de sentimiento o un
+modelo más caro, y otra propone arreglar la causa con el mecanismo que ya existe, gana la segunda. El
+examen premia la intervención de menor esfuerzo que ataca la <b>causa raíz</b>.</div>
+
+<table>
+<tr><th>Si el problema es…</th><th>La respuesta suele ser…</th></tr>
+<tr><td>Se salta un paso obligatorio con consecuencias graves</td><td>Enforcement <b>programático</b>, no una instrucción en el prompt</td></tr>
+<tr><td>Confunde dos tools parecidas desde el primer turno</td><td>Ampliar las <b>descripciones</b>: formatos, ejemplos, casos límite y fronteras</td></tr>
+<tr><td>La selección de tool se degrada tras N turnos</td><td>La <b>ventana de contexto</b>, no el esquema</td></tr>
+<tr><td>Decide mal cuándo escalar</td><td><b>Criterios explícitos</b> con ejemplos, no autoconfianza del modelo</td></tr>
+<tr><td>Algo debe llegar a todo el equipo</td><td>El scope de <b>proyecto</b>, versionado en el repo</td></tr>
+<tr><td>Convenciones para ficheros dispersos por el repo</td><td>Reglas por <b>ruta</b> con globs, no un fichero por directorio</td></tr>
+<tr><td>Cambio grande con varias arquitecturas posibles</td><td><b>Plan mode</b> antes de tocar nada</td></tr>
+<tr><td>Informe incompleto y subagentes que funcionan bien</td><td>La <b>descomposición del coordinador</b></td></tr>
+<tr><td>Un subagente falla</td><td><b>Error estructurado</b>: tipo, intento, resultados parciales, alternativas</td></tr>
+<tr><td>Revisión larga con resultados inconsistentes</td><td><b>Pasadas separadas</b>: por unidad y luego de integración</td></tr>
+<tr><td>Ahorrar coste en un flujo que bloquea a alguien</td><td>Batch <b>solo</b> para lo que nadie espera</td></tr>
+</table>
+
+<div class="trap"><b>Afirmaciones falsas que se usan como cebo</b>Que un contexto más grande arregla la
+<b>dilución de atención</b> · que la <b>autoconfianza</b> del modelo sirve para enrutar a revisión · que
+<b>exigir consenso</b> entre varias pasadas mejora la detección, cuando en realidad suprime bugs que solo
+aparecen de forma intermitente · y flags de CLI que sencillamente no existen.</div>
+</section>
+
+<section id="objetivos">
+<h2>Qué evalúa cada dominio</h2>
+<p>La guía desarrolla cada dominio en varios <i>task statements</i> con lo que hay que saber y lo que hay
+que saber hacer. Ese detalle está en el documento oficial y merece leerse entero. Aquí va el mapa de temas
+para orientar el estudio, y el desarrollo conceptual de cada uno está en los
+<a href="/apuntes/">apuntes</a>.</p>
+
+<div class="dom"><h3>Agentic Architecture &amp; Orchestration</h3><span class="w">27%</span></div>
+<p>Bucles agénticos y su condición de parada · coordinador y subagentes, con el paso explícito de contexto
+y el spawn en paralelo · enforcement y handoff en flujos multi-paso · hooks para interceptar y normalizar
+· descomposición fija frente a dinámica · gestión de sesiones, reanudación y ramificación.</p>
+
+<div class="dom"><h3>Claude Code Configuration &amp; Workflows</h3><span class="w">20%</span></div>
+<p>Jerarquía y modularidad de la configuración de proyecto · comandos y skills, con sus ámbitos y sus
+opciones de aislamiento · reglas condicionales por ruta · cuándo planificar antes de ejecutar · técnicas
+de refinamiento iterativo · integración en CI con salida estructurada.</p>
+
+<div class="dom"><h3>Prompt Engineering &amp; Structured Output</h3><span class="w">20%</span></div>
+<p>Criterios explícitos para reducir falsos positivos · few-shot para consistencia y para casos ambiguos
+· salida estructurada con tool use y JSON Schema, y qué garantiza y qué no · validación, reintento y
+bucles de feedback · cuándo el procesamiento por lotes es apropiado · arquitecturas de revisión en varias
+pasadas e instancias.</p>
+
+<div class="dom"><h3>Tool Design &amp; MCP Integration</h3><span class="w">18%</span></div>
+<p>Descripciones que diferencian tools parecidas · errores estructurados con categoría y reintentabilidad
+· distribución de tools por rol y configuración de la elección · integración de servidores MCP con sus
+ámbitos y credenciales · selección de las tools integradas de lectura, búsqueda y edición.</p>
+
+<div class="dom"><h3>Context Management &amp; Reliability</h3><span class="w">15%</span></div>
+<p>Preservar información crítica en interacciones largas · criterios de escalado y resolución de ambigüedad
+· propagación de errores entre agentes · contexto en exploración de código grande · revisión humana y
+calibración de confianza · procedencia de la información e incertidumbre en síntesis multi-fuente.</p>
+</section>
+
+<section id="escenarios">
+<h2>Los seis escenarios</h2>
+<p>El examen presenta cuatro de seis, y la guía oficial los describe con detalle: <b>léelos ahí</b>. Lo que
+sigue es lo que conviene tener trabajado de cada uno — las decisiones que hay que saber defender y los
+anti-patrones que aparecen como distractores.</p>
+
+<div class="esc">
+<h3>1 · Agente de resolución de soporte</h3>
+<div class="escdom">Orquestación · tools y MCP · contexto</div>
+<h4>Decisiones que defender</h4>
+<ol>
+<li>El bucle se controla por <code>stop_reason</code>, no por un tope de iteraciones.</li>
+<li>Una operación <b>irreversible</b> lleva checkpoint humano o prerequisito programático <b>antes</b> de cablear el bucle; y si el rol no la necesita, se quita la tool.</li>
+<li>La tool de escalado <b>compite</b> con las demás: sin condición de exclusión en las descripciones, se convierte en la salida fácil o no se usa nunca.</li>
+<li>Los fallos vuelven con bandera de error y categoría, nunca como resultado vacío.</li>
+<li>Las conversaciones largas exigen sacar los hechos transaccionales del historial que se resume.</li>
+</ol>
+<h4>Anti-patrones</h4>
+<ul><li>Auditar una capacidad peligrosa en vez de retirarla.</li>
+<li>Confiar en una instrucción del prompt donde hace falta enforcement.</li>
+<li>Fijar un objetivo de resolución sin definir qué cuenta como resuelto.</li></ul>
+</div>
+
+<div class="esc">
+<h3>2 · Generación de código con Claude Code</h3>
+<div class="escdom">Configuración y flujos · contexto</div>
+<h4>Decisiones que defender</h4>
+<ol>
+<li>Planificar antes de ejecutar cuando hay varias arquitecturas posibles y muchos ficheros en juego.</li>
+<li>La configuración de proyecto se <b>concatena</b> entre niveles: las reglas contradictorias hay que eliminarlas, no esperar a que gane una.</li>
+<li>Las reglas de permisos se evalúan en un orden fijo y el primer match decide.</li>
+<li>Cada mecanismo de contexto duradero resuelve un problema distinto; amontonarlos en un solo fichero los degrada todos.</li>
+<li>Dos correcciones sobre el mismo problema significan contexto contaminado: limpiar y replantear.</li>
+</ol>
+<h4>Anti-patrones</h4>
+<ul><li>Modo permisivo «por velocidad» contra un repositorio vivo.</li>
+<li>Confiar una prohibición a una nota en la configuración en vez de a un control.</li></ul>
+</div>
+
+<div class="esc">
+<h3>3 · Sistema multi-agente de investigación</h3>
+<div class="escdom">Orquestación · tools y MCP · contexto</div>
+<h4>Decisiones que defender</h4>
+<ol>
+<li>Los subagentes <b>no heredan contexto</b>: los hallazgos viajan en el prompt con el que se lanzan.</li>
+<li>Paralelizar es emitir varias llamadas de spawn <b>en una sola respuesta</b>.</li>
+<li>Particionar el alcance entre subagentes para no duplicar trabajo.</li>
+<li>Un bucle de refinamiento donde el coordinador detecta huecos y re-delega con consultas dirigidas.</li>
+<li>Separar contenido de metadatos para que la atribución sobreviva a cada resumen.</li>
+</ol>
+<h4>Anti-patrones</h4>
+<ul><li>Culpar a los subagentes cuando el fallo está en cómo se repartió el trabajo.</li>
+<li>Recorrer siempre el pipeline completo en vez de elegir según la consulta.</li>
+<li>Usar multi-agente en trabajo acoplado, donde multiplica coste sin ganancia.</li></ul>
+</div>
+
+<div class="esc">
+<h3>4 · Productividad de desarrollo</h3>
+<div class="escdom">Tools y MCP · configuración · orquestación</div>
+<h4>Decisiones que defender</h4>
+<ol>
+<li>Modelo híbrido de contexto: precargar lo estable y recuperar el resto bajo demanda.</li>
+<li>Delegar en un subagente la exploración que inundaría el contexto principal.</li>
+<li>Elegir la tool por lo que busca: contenido, rutas o edición puntual, con su alternativa cuando falla.</li>
+<li>Conectar servidores deliberadamente: cada uno gasta contexto aunque no se use.</li>
+<li>Acotar el catálogo de tools por rol antes de que la selección se degrade.</li>
+</ol>
+<h4>Anti-patrones</h4>
+<ul><li>Cargar el repositorio entero «para que tenga contexto».</li>
+<li>Repartir muchas tools entre varios servidores creyendo que reduce la confusión.</li></ul>
+</div>
+
+<div class="esc">
+<h3>5 · Claude Code en CI/CD</h3>
+<div class="escdom">Configuración y flujos · prompting</div>
+<h4>Decisiones que defender</h4>
+<ol>
+<li>Los hallazgos son material para triar, no un veredicto: se confirma lo demostrable desde el diff.</li>
+<li>La puerta humana va donde un hallazgo se convierte en acción difícil de revertir.</li>
+<li>Los falsos positivos bajan dando las <b>convenciones del equipo</b>, no pidiendo «más rigor».</li>
+<li>Modo no interactivo con salida estructurada para consumir el resultado en el pipeline.</li>
+<li>Una instancia independiente revisa mejor que la que generó el código.</li>
+</ol>
+<h4>Anti-patrones</h4>
+<ul><li>Bloquear el merge con cada hallazgo: en una semana se aprueba en automático.</li>
+<li>Aceptar afirmaciones sobre comportamiento en ejecución que el revisor no pudo medir.</li></ul>
+</div>
+
+<div class="esc">
+<h3>6 · Extracción de datos estructurados</h3>
+<div class="escdom">Prompting y salida estructurada · contexto</div>
+<h4>Decisiones que defender</h4>
+<ol>
+<li>El esquema garantiza la forma, <b>no el significado</b>: la validación semántica sigue siendo tuya.</li>
+<li>Campos anulables para que el modelo pueda abstenerse en vez de inventar.</li>
+<li>Válvulas de escape en las categorías cerradas, porque las listas fijas envejecen.</li>
+<li>Reintento con el error concreto como feedback, sabiendo cuándo es inútil: si el dato no está, no aparecerá.</li>
+<li>Confianza por campo y muestreo para decidir qué revisa un humano.</li>
+</ol>
+<h4>Anti-patrones</h4>
+<ul><li>Recalcular un total a partir de las líneas: fabrica datos que ahora pasan validación.</li>
+<li>Reintentar con el mismo prompt esperando un resultado distinto.</li></ul>
+</div>
+</section>
+
+<section id="ejercicios">
+<h2>Cuatro laboratorios</h2>
+<p>La guía propone ejercicios prácticos de preparación. Estos son los que yo montaría, alineados con ellos
+y con lo que más pesa en el examen. Construir uno enseña más que releer tres veces la teoría.</p>
+<table>
+<tr><th>#</th><th>Laboratorio</th><th>Refuerza</th></tr>
+<tr><td>1</td><td>Agente con tres o cuatro tools, dos de ellas deliberadamente parecidas. Bucle controlado por <code>stop_reason</code>, errores con categoría y reintentabilidad, y un control programático que bloquee una operación por encima de un umbral.</td><td>Orquestación · tools · contexto</td></tr>
+<tr><td>2</td><td>Configurar un repositorio para un equipo: reglas de proyecto, reglas condicionales por ruta, una skill aislada con permisos restringidos, y un servidor MCP compartido con credenciales fuera del repo.</td><td>Claude Code · MCP</td></tr>
+<tr><td>3</td><td>Pipeline de extracción con campos anulables y categorías extensibles, bucle de validación y reintento con feedback, y un lote grande con reenvío selectivo de los fallidos.</td><td>Salida estructurada · contexto</td></tr>
+<tr><td>4</td><td>Coordinador con dos subagentes lanzados en paralelo, salida estructurada que separe afirmación, evidencia, fuente y fecha, un timeout simulado para probar la propagación de errores, y fuentes en conflicto.</td><td>Orquestación · tools · contexto</td></tr>
+</table>
+</section>
+
+<section id="journey">
+<h2>El journey</h2>
+<div class="prog">
+  <div class="ptop"><span>Progreso</span><span><b id="pn">0</b> <span id="pt"></span></span></div>
+  <div class="track"><div class="fill" id="pf" style="width:0%"></div></div>
+</div>
+<div id="etapas"></div>
+<div style="margin-top:12px;text-align:right"><button class="reset" id="reset">reiniciar progreso</button></div>
+<div class="win" style="margin-top:18px"><b>Antes de agendar</b>Ponderado ≥85% en el simulador filtrado por CCAR-F · los seis escenarios explicados en voz alta en dos minutos cada uno · los cuatro ejercicios oficiales completados · un simulacro cronometrado.</div>
+<div class="trap"><b>El error propio de este examen</b>Estudiar por temario en vez de por escenario, y arrastrar el temario del Developer. <b>Streaming, caching, tokens, rate limits, OAuth, nubes, embeddings y visión están fuera</b>: cada hora ahí es una hora perdida.</div>
+</section>
+</div>
+
+<script>
+const ETAPAS=[
+ {n:"0",t:"Delimitar y medir",m:"1 sesión · antes de estudiar nada",
+  tareas:["Leer la lista de fuera de alcance y tachar mentalmente lo que ya no aplica del material del Developer",
+          "Simulacro ponderado en el simulador filtrado por CCAR-F y anotar acierto por dominio",
+          "Leer los seis escenarios de esta página de una sentada"],
+  salida:"Sabes qué NO estudiar y tienes un número por dominio."},
+ {n:"1",t:"Orquestación agéntica · objetivos 1.1 a 1.7",m:"27% · el bloque más pesado",
+  tareas:["Estudiar los siete task statements del dominio 1",
+          "Ejercicio oficial 1: agente multi-tool con escalado, bucle por stop_reason y hook de umbral",
+          "Verificar en tu montaje que el subagente NO ve el historial del padre",
+          "Practicar --resume con nombre y fork_session desde una línea base común",
+          "Escenarios 1 y 3 con sus seis preguntas de muestra"],
+  salida:"Explicas por qué un prerequisito programático gana a una instrucción cuando hay dinero de por medio."},
+ {n:"2",t:"Claude Code para equipos · objetivos 3.1 a 3.6",m:"20% · configuración fina, no uso diario",
+  tareas:["Estudiar los seis task statements del dominio 3",
+          "Ejercicio oficial 2: CLAUDE.md de proyecto, .claude/rules/ con globs, skill con context: fork y allowed-tools",
+          "Usar /memory para comprobar qué ficheros de memoria están cargados",
+          "Probar @import para trocear un CLAUDE.md grande",
+          "Ejecutar en CI con -p, --output-format json y --json-schema",
+          "Escenarios 2 y 5 con sus seis preguntas de muestra"],
+  salida:"Sabes de memoria dónde va cada cosa: commands, rules, skills, .mcp.json, y qué se comparte por git."},
+ {n:"3",t:"Prompt y salida estructurada · objetivos 4.1 a 4.6",m:"20% · empatado en segundo lugar",
+  tareas:["Estudiar los seis task statements del dominio 4",
+          "Ejercicio oficial 3: pipeline de extracción con validación-reintento y batch por custom_id",
+          "Escribir criterios explícitos de revisión y comparar con «sé conservador»",
+          "Construir 2-4 few-shot para un caso ambiguo mostrando POR QUÉ se eligió una acción",
+          "Probar tool_choice forzada para garantizar el orden de dos extracciones"],
+  salida:"Distingues error de sintaxis de error semántico y sabes cuándo un reintento es inútil."},
+ {n:"4",t:"Diseño de tools y MCP · objetivos 2.1 a 2.5",m:"18%",
+  tareas:["Estudiar los cinco task statements del dominio 2",
+          "Escribir dos descripciones de tools deliberadamente parecidas y arreglarlas hasta que la selección sea fiable",
+          "Implementar errorCategory + isRetryable en una tool y probar los cuatro tipos de error",
+          "Configurar un MCP de proyecto con ${VAR} y otro de usuario, y verificar que conviven",
+          "Exponer un catálogo como MCP resource y medir si bajan las llamadas exploratorias",
+          "Escenario 4: repasar Grep vs Glob vs Edit y el fallback Read+Write"],
+  salida:"Puedes justificar por qué 18 tools rinden peor que 4-5 y qué hacer al respecto."},
+ {n:"5",t:"Contexto y fiabilidad · objetivos 5.1 a 5.6",m:"15% · transversal a todos los escenarios",
+  tareas:["Estudiar los seis task statements del dominio 5",
+          "Ejercicio oficial 4: multi-agente con propagación de error y conflicto entre fuentes",
+          "Montar un bloque de case facts y comprobar que sobrevive al resumen del historial",
+          "Recortar una salida de tool verbosa a los campos relevantes",
+          "Diseñar recuperación ante caídas con manifiesto de estado"],
+  salida:"Sabes nombrar el efecto lost-in-the-middle y qué se hace para mitigarlo."},
+ {n:"6",t:"Consolidación",m:"solo repaso",
+  tareas:["Segundo simulacro cronometrado",
+          "Repaso dirigido de los dominios en rojo",
+          "Explicar los seis escenarios en voz alta, dos minutos cada uno",
+          "Releer la tabla del patrón de respuesta la víspera"],
+  salida:"Ponderado ≥85% y los seis escenarios sin mirar. Entonces se agenda."}
+];
+const KEY="ccar-f-journey-v2";
+let ST={};try{ST=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(ST))}catch(e){}};
+const total=ETAPAS.reduce((a,e)=>a+e.tareas.length,0);
+function render(){
+  document.getElementById("etapas").innerHTML=ETAPAS.map((e,i)=>{
+    const h=e.tareas.filter((_,k)=>ST[i+"."+k]).length, done=h===e.tareas.length;
+    return `<div class="etapa ${done?'hecha':''}">
+      <div class="eh"><span class="enum">${done?'✓':'Etapa '+e.n}</span>
+      <span class="et">${e.t}<div class="emeta">${e.m} · ${h}/${e.tareas.length}</div></span></div>
+      ${e.tareas.map((t,k)=>`<label class="tarea ${ST[i+"."+k]?'ok':''}"><input type="checkbox" data-i="${i}" data-k="${k}" ${ST[i+"."+k]?'checked':''}><span>${t}</span></label>`).join("")}
+      <div class="salida"><b>Criterio de salida</b>${e.salida}</div></div>`;
+  }).join("");
+  document.querySelectorAll('.tarea input').forEach(c=>c.onchange=()=>{
+    const id=c.dataset.i+"."+c.dataset.k;
+    if(c.checked)ST[id]=1; else delete ST[id];
+    save();render();
+  });
+  const n=Object.keys(ST).length, pc=Math.round(n/total*100);
+  document.getElementById("pn").textContent=n;
+  document.getElementById("pt").textContent="de "+total+" tareas · "+pc+"%";
+  const f=document.getElementById("pf"); f.style.width=pc+"%"; f.className="fill"+(pc===100?" done":"");
+}
+document.getElementById("reset").onclick=()=>{if(confirm("¿Reiniciar el progreso?")){ST={};save();render()}};
+render();
+</script>
