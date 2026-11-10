@@ -1,0 +1,8 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "python3 build.py",
+  "outputDirectory": "site",
+  "installCommand": "echo 'sin dependencias: build.py solo usa la libreria estandar'",
+  "trailingSlash": true,
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- ."
+}
