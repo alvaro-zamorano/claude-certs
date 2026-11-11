@@ -1,0 +1,334 @@
+<title>Technical Reference</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{
+  --bg:#f7f6f3; --surface:#fffefb; --surface-2:#f0eee8; --line:#e0ddd4; --line-strong:#c9c5b8;
+  --ink:#20201d; --ink-2:#57544c; --ink-3:#8b8779;
+  --accent:#b5541f; --accent-soft:#f6e8de; --accent-ink:#8c3f16;
+  --ok:#2f6b46; --ok-soft:#e2efe7; --bad:#a32f28; --bad-soft:#f8e5e3;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+  --sans:ui-sans-serif,-apple-system,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#16161a; --surface:#1e1e23; --surface-2:#26262c; --line:#33333b; --line-strong:#4a4a55;
+  --ink:#eceae4; --ink-2:#a8a49b; --ink-3:#7b776e;
+  --accent:#e0834c; --accent-soft:#3a2617; --accent-ink:#f0a274;
+  --ok:#6dbb8e; --ok-soft:#1c2f24; --bad:#e0817a; --bad-soft:#33201e;
+}}
+:root[data-theme="dark"]{
+  --bg:#16161a; --surface:#1e1e23; --surface-2:#26262c; --line:#33333b; --line-strong:#4a4a55;
+  --ink:#eceae4; --ink-2:#a8a49b; --ink-3:#7b776e;
+  --accent:#e0834c; --accent-soft:#3a2617; --accent-ink:#f0a274;
+  --ok:#6dbb8e; --ok-soft:#1c2f24; --bad:#e0817a; --bad-soft:#33201e;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:840px;margin:0 auto;padding:26px 20px 80px}
+header.top{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:15px;margin-bottom:18px}
+h1{font-size:var(--t-sub);margin:0;letter-spacing:-.02em}
+.sub{color:var(--ink-3);font-size:var(--t-menor);margin-top:3px}
+.nav{display:flex;gap:13px;font-size:var(--t-menor);flex-wrap:wrap}
+a{color:var(--accent-ink)}
+.lead{font-size:var(--t-dato);color:var(--ink-2);border-left:3px solid var(--accent);padding-left:14px;margin:0 0 20px}
+.jump{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 26px}
+.jump a{background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:5px 11px;font-size:var(--t-micro);text-decoration:none;color:var(--ink-2)}
+.jump a:hover{border-color:var(--line-strong);color:var(--ink)}
+section{margin-bottom:34px;scroll-margin-top:14px}
+h2{font-size:var(--t-base);margin:0 0 8px;letter-spacing:-.01em}
+h2 .tag{font-family:var(--mono);font-size:var(--t-micro);color:var(--ink-3);font-weight:400;margin-left:7px}
+h3{margin:18px 0 6px;color:var(--ink-2);text-transform:uppercase;letter-spacing:.06em;font-size:var(--t-micro);font-weight:600}
+p{margin:0 0 10px;font-size:var(--t-dato)}
+code{font-family:var(--mono);font-size:var(--t-dato);background:var(--surface-2);padding:1px 5px;border-radius:4px;border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;font-size:var(--t-menor);margin:0 0 12px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+th{background:var(--surface-2);font-weight:600;font-size:var(--t-micro);white-space:nowrap}
+.ask{background:var(--accent-soft);border-radius:8px;padding:11px 14px;margin:0 0 12px;font-size:var(--t-dato)}
+.ask b:first-child{display:block;font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;color:var(--accent-ink)}
+pre{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px;overflow-x:auto;font-family:var(--mono);font-size:var(--t-micro);line-height:1.5;margin:0 0 12px}
+pre .c{color:var(--ink-3)}
+ul{margin:0 0 12px;padding-left:19px;font-size:var(--t-dato)}li{margin-bottom:4px}
+@media(max-width:640px){
+  .wrap{padding:16px 14px calc(50px + env(safe-area-inset-bottom))}
+  h1{font-size:var(--t-sub)} h2{font-size:var(--t-base)} p,li{font-size:var(--t-dato)}
+  table{font-size:var(--t-micro)} th,td{padding:5px 7px} pre{font-size:var(--t-micro)}
+}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div><h1>Technical Reference</h1><div class="sub">The API surface you don't touch daily · exact names, permitted values and what gets asked about each one</div></div>
+  <div class="nav"><a href="../architect/">Architect</a><a href="../developer/">Developer</a><a href="../tarjetas/">Flashcards</a><a href="../apuntes/">Notes</a><a href="../">Test</a></div>
+</header>
+
+<p class="lead">The notes explain the why; this is the what. It is meant for what doesn't stick because you never write it: field names, admitted values and return shapes. The exam doesn't ask you to write code, but it does ask you to recognise the right name among four that sound alike.</p>
+
+<div class="jump">
+<a href="#messages">Messages</a><a href="#modos">Modes and context</a><a href="#stop">stop_reason</a><a href="#tools">Tool use</a><a href="#stream">Streaming</a>
+<a href="#batch">Batch</a><a href="#cache">Caching</a><a href="#think">Thinking and effort</a><a href="#struct">Structured output</a>
+<a href="#errors">Errors and retries</a><a href="#evals">Evals</a><a href="#hooks">Hooks</a><a href="#sdk">Agent SDK</a><a href="#mcp">MCP</a><a href="#limits">Limits</a>
+</div>
+
+<section id="messages">
+<h2>Messages API <span class="tag">POST /v1/messages</span></h2>
+<table>
+<tr><th>Field</th><th>Required</th><th>Notes</th></tr>
+<tr><td><code>model</code></td><td>Yes</td><td>Snapshot ID. IDs without a date <b>are still fixed snapshots</b>, not moving pointers</td></tr>
+<tr><td><code>messages</code></td><td>Yes</td><td>Only <code>user</code> and <code>assistant</code> roles. Consecutive turns of the same role are merged</td></tr>
+<tr><td><code>max_tokens</code></td><td>Yes</td><td><code>0</code> is used to warm the cache without generating a response</td></tr>
+<tr><td><code>system</code></td><td>No</td><td><b>Top-level parameter</b>, string or array of blocks. There is no <code>system</code> role</td></tr>
+<tr><td><code>tools</code>, <code>tool_choice</code></td><td>No</td><td>See the tool use section</td></tr>
+<tr><td><code>stream</code></td><td>No</td><td><code>true</code> enables SSE</td></tr>
+<tr><td><code>thinking</code>, <code>output_config</code></td><td>No</td><td>See reasoning and structured output</td></tr>
+<tr><td><code>temperature</code>, <code>top_p</code>, <code>top_k</code>, <code>stop_sequences</code></td><td>No</td><td>Sampling</td></tr>
+<tr><td><code>metadata</code>, <code>service_tier</code>, <code>inference_geo</code></td><td>No</td><td><code>inference_geo</code>: <code>"global"</code> by default or <code>"us"</code>, at a surcharge</td></tr>
+</table>
+<div class="ask"><b>What gets asked</b>That the system prompt is a separate parameter and that there is no <code>system</code> role inside <code>messages</code>. It is the most cited difference against other chat APIs.</div>
+</section>
+
+<section id="modos">
+<h2>The interaction modes</h2>
+<p>A developer reaches Claude through a <b>REST API</b>, normally via an SDK. The choice of mode is settled with two questions: <b>is someone waiting?</b> and <b>is it real time or offline volume?</b></p>
+<table><tr><th>Mode</th><th>When</th></tr>
+<tr><td><b>Synchronous</b></td><td>Someone is waiting and the response is short. The simplest one</td></tr>
+<tr><td><b>Streaming</b></td><td>Someone is waiting and the response is long: buys perceived latency in exchange for assembling the response yourself</td></tr>
+<tr><td><b>Async / await</b></td><td>Nobody is waiting at that instant, but it is still real time: concurrency without blocking</td></tr>
+<tr><td><b>Batch</b></td><td>Nobody is waiting and it is offline volume: lower cost per token, non-deterministic latency</td></tr></table>
+<div class="ask"><b>What gets asked</b>That <b>firing synchronous calls in parallel is not batch</b>: it gives concurrency, not a discount. And that streaming speeds nothing up — it improves <i>perceived</i> latency.</div>
+
+<h3>The context window and its two ways of breaking</h3>
+<p>It is a <b>fixed token budget that holds the entire request at once</b>: system, history, tools, documents and the generation. It fails in two distinct ways, and the exam may ask you to tell them apart:</p>
+<table><tr><th>Situation</th><th>What happens</th></tr>
+<tr><td>The input no longer fits</td><td><b>Error before generating</b>. There is no partial response</td></tr>
+<tr><td>The ceiling is hit <b>mid-generation</b></td><td><b>Truncated</b> output with <code>stop_reason: model_context_window_exceeded</code></td></tr></table>
+<div class="ask"><b>What gets asked</b>That <b>managing the history is the application's job</b>, not the API's. Nobody prunes for you: compaction, pruning and subagents are your decisions.</div>
+</section>
+
+<section id="stop">
+<h2><code>stop_reason</code> values</h2>
+<table>
+<tr><th>Value</th><th>Means</th><th>What you do</th></tr>
+<tr><td><code>end_turn</code></td><td>Finished naturally</td><td>Close the turn</td></tr>
+<tr><td><code>tool_use</code></td><td>Asks to run one or more tools</td><td>Run them and return <code>tool_result</code>; the loop continues</td></tr>
+<tr><td><code>max_tokens</code></td><td>Truncated output</td><td>Can break strict JSON. Retry with more budget</td></tr>
+<tr><td><code>stop_sequence</code></td><td>Hit a stop sequence</td><td>Handle it per your protocol</td></tr>
+<tr><td><code>refusal</code></td><td>Declined to answer</td><td>Returns 200 and <b>is billed</b>. Takes precedence over the schema</td></tr>
+<tr><td><code>pause_turn</code></td><td>Pause in a long operation</td><td>Continue the turn</td></tr>
+<tr><td><code>model_context_window_exceeded</code></td><td>Went past the window</td><td>Compact or reduce context</td></tr>
+</table>
+<div class="ask"><b>What gets asked</b><code>tool_use</code> versus <code>end_turn</code> as the control of the agentic loop, and that <code>refusal</code> and <code>max_tokens</code> are the two cases in which structured output may not satisfy the schema.</div>
+</section>
+
+<section id="tools">
+<h2>Tool use</h2>
+<h3>Defining a tool</h3>
+<pre>{
+  "name": "search_order",          <span class="c">// ^[a-zA-Z0-9_-]{1,64}$</span>
+  "description": "...",             <span class="c">// 3-4 sentences minimum, include when NOT to use it</span>
+  "input_schema": { ... },          <span class="c">// JSON Schema</span>
+  "input_examples": [ ... ]         <span class="c">// optional, useful on nested inputs</span>
+}</pre>
+<h3>tool_choice values</h3>
+<table><tr><th>Value</th><th>Effect</th></tr>
+<tr><td><code>auto</code></td><td>Default when <code>tools</code> are present. The model decides</td></tr>
+<tr><td><code>any</code></td><td>Forces a call to some tool</td></tr>
+<tr><td><code>tool</code></td><td>Forces a specific one (carries <code>name</code>)</td></tr>
+<tr><td><code>none</code></td><td>Default when there are no <code>tools</code></td></tr></table>
+<p>With <code>any</code> or <code>tool</code>, the API prefills the turn: <b>there will be no text before the <code>tool_use</code></b>. Parallelism comes enabled; it is turned off with <code>disable_parallel_tool_use: true</code> inside <code>tool_choice</code>.</p>
+
+<h3>Returning the result</h3>
+<pre>{
+  "role": "user",                   <span class="c">// there is no "tool" role</span>
+  "content": [
+    { "type": "tool_result",
+      "tool_use_id": "toolu_...",   <span class="c">// required</span>
+      "content": "...",             <span class="c">// optional</span>
+      "is_error": true },           <span class="c">// optional: model-readable failure</span>
+    { "type": "text", "text": "..." } <span class="c">// the text goes AFTER</span>
+  ]
+}</pre>
+<div class="ask"><b>What gets asked</b>That <code>tool_result</code> blocks go first in <code>content</code> and in the message immediately after the <code>tool_use</code> (otherwise, 400), and that a failure is signalled with <code>is_error</code>, not with an exception nor with an empty result the model would mistake for data.</div>
+</section>
+
+<section id="stream">
+<h2>Streaming <span class="tag">stream: true</span></h2>
+<pre>message_start
+  content_block_start   <span class="c">// per block, with its index</span>
+  content_block_delta   <span class="c">// N times</span>
+  content_block_stop    <span class="c">// HERE the block is closed</span>
+message_delta           <span class="c">// cumulative usage</span>
+message_stop            <span class="c">// HERE the turn is confirmed</span></pre>
+<table><tr><th>Delta type</th><th>Content</th></tr>
+<tr><td><code>text_delta</code></td><td>Text fragment</td></tr>
+<tr><td><code>input_json_delta</code></td><td><b>Partial JSON</b> of a tool's input. Do not parse until <code>content_block_stop</code></td></tr>
+<tr><td><code>thinking_delta</code></td><td>Reasoning fragment</td></tr>
+<tr><td><code>signature_delta</code></td><td>Right before closing a thinking block</td></tr></table>
+<div class="ask"><b>What gets asked</b>Three things: errors arrive as <code>event: error</code> <b>after an HTTP 200</b>; <b>tool use and thinking blocks are not recovered partially</b> (you only resume from the last text block); and a tool use error on retry usually traces back to a half-built block, not to the schema.</div>
+</section>
+
+<section id="batch">
+<h2>Message Batches</h2>
+<table><tr><th>Concept</th><th>Value</th></tr>
+<tr><td>Discount</td><td><b>50%</b> input and output</td></tr>
+<tr><td>Limit per batch</td><td><b>100,000</b> requests or <b>256 MB</b></td></tr>
+<tr><td>Window</td><td>Most under 1 h · results on completion or at <b>24 h</b> · <b>expire</b> at 24 h</td></tr>
+<tr><td>Results downloadable for</td><td><b>29 days</b></td></tr>
+<tr><td><code>processing_status</code></td><td>Only <code>in_progress</code> and <code>ended</code></td></tr>
+<tr><td>Result per request</td><td><code>succeeded</code> · <code>errored</code> · <code>canceled</code> · <code>expired</code> (the last three are not billed)</td></tr>
+<tr><td>Not supported</td><td><code>stream: true</code>, <code>max_tokens: 0</code></td></tr>
+<tr><td>Available on</td><td>Claude API and Claude Platform on AWS only</td></tr></table>
+<div class="ask"><b>What gets asked</b>That there are only two batch states, that it does not support streaming, and that firing synchronous calls in parallel <b>is not batching</b> because it does not lower the cost per token.</div>
+</section>
+
+<section id="cache">
+<h2>Prompt caching <span class="tag">cache_control</span></h2>
+<pre>{ "type": "text", "text": "...",
+  "cache_control": { "type": "ephemeral", "ttl": "1h" } }
+<span class="c">// "ephemeral" is the only type. ttl optional: 5 min by default</span></pre>
+<table><tr><th>Parameter</th><th>Value</th></tr>
+<tr><td>TTL</td><td>5 min by default · 1 h extended</td></tr>
+<tr><td>Maximum breakpoints</td><td><b>4</b> (the automatic one consumes one)</td></tr>
+<tr><td>Lookback</td><td>20 blocks per breakpoint</td></tr>
+<tr><td>Write price</td><td>1.25× (5 min) · 2× (1 h)</td></tr>
+<tr><td>Read price</td><td>0.1×</td></tr>
+<tr><td>Prefix hierarchy</td><td><code>tools</code> → <code>system</code> → <code>messages</code></td></tr>
+<tr><td>Minimum cacheable</td><td>Between 512 and 4,096 tokens depending on the model</td></tr></table>
+<div class="ask"><b>What gets asked</b>That changing <code>tools</code> invalidates the whole prefix, that changing the effort level also breaks the cache because it is rendered into the prompt, and the <b>silent failure</b>: below the minimum it does not cache and <b>gives no error</b> — you detect it with both cache counters at zero in <code>usage</code>.</div>
+</section>
+
+<section id="think">
+<h2>Reasoning and effort</h2>
+<table><tr><th>Parameter</th><th>Values</th><th>Notes</th></tr>
+<tr><td><code>thinking.type</code></td><td><code>adaptive</code></td><td>The model decides. On current models it is <b>always on</b>; disabling it gives 400</td></tr>
+<tr><td><code>thinking.type</code></td><td><code>enabled</code> + <code>budget_tokens</code></td><td><b>Deprecated.</b> Rejected with 400 on recent models</td></tr>
+<tr><td><code>display</code></td><td><code>summarized</code> · <code>omitted</code></td><td>Billed the same in both cases</td></tr>
+<tr><td><code>output_config.effort</code></td><td><code>max</code> · <code>xhigh</code> · <code>high</code> · <code>medium</code> · <code>low</code></td><td>Defaults to <b><code>high</code></b>. A behavioural signal, not a budget</td></tr></table>
+<div class="ask"><b>The underlying principle</b>Choosing the <b>model</b> and choosing the <b>reasoning mode</b> are two <b>separate and composable</b> levers. The rule works from the floor up: <b>the smallest model and the simplest reasoning and prompting that pass your eval</b>, and add capacity only where the eval says it is needed. Not the other way round.</div>
+<div class="ask"><b>What gets asked</b>That reasoning tokens <b>are billed as output</b> and count against <code>max_tokens</code> even when the text is not returned, and that <code>thinking</code> blocks carry a <code>signature</code> and must be returned <b>unmodified</b> or the next request fails.</div>
+</section>
+
+<section id="struct">
+<h2>Structured output</h2>
+<p>Two mechanisms: <b>JSON outputs</b> (schema in <code>output_config.format</code>, constrains the final response) and <b>strict tool use</b> (<code>strict: true</code> on a tool, validates the arguments). Both by constrained decoding.</p>
+<table><tr><th>Limit per request</th><th>Value</th></tr>
+<tr><td>Tools with <code>strict</code></td><td><b>20</b></td></tr>
+<tr><td>Optional parameters, total</td><td><b>24</b></td></tr>
+<tr><td>Parameters with union types</td><td><b>16</b></td></tr>
+<tr><td>Compilation timeout</td><td><b>180 s</b></td></tr>
+<tr><td>Grammar cache</td><td>24 h since last use</td></tr></table>
+<table><tr><th>Supports</th><th>Does not support (400)</th></tr>
+<tr><td>basic types, scalar <code>enum</code>, <code>const</code>, <code>anyOf</code>, internal <code>$ref</code>, <code>default</code>, <code>required</code>, string formats</td><td>recursive schemas, external <code>$ref</code>, <code>minimum</code>/<code>maximum</code>, <code>minLength</code>/<code>maxLength</code>, lookahead in <code>pattern</code></td></tr></table>
+<div class="ask"><b>What gets asked</b>That prefill <b>no longer works</b> to force JSON, that the casing of <code>enum</code> values is not guaranteed, that <code>required</code> properties come first in the ordering, and that citations plus structured outputs give 400.</div>
+</section>
+
+<section id="errors">
+<h2>Errors and retry strategy</h2>
+<table><tr><th>Code</th><th>Type</th><th>Retryable?</th></tr>
+<tr><td>400</td><td><code>invalid_request_error</code></td><td>No — fix the request</td></tr>
+<tr><td>401 / 403</td><td>auth / permissions</td><td>No — credential</td></tr>
+<tr><td>413</td><td><code>request_too_large</code></td><td>No — split it up</td></tr>
+<tr><td>429</td><td><code>rate_limit_error</code></td><td><b>Yes</b>, with backoff and respecting <code>retry-after</code></td></tr>
+<tr><td>500</td><td><code>api_error</code></td><td><b>Yes</b></td></tr>
+<tr><td>504</td><td><code>timeout_error</code></td><td><b>Yes</b></td></tr>
+<tr><td>529</td><td><code>overloaded_error</code></td><td><b>Yes</b> — global overload, not yours</td></tr></table>
+<h3>Classifying failures</h3>
+<ul>
+<li>First question on any failure: <b>could waiting and retrying resolve it?</b></li>
+<li>If yes → <b>exponential backoff with a cap and a retry budget</b>. Never an immediate loop, which only makes the problem worse.</li>
+<li>If no → <b>a named fallback</b>. Without it, the unhandled exception becomes the default behaviour, and one bad response takes down the whole flow.</li>
+<li>Tool failure → back to the model with the <b>error flag set</b>, never hidden behind an empty result the model would mistake for data.</li>
+</ul>
+<p>The official SDKs already retry with exponential backoff, <b>2 retries by default</b>, respecting <code>retry-after</code>.</p>
+</section>
+
+<section id="evals">
+<h2>Evals: grading method by output shape</h2>
+<table><tr><th>Output shape</th><th>Grader</th></tr>
+<tr><td>There is <b>one correct form</b></td><td><b>Exact match</b></td></tr>
+<tr><td><b>Structured</b> output</td><td><b>Code-based check</b></td></tr>
+<tr><td><b>Open-ended</b> quality</td><td><b>LLM judge</b>, calibrated against human-labelled cases <b>before</b> you trust it</td></tr></table>
+<p>Official order of preference: code → LLM → human. On the human, the docs say literally "avoid it if you can". And the design principle: <b>more cases with somewhat worse signal and automatic grading beats few hand-graded cases</b>.</p>
+<div class="ask"><b>What gets asked</b>That <b>the eval is written first</b>: identifying the expected behaviour forces you to define success while the design can still change. An eval turns "it's done" from a feeling into a score over a fixed set of cases.</div>
+
+<h3>Test levels and what each one catches</h3>
+<table><tr><th>Level</th><th>Catches</th></tr>
+<tr><td>Unit</td><td>Logic errors <b>inside</b> a component</td></tr>
+<tr><td>Functional</td><td>That a component meets its specification</td></tr>
+<tr><td><b>Integration</b></td><td>The <b>seam</b>: the handoff between two components that pass separately</td></tr>
+<tr><td>End-to-end</td><td>The whole flow. Tells you something fails, not where</td></tr></table>
+<div class="ask"><b>The diagnostic pattern</b>Units and functionals green with the e2e red means the breakage is in <b>a handoff</b>, not inside a component — and by definition that is what an integration test covers. The complete answer has two halves: <b>fix at the seam</b> and <b>add the integration test that was missing</b>. A trace tells you which step produced the bad result, which is what turns a day of investigation into a short fix.</div>
+<p>The same instinct governs information retrieval: <b>a single search</b> for single-fact queries, <b>search across several iterations</b> when the question is genuinely multi-step.</p>
+</section>
+
+<section id="hooks">
+<h2>Hooks</h2>
+<table><tr><th>Event</th><th>What for</th></tr>
+<tr><td><code>PreToolUse</code></td><td>Validate or <b>block before</b> execution</td></tr>
+<tr><td><code>PostToolUse</code></td><td>Add context, replace the output, <b>auditing</b></td></tr>
+<tr><td><code>UserPromptSubmit</code></td><td>Intercept the user's input</td></tr>
+<tr><td><code>SubagentStart</code> / <code>SubagentStop</code></td><td>Subagent lifecycle</td></tr>
+<tr><td><code>PreCompact</code></td><td>Before compacting (<code>trigger</code>: manual or auto)</td></tr>
+<tr><td><code>SessionStart</code> / <code>SessionEnd</code> / <code>Stop</code> / <code>Notification</code></td><td>Lifecycle and notices</td></tr></table>
+<h3>PreToolUse return shape</h3>
+<pre>{ "permissionDecision": "deny",        <span class="c">// allow | deny | ask | defer</span>
+  "permissionDecisionReason": "...",
+  "updatedInput": { ... } }            <span class="c">// optional</span></pre>
+<ul>
+<li><b>Exit 2</b> = blocking error, not overridable even with an <code>allow</code>.</li>
+<li><b>Silence is not approval</b>: a hook can deny, but staying quiet lets the normal permission flow continue.</li>
+<li>Hooks run <b>in your process, outside the context window</b>: they consume no tokens beyond what they return.</li>
+</ul>
+<div class="ask"><b>What gets asked</b>That the hook is the mechanism for <b>deterministic enforcement</b> as opposed to an instruction, that <code>PreToolUse</code> is where you put the action boundary that <b>blocks and logs before</b> execution, and that <code>PostToolUse</code> is the place for the audit log for a regulated customer.</div>
+</section>
+
+<section id="sdk">
+<h2>Agent SDK</h2>
+<table><tr><th>Option</th><th>What it does</th></tr>
+<tr><td><code>allowedTools</code></td><td>Auto-approval. Must include the spawn tool to use subagents</td></tr>
+<tr><td><code>maxTurns</code></td><td>Counts <b>only turns with tool use</b></td></tr>
+<tr><td><code>maxBudgetUsd</code></td><td>Cuts off by cost; <b>includes subagent spend</b></td></tr>
+<tr><td><code>systemPrompt</code></td><td>Without it, a minimal prompt. With the preset, the full CLI prompt. Or your own</td></tr>
+<tr><td><code>settingSources</code></td><td>Controls whether CLAUDE.md is loaded. Empty disables it</td></tr>
+<tr><td><code>resume</code> / <code>forkSession</code></td><td>Pick up a specific session / branch it into a new one</td></tr>
+<tr><td><code>permissionMode</code></td><td><code>default</code> · <code>acceptEdits</code> · <code>plan</code> · <code>auto</code> · <code>dontAsk</code> · <code>bypassPermissions</code></td></tr>
+</table>
+<h3>A subagent's AgentDefinition</h3>
+<pre>{ "description": "...",   <span class="c">// required</span>
+  "prompt": "...",        <span class="c">// required - the ONLY thing that crosses from the parent</span>
+  "tools": [...],         <span class="c">// if omitted, inherits all</span>
+  "model": "inherit",     <span class="c">// or a specific model</span>
+  "skills": [...] }       <span class="c">// subagents do NOT preload skills</span></pre>
+<div class="ask"><b>What gets asked</b>That <code>maxTurns</code> does not count turns without tools, that the budget includes subagents, and that the subagent does not inherit history: only the prompt string.</div>
+</section>
+
+<section id="mcp">
+<h2>MCP</h2>
+<table><tr><th>Primitive</th><th>Controlled by</th><th>Methods</th></tr>
+<tr><td>Tools</td><td>The <b>model</b></td><td><code>tools/list</code> · <code>tools/call</code></td></tr>
+<tr><td>Resources</td><td>The <b>application</b> (read-only)</td><td><code>resources/list</code> · <code>resources/read</code></td></tr>
+<tr><td>Prompts</td><td>The <b>user</b></td><td><code>prompts/list</code> · <code>prompts/get</code></td></tr></table>
+<table><tr><th>Decision</th><th>Options</th></tr>
+<tr><td>Transport</td><td><b>stdio</b> (local) · <b>Streamable HTTP</b> (remote or multi-developer)</td></tr>
+<tr><td>Scope in Claude Code</td><td><b>local</b> (personal) · <b>project</b> (<code>.mcp.json</code>, versioned) · <b>user</b> (all your projects)</td></tr>
+<tr><td>Deferred loading</td><td><code>defer_loading</code> on the toolset: defers the <b>context</b>, not the payload</td></tr></table>
+<p>Naming in Claude Code: tools <code>mcp__server__tool</code> · prompts <code>/mcp__server__prompt</code> · resources <code>@server:proto://path</code>.</p>
+<div class="ask"><b>What gets asked</b>Who controls each primitive, that stdio should not use OAuth because it takes credentials from the environment, and that a stdio server in <code>.mcp.json</code> <b>looks shareable and is not</b>.</div>
+</section>
+
+<section id="limits">
+<h2>Limits and counters</h2>
+<table><tr><th>Concept</th><th>Value</th></tr>
+<tr><td>Request size</td><td>Messages <b>32 MB</b> · Batch <b>256 MB</b> · Files <b>500 MB</b></td></tr>
+<tr><td>Non-streaming timeout</td><td><b>10 minutes</b></td></tr>
+<tr><td>Counting tokens</td><td><code>POST /v1/messages/count_tokens</code> — <b>free</b>, independent rate limit</td></tr>
+<tr><td>ITPM</td><td>input plus cache creation. <b>Cache reads do not count</b></td></tr>
+<tr><td>OTPM</td><td>Tokens actually generated. <code>max_tokens</code> <b>has no effect</b></td></tr>
+<tr><td>Headers</td><td><code>request-id</code> on every response · <code>anthropic-ratelimit-*-{limit,remaining,reset}</code></td></tr>
+<tr><td>Tool selection degradation</td><td>Above <b>30-50</b> available tools</td></tr>
+<tr><td>Cost of an image</td><td><code>⌈width/28⌉ × ⌈height/28⌉</code> visual tokens</td></tr>
+<tr><td>Image ceiling</td><td>High resolution <b>2576 px / 4784</b> tokens · standard <b>1568 px / 1568</b></td></tr>
+<tr><td>Cost of multi-agent</td><td>Multiplies by the number of subagents: <b>~15×</b> in the published case</td></tr>
+</table>
+<div class="ask"><b>What gets asked</b>That you cannot budget what you do not measure: you have to instrument <b>token cost, latency and error rate on every call</b> and then tune one chosen lever, instead of guessing by looking at the bill. And that the orchestrator-workers pattern only earns that cost on tasks that <b>split into independent parallel parts</b>, not on tightly coupled work a single agent solves for a fraction.</div>
+</section>
+
+</div>

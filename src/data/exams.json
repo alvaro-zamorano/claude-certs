@@ -1,0 +1,57 @@
+{
+ "CCAR-F": {
+  "name": "Architect · Foundations",
+  "w": {
+   "Agentic Architecture & Orchestration": 27,
+   "Tool Design & MCP Integration": 18,
+   "Claude Code Configuration & Workflows": 20,
+   "Prompt Engineering & Structured Output": 20,
+   "Context Management & Reliability": 15
+  },
+  "n": 60,
+  "min": 120
+ },
+ "CCDV-F": {
+  "name": "Developer · Foundations",
+  "w": {
+   "Agents and Workflows": 14.7,
+   "Applications and Integration": 33.1,
+   "Claude Code": 3.1,
+   "Eval, Testing, and Debugging": 2.6,
+   "Model Selection and Optimization": 16.8,
+   "Prompt and Context Engineering": 11,
+   "Security and Safety": 8.1,
+   "Tools and MCPs": 10.6
+  },
+  "n": 53,
+  "min": 120
+ },
+ "CCAO-F": {
+  "name": "Associate · Foundations",
+  "w": {
+   "Prompting and Task Execution": 14,
+   "Output Evaluation and Validation": 21,
+   "Product and Model Selection": 12,
+   "Workflow Integration and Solution Design": 16,
+   "Configuration and Knowledge Management": 12,
+   "Governance, Risk, and Responsible Use": 15,
+   "Troubleshooting and Optimization": 10
+  },
+  "n": 60,
+  "min": 120
+ },
+ "CCAR-P": {
+  "name": "Architect · Professional",
+  "w": {
+   "Solution Design & Architecture": 17,
+   "Claude Models, Prompting & Context Engineering": 13,
+   "Integration": 19,
+   "Evaluation, Testing & Optimization": 16,
+   "Governance, Safety & Risk Management": 14,
+   "Stakeholder Communication & Lifecycle Management": 14,
+   "Developer Productivity & Operational Enablement": 7
+  },
+  "n": 63,
+  "min": 120
+ }
+}

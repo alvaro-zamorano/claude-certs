@@ -1,0 +1,411 @@
+<title>Architect Foundations</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{
+  --bg:#f7f6f3;--surface:#fffefb;--surface-2:#f0eee8;--line:#e0ddd4;--line-strong:#c9c5b8;
+  --ink:#20201d;--ink-2:#57544c;--ink-3:#8b8779;
+  --accent:#b5541f;--accent-soft:#f6e8de;--accent-ink:#8c3f16;
+  --ok:#2f6b46;--ok-soft:#e2efe7;--bad:#a32f28;--bad-soft:#f8e5e3;
+  --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:ui-sans-serif,-apple-system,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#16161a;--surface:#1e1e23;--surface-2:#26262c;--line:#33333b;--line-strong:#4a4a55;
+  --ink:#eceae4;--ink-2:#a8a49b;--ink-3:#7b776e;
+  --accent:#e0834c;--accent-soft:#3a2617;--accent-ink:#f0a274;
+  --ok:#6dbb8e;--ok-soft:#1c2f24;--bad:#e0817a;--bad-soft:#33201e;}}
+:root[data-theme="dark"]{
+  --bg:#16161a;--surface:#1e1e23;--surface-2:#26262c;--line:#33333b;--line-strong:#4a4a55;
+  --ink:#eceae4;--ink-2:#a8a49b;--ink-3:#7b776e;
+  --accent:#e0834c;--accent-soft:#3a2617;--accent-ink:#f0a274;
+  --ok:#6dbb8e;--ok-soft:#1c2f24;--bad:#e0817a;--bad-soft:#33201e;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:calc(20px + env(safe-area-inset-top)) 18px calc(70px + env(safe-area-inset-bottom))}
+header.top{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:13px;margin-bottom:14px}
+h1{font-size:var(--t-sub);margin:0;letter-spacing:-.02em}
+.sub{color:var(--ink-3);font-size:var(--t-micro);margin-top:3px}
+.nav{display:flex;gap:11px;font-size:var(--t-micro);flex-wrap:wrap}
+a{color:var(--accent-ink)}
+button{font-family:inherit;cursor:pointer}
+.jump{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 20px}
+.jump a{background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:5px 11px;font-size:var(--t-micro);text-decoration:none;color:var(--ink-2)}
+.lead{font-size:var(--t-dato);color:var(--ink-2);border-left:3px solid var(--accent);padding-left:14px;margin:0 0 22px}
+section{margin-bottom:34px;scroll-margin-top:14px}
+h2{font-size:var(--t-base);margin:0 0 10px;letter-spacing:-.01em}
+h3{font-size:var(--t-dato);margin:20px 0 7px}
+h4{font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.09em;color:var(--accent-ink);margin:14px 0 5px;font-weight:700}
+p{margin:0 0 10px;font-size:var(--t-dato)}
+ul,ol{margin:0 0 12px;padding-left:20px;font-size:var(--t-dato)}li{margin-bottom:5px}
+code{font-family:var(--mono);font-size:var(--t-dato);background:var(--surface-2);padding:1px 5px;border-radius:4px;border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;font-size:var(--t-menor);margin:0 0 13px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+th{background:var(--surface-2);font-weight:600;font-size:var(--t-micro);white-space:nowrap}
+.key,.trap,.win{border-radius:8px;padding:12px 14px;margin:0 0 13px;font-size:var(--t-dato)}
+.key{background:var(--accent-soft)}.key b:first-child{display:block;font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px;color:var(--accent-ink)}
+.trap{background:var(--bad-soft)}.trap b:first-child{display:block;font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px;color:var(--bad)}
+.win{background:var(--ok-soft)}.win b:first-child{display:block;font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px;color:var(--ok)}
+.ts{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:13px 15px;margin-bottom:9px}
+.ts .n{font-family:var(--mono);font-size:var(--t-micro);color:var(--ink-3)}
+.ts .t{font-weight:600;font-size:var(--t-dato);margin:2px 0 7px;letter-spacing:-.01em}
+.ts ul{margin-bottom:0;font-size:var(--t-dato)}
+.dom{display:flex;align-items:baseline;gap:9px;margin:24px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--accent)}
+.dom h3{margin:0;font-size:var(--t-base);flex:1}
+.dom .w{font-family:var(--mono);font-size:var(--t-menor);color:var(--accent-ink);font-weight:600}
+.esc{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:16px 17px;margin-bottom:12px}
+.esc h3{margin:0 0 3px;font-size:var(--t-base)}
+.escdom{font-size:var(--t-micro);color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:9px}
+.ctx{background:var(--surface-2);border-radius:7px;padding:10px 12px;font-size:var(--t-dato);color:var(--ink-2);margin-bottom:11px}
+.qa{border-top:1px solid var(--line);padding-top:9px;margin-top:9px;font-size:var(--t-dato)}
+.qa .p{font-weight:520;margin-bottom:4px}
+.qa .r{color:var(--ink-2)}
+.qa .r b{color:var(--ok)}
+/* Journey */
+.prog{position:sticky;top:0;z-index:10;background:var(--bg);padding:9px 0 11px;margin-bottom:14px;border-bottom:1px solid var(--line)}
+.ptop{display:flex;justify-content:space-between;align-items:baseline;font-size:var(--t-micro);color:var(--ink-3);margin-bottom:5px}
+.ptop b{color:var(--ink);font-size:var(--t-dato)}
+.track{height:6px;background:var(--surface-2);border-radius:99px;overflow:hidden}
+.fill{height:100%;background:var(--accent);border-radius:99px;transition:width .4s}
+.fill.done{background:var(--ok)}
+.etapa{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:15px 16px;margin-bottom:10px}
+.etapa.hecha{border-color:var(--ok);background:var(--ok-soft)}
+.eh{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px}
+.enum{font-family:var(--mono);font-size:var(--t-micro);background:var(--surface-2);border:1px solid var(--line);border-radius:99px;padding:3px 9px;color:var(--ink-3);white-space:nowrap;flex:0 0 auto;margin-top:2px}
+.etapa.hecha .enum{background:var(--ok);border-color:var(--ok);color:#fff}
+.et{font-size:var(--t-dato);font-weight:600;flex:1;min-width:0}
+.emeta{font-size:var(--t-micro);color:var(--ink-3);text-transform:uppercase;letter-spacing:.07em;margin-top:2px;font-weight:400}
+.tarea{display:flex;gap:9px;align-items:flex-start;padding:7px 0;font-size:var(--t-dato);border-top:1px solid var(--line);cursor:pointer}
+.tarea input{margin:3px 0 0;width:17px;height:17px;flex:0 0 auto;accent-color:var(--accent)}
+.tarea span{flex:1}
+.tarea.ok span{text-decoration:line-through;color:var(--ink-3)}
+.salida{margin-top:10px;padding-top:9px;border-top:1px dashed var(--line-strong);font-size:var(--t-menor);color:var(--ink-2)}
+.salida b{color:var(--ink);font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.09em;display:block;margin-bottom:3px}
+.reset{background:none;border:none;color:var(--ink-3);font-size:var(--t-micro);text-decoration:underline;padding:0}
+.dos{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:700px){.dos{grid-template-columns:1fr}}
+@media(max-width:640px){
+  .wrap{padding:15px 14px calc(60px + env(safe-area-inset-bottom))}
+  h1{font-size:var(--t-sub)}h2{font-size:var(--t-base)}p,li{font-size:var(--t-dato)}
+  table{font-size:var(--t-micro)}th,td{padding:5px 7px}
+  .etapa,.esc,.ts{padding:13px}
+}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div><h1>Architect – Foundations</h1><div class="sub">CCAR-F · scenario-by-scenario study route, with verifiable exit criteria</div></div>
+  <div class="nav"><a href="../flash/">Cheat sheet</a><a href="../referencia/">Reference</a><a href="../tarjetas/">Cards</a><a href="../apuntes/">Notes</a><a href="../">Test</a></div>
+</header>
+
+<div class="jump">
+<a href="#alcance">Scope</a><a href="#ficha">Fact sheet</a><a href="#patron">How to reason through the items</a><a href="#objetivos">What each domain tests</a><a href="#escenarios">The six scenarios</a><a href="#ejercicios">Labs</a><a href="#journey">Route</a>
+</div>
+
+<p class="lead">It is the most predictable exam in the programme: it presents four scenarios drawn from a bank of six, and the official guide describes all six. That is why this route goes <b>scenario by scenario</b> rather than by syllabus — which is how the exam itself is built. The guide is the source for the syllabus and the weights; this page is the working route.</p>
+
+<section id="alcance">
+<h2>Start here: draw the boundary of the syllabus</h2>
+<p>The official guide closes with an appendix listing <b>what is explicitly out of scope</b>.
+It is the first thing to read, because it saves more time than anything else — and because a good part
+of what you study for the Developer does not count here.</p>
+<div class="key"><b>The criterion, in one sentence</b>This exam measures <b>architecture decisions</b>, not API
+mechanics. Anything that is low-level implementation, cloud infrastructure, pricing or authentication
+protocols is out; what is in is when to choose each mechanism and why.</div>
+<p>Check the guide's appendix for the full list before planning. As a rule of thumb derived from it:
+out of our <a href="/en/referencia/">technical reference</a>, only <code>tool_use</code> with
+JSON schemas, the <code>tool_choice</code> values, <code>stop_reason</code>, <code>max_tokens</code>,
+system prompts and the Batch API apply here. The rest of the sections are for the Developer.</p>
+<div class="trap"><b>The mistake specific to this exam</b>Dragging in the Developer syllabus. Every hour spent
+on streaming, caching, token counting, quota limits or third-party platforms is an hour lost.</div>
+</section>
+
+<section id="ficha">
+<h2>The fact sheet</h2>
+<table>
+<tr><th>Code</th><td>CCAR-F</td><th>Items</th><td>60</td></tr>
+<tr><th>Structure</th><td colspan="3"><b>4 scenarios</b> from a bank of <b>6 published</b></td></tr>
+<tr><th>Time</th><td>120 min</td><th>Pass mark</th><td>720 / 1000</td></tr>
+</table>
+<table>
+<tr><th>Domain</th><th>Weight</th><th>Items</th><th>Task statements</th></tr>
+<tr><td>1 · Agentic Architecture &amp; Orchestration</td><td>27%</td><td>16</td><td>7</td></tr>
+<tr><td>3 · Claude Code Configuration &amp; Workflows</td><td>20%</td><td>12</td><td>6</td></tr>
+<tr><td>4 · Prompt Engineering &amp; Structured Output</td><td>20%</td><td>12</td><td>6</td></tr>
+<tr><td>2 · Tool Design &amp; MCP Integration</td><td>18%</td><td>11</td><td>5</td></tr>
+<tr><td>5 · Context Management &amp; Reliability</td><td>15%</td><td>9</td><td>6</td></tr>
+</table>
+</section>
+
+<section id="patron">
+<h2>How to reason through the items</h2>
+<p>The items are production scenarios with four options that all sound reasonable. After working through
+the material, these are the heuristics that most often decide between two defensible options.</p>
+
+<div class="key"><b>The rule that settles most items</b><b>The proportionate answer, not the most sophisticated one.</b>
+When one option proposes a trained classifier, a routing layer, sentiment analysis or a more expensive
+model, and another proposes fixing the cause with the mechanism that already exists, the second wins. The
+exam rewards the lowest-effort intervention that attacks the <b>root cause</b>.</div>
+
+<table>
+<tr><th>If the problem is…</th><th>The answer is usually…</th></tr>
+<tr><td>It skips a mandatory step with serious consequences</td><td><b>Programmatic</b> enforcement, not an instruction in the prompt</td></tr>
+<tr><td>It confuses two similar tools from the very first turn</td><td>Expanding the <b>descriptions</b>: formats, examples, edge cases and boundaries</td></tr>
+<tr><td>Tool selection degrades after N turns</td><td>The <b>context window</b>, not the schema</td></tr>
+<tr><td>It decides badly when to escalate</td><td><b>Explicit criteria</b> with examples, not the model's self-confidence</td></tr>
+<tr><td>Something must reach the whole team</td><td><b>Project</b> scope, versioned in the repo</td></tr>
+<tr><td>Conventions for files scattered across the repo</td><td><b>Path</b> rules with globs, not one file per directory</td></tr>
+<tr><td>Large change with several possible architectures</td><td><b>Plan mode</b> before touching anything</td></tr>
+<tr><td>Incomplete report and subagents that work fine</td><td>The <b>coordinator's decomposition</b></td></tr>
+<tr><td>A subagent fails</td><td><b>Structured error</b>: type, attempt, partial results, alternatives</td></tr>
+<tr><td>Long review with inconsistent results</td><td><b>Separate passes</b>: per unit and then integration</td></tr>
+<tr><td>Saving cost in a flow that blocks someone</td><td>Batch <b>only</b> for what nobody is waiting on</td></tr>
+</table>
+
+<div class="trap"><b>False claims used as bait</b>That a bigger context fixes
+<b>attention dilution</b> · that the model's <b>self-confidence</b> is good for routing to review · that
+<b>requiring consensus</b> across several passes improves detection, when in fact it suppresses bugs that
+only show up intermittently · and CLI flags that simply do not exist.</div>
+</section>
+
+<section id="objetivos">
+<h2>What each domain tests</h2>
+<p>The guide breaks each domain into several <i>task statements</i> with what you need to know and what you
+need to be able to do. That detail is in the official document and is worth reading in full. What follows is
+the topic map to orient your study, and the conceptual development of each one is in the
+<a href="/en/apuntes/">notes</a>.</p>
+
+<div class="dom"><h3>Agentic Architecture &amp; Orchestration</h3><span class="w">27%</span></div>
+<p>Agentic loops and their stopping condition · coordinator and subagents, with explicit context passing
+and parallel spawning · enforcement and handoff in multi-step flows · hooks to intercept and normalise
+· fixed versus dynamic decomposition · session management, resumption and branching.</p>
+
+<div class="dom"><h3>Claude Code Configuration &amp; Workflows</h3><span class="w">20%</span></div>
+<p>Hierarchy and modularity of project configuration · commands and skills, with their scopes and their
+isolation options · conditional rules by path · when to plan before executing · iterative refinement
+techniques · CI integration with structured output.</p>
+
+<div class="dom"><h3>Prompt Engineering &amp; Structured Output</h3><span class="w">20%</span></div>
+<p>Explicit criteria to reduce false positives · few-shot for consistency and for ambiguous cases
+· structured output with tool use and JSON Schema, and what it guarantees and what it does not · validation,
+retry and feedback loops · when batch processing is appropriate · multi-pass and multi-instance review
+architectures.</p>
+
+<div class="dom"><h3>Tool Design &amp; MCP Integration</h3><span class="w">18%</span></div>
+<p>Descriptions that differentiate similar tools · structured errors with category and retryability
+· distributing tools by role and configuring the choice · integrating MCP servers with their
+scopes and credentials · choosing among the built-in read, search and edit tools.</p>
+
+<div class="dom"><h3>Context Management &amp; Reliability</h3><span class="w">15%</span></div>
+<p>Preserving critical information across long interactions · escalation criteria and ambiguity resolution
+· error propagation between agents · context in large codebase exploration · human review and confidence
+calibration · information provenance and uncertainty in multi-source synthesis.</p>
+</section>
+
+<section id="escenarios">
+<h2>The six scenarios</h2>
+<p>The exam presents four of six, and the official guide describes them in detail: <b>read them there</b>. What
+follows is what is worth having worked through for each one — the decisions you need to be able to defend and the
+anti-patterns that show up as distractors.</p>
+
+<div class="esc">
+<h3>1 · Support resolution agent</h3>
+<div class="escdom">Orchestration · tools and MCP · context</div>
+<h4>Decisions to defend</h4>
+<ol>
+<li>The loop is controlled by <code>stop_reason</code>, not by an iteration cap.</li>
+<li>An <b>irreversible</b> operation gets a human checkpoint or a programmatic prerequisite <b>before</b> the loop is wired up; and if the role does not need it, the tool is removed.</li>
+<li>The escalation tool <b>competes</b> with the rest: without an exclusion condition in the descriptions, it becomes the easy way out or is never used.</li>
+<li>Failures come back with an error flag and a category, never as an empty result.</li>
+<li>Long conversations require pulling the transactional facts out of the history that gets summarised.</li>
+</ol>
+<h4>Anti-patterns</h4>
+<ul><li>Auditing a dangerous capability instead of removing it.</li>
+<li>Relying on a prompt instruction where enforcement is needed.</li>
+<li>Setting a resolution target without defining what counts as resolved.</li></ul>
+</div>
+
+<div class="esc">
+<h3>2 · Code generation with Claude Code</h3>
+<div class="escdom">Configuration and workflows · context</div>
+<h4>Decisions to defend</h4>
+<ol>
+<li>Plan before executing when there are several possible architectures and many files in play.</li>
+<li>Project configuration is <b>concatenated</b> across levels: contradictory rules have to be removed, not left to see which one wins.</li>
+<li>Permission rules are evaluated in a fixed order and the first match decides.</li>
+<li>Each persistent-context mechanism solves a different problem; piling them into a single file degrades them all.</li>
+<li>Two corrections on the same problem mean contaminated context: clear it and start again.</li>
+</ol>
+<h4>Anti-patterns</h4>
+<ul><li>Permissive mode "for speed" against a live repository.</li>
+<li>Entrusting a prohibition to a note in the configuration instead of to a control.</li></ul>
+</div>
+
+<div class="esc">
+<h3>3 · Multi-agent research system</h3>
+<div class="escdom">Orchestration · tools and MCP · context</div>
+<h4>Decisions to defend</h4>
+<ol>
+<li>Subagents <b>do not inherit context</b>: findings travel in the prompt they are launched with.</li>
+<li>Parallelising means emitting several spawn calls <b>in a single response</b>.</li>
+<li>Partition the scope between subagents so work is not duplicated.</li>
+<li>A refinement loop where the coordinator spots gaps and re-delegates with targeted queries.</li>
+<li>Separate content from metadata so attribution survives every summary.</li>
+</ol>
+<h4>Anti-patterns</h4>
+<ul><li>Blaming the subagents when the failure is in how the work was divided.</li>
+<li>Always running the full pipeline instead of choosing based on the query.</li>
+<li>Using multi-agent on coupled work, where it multiplies cost with no gain.</li></ul>
+</div>
+
+<div class="esc">
+<h3>4 · Development productivity</h3>
+<div class="escdom">Tools and MCP · configuration · orchestration</div>
+<h4>Decisions to defend</h4>
+<ol>
+<li>Hybrid context model: preload what is stable and retrieve the rest on demand.</li>
+<li>Delegate to a subagent the exploration that would flood the main context.</li>
+<li>Choose the tool by what you are looking for: content, paths or a targeted edit, with its fallback when it fails.</li>
+<li>Connect servers deliberately: each one spends context even when it is not used.</li>
+<li>Narrow the tool catalogue by role before selection degrades.</li>
+</ol>
+<h4>Anti-patterns</h4>
+<ul><li>Loading the whole repository "so it has context".</li>
+<li>Spreading many tools across several servers believing it reduces confusion.</li></ul>
+</div>
+
+<div class="esc">
+<h3>5 · Claude Code in CI/CD</h3>
+<div class="escdom">Configuration and workflows · prompting</div>
+<h4>Decisions to defend</h4>
+<ol>
+<li>Findings are material to triage, not a verdict: you confirm what is demonstrable from the diff.</li>
+<li>The human gate goes where a finding turns into an action that is hard to reverse.</li>
+<li>False positives drop by giving the <b>team's conventions</b>, not by asking for "more rigour".</li>
+<li>Non-interactive mode with structured output to consume the result in the pipeline.</li>
+<li>An independent instance reviews better than the one that generated the code.</li>
+</ol>
+<h4>Anti-patterns</h4>
+<ul><li>Blocking the merge on every finding: within a week it gets approved automatically.</li>
+<li>Accepting claims about runtime behaviour that the reviewer had no way to measure.</li></ul>
+</div>
+
+<div class="esc">
+<h3>6 · Structured data extraction</h3>
+<div class="escdom">Prompting and structured output · context</div>
+<h4>Decisions to defend</h4>
+<ol>
+<li>The schema guarantees the shape, <b>not the meaning</b>: semantic validation is still yours.</li>
+<li>Nullable fields so the model can abstain instead of inventing.</li>
+<li>Escape hatches in closed categories, because fixed lists age.</li>
+<li>Retry with the specific error as feedback, knowing when it is pointless: if the data is not there, it will not appear.</li>
+<li>Per-field confidence and sampling to decide what a human reviews.</li>
+</ol>
+<h4>Anti-patterns</h4>
+<ul><li>Recomputing a total from the line items: it fabricates data that now passes validation.</li>
+<li>Retrying with the same prompt expecting a different result.</li></ul>
+</div>
+</section>
+
+<section id="ejercicios">
+<h2>Four labs</h2>
+<p>The guide proposes practical preparation exercises. These are the ones I would build, aligned with them
+and with what weighs most in the exam. Building one teaches more than rereading the theory three times.</p>
+<table>
+<tr><th>#</th><th>Lab</th><th>Reinforces</th></tr>
+<tr><td>1</td><td>Agent with three or four tools, two of them deliberately similar. Loop controlled by <code>stop_reason</code>, errors with category and retryability, and a programmatic control that blocks an operation above a threshold.</td><td>Orchestration · tools · context</td></tr>
+<tr><td>2</td><td>Configure a repository for a team: project rules, conditional rules by path, an isolated skill with restricted permissions, and a shared MCP server with credentials kept outside the repo.</td><td>Claude Code · MCP</td></tr>
+<tr><td>3</td><td>Extraction pipeline with nullable fields and extensible categories, a validation and retry loop with feedback, and a large batch with selective resubmission of the failures.</td><td>Structured output · context</td></tr>
+<tr><td>4</td><td>Coordinator with two subagents launched in parallel, structured output separating claim, evidence, source and date, a simulated timeout to test error propagation, and conflicting sources.</td><td>Orchestration · tools · context</td></tr>
+</table>
+</section>
+
+<section id="journey">
+<h2>The journey</h2>
+<div class="prog">
+  <div class="ptop"><span>Progress</span><span><b id="pn">0</b> <span id="pt"></span></span></div>
+  <div class="track"><div class="fill" id="pf" style="width:0%"></div></div>
+</div>
+<div id="etapas"></div>
+<div style="margin-top:12px;text-align:right"><button class="reset" id="reset">reset progress</button></div>
+<div class="win" style="margin-top:18px"><b>Before booking</b>Weighted ≥85% in the simulator · the six scenarios explained out loud in two minutes each · the four official exercises completed · one timed mock.</div>
+<div class="trap"><b>The mistake specific to this exam</b>Studying by syllabus instead of by scenario, and dragging in the Developer syllabus. <b>Streaming, caching, tokens, rate limits, OAuth, clouds, embeddings and vision are out of scope</b>: every hour there is an hour lost.</div>
+</section>
+</div>
+
+<script>
+const ETAPAS=[
+ {n:"0",t:"Scope and measure",m:"1 session · before studying anything",
+  tareas:["Read the out-of-scope list and mentally cross out what no longer applies from the Developer material",
+          "Weighted mock in the simulator: accuracy by domain is recorded above, under «Where you stand now»",
+          "Read the six scenarios on this page in one sitting"],
+  salida:"You know what NOT to study and you have a number per domain."},
+ {n:"1",t:"Agentic orchestration · objectives 1.1 to 1.7",m:"27% · the heaviest block",
+  tareas:["Study the seven task statements of domain 1",
+          "Official exercise 1: multi-tool agent with escalation, stop_reason loop and threshold hook",
+          "Verify in your own setup that the subagent does NOT see the parent's history",
+          "Practise --resume with a name and fork_session from a common baseline",
+          "Scenarios 1 and 3 with their six sample questions"],
+  salida:"You can explain why a programmatic prerequisite beats an instruction when money is involved."},
+ {n:"2",t:"Claude Code for teams · objectives 3.1 to 3.6",m:"20% · fine configuration, not daily use",
+  tareas:["Study the six task statements of domain 3",
+          "Official exercise 2: project CLAUDE.md, .claude/rules/ with globs, skill with context: fork and allowed-tools",
+          "Use /memory to check which memory files are loaded",
+          "Try @import to break up a large CLAUDE.md",
+          "Run in CI with -p, --output-format json and --json-schema",
+          "Scenarios 2 and 5 with their six sample questions"],
+  salida:"You know from memory where each thing goes: commands, rules, skills, .mcp.json, and what gets shared via git."},
+ {n:"3",t:"Prompting and structured output · objectives 4.1 to 4.6",m:"20% · tied for second place",
+  tareas:["Study the six task statements of domain 4",
+          "Official exercise 3: extraction pipeline with validation-retry and batch by custom_id",
+          "Write explicit review criteria and compare them with \"be conservative\"",
+          "Build 2-4 few-shot examples for an ambiguous case showing WHY one action was chosen",
+          "Try forced tool_choice to guarantee the order of two extractions"],
+  salida:"You tell a syntax error apart from a semantic one and know when a retry is pointless."},
+ {n:"4",t:"Tool design and MCP · objectives 2.1 to 2.5",m:"18%",
+  tareas:["Study the five task statements of domain 2",
+          "Write two deliberately similar tool descriptions and fix them until selection is reliable",
+          "Implement errorCategory + isRetryable in a tool and test the four error types",
+          "Configure a project MCP with ${VAR} and a user one, and verify they coexist",
+          "Expose a catalogue as an MCP resource and measure whether exploratory calls drop",
+          "Scenario 4: review Grep vs Glob vs Edit and the Read+Write fallback"],
+  salida:"You can justify why 18 tools perform worse than 4-5 and what to do about it."},
+ {n:"5",t:"Context and reliability · objectives 5.1 to 5.6",m:"15% · cuts across every scenario",
+  tareas:["Study the six task statements of domain 5",
+          "Official exercise 4: multi-agent with error propagation and conflicting sources",
+          "Set up a case facts block and check that it survives the history summary",
+          "Trim a verbose tool output down to the relevant fields",
+          "Design crash recovery with a state manifest"],
+  salida:"You can name the lost-in-the-middle effect and what is done to mitigate it."},
+ {n:"6",t:"Consolidation",m:"review only",
+  tareas:["Second timed mock",
+          "Targeted review of the domains in the red",
+          "Explain the six scenarios out loud, two minutes each",
+          "Reread the answer-pattern table the night before"],
+  salida:"Weighted ≥85% and the six scenarios without looking. Then you book."}
+];
+const KEY="ccar-f-journey-v2";
+let ST={};try{ST=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(ST))}catch(e){}};
+const total=ETAPAS.reduce((a,e)=>a+e.tareas.length,0);
+function render(){
+  document.getElementById("etapas").innerHTML=ETAPAS.map((e,i)=>{
+    const h=e.tareas.filter((_,k)=>ST[i+"."+k]).length, done=h===e.tareas.length;
+    return `<div class="etapa ${done?'hecha':''}">
+      <div class="eh"><span class="enum">${done?'✓':'Stage '+e.n}</span>
+      <span class="et">${e.t}<div class="emeta">${e.m} · ${h}/${e.tareas.length}</div></span></div>
+      ${e.tareas.map((t,k)=>`<label class="tarea ${ST[i+"."+k]?'ok':''}"><input type="checkbox" data-i="${i}" data-k="${k}" ${ST[i+"."+k]?'checked':''}><span>${t}</span></label>`).join("")}
+      <div class="salida"><b>Exit criteria</b>${e.salida}</div></div>`;
+  }).join("");
+  document.querySelectorAll('.tarea input').forEach(c=>c.onchange=()=>{
+    const id=c.dataset.i+"."+c.dataset.k;
+    if(c.checked)ST[id]=1; else delete ST[id];
+    save();render();
+  });
+  const n=Object.keys(ST).length, pc=Math.round(n/total*100);
+  document.getElementById("pn").textContent=n;
+  document.getElementById("pt").textContent="of "+total+" tasks · "+pc+"%";
+  const f=document.getElementById("pf"); f.style.width=pc+"%"; f.className="fill"+(pc===100?" done":"");
+}
+document.getElementById("reset").onclick=()=>{if(confirm("Reset progress?")){ST={};save();render()}};
+render();
+</script>

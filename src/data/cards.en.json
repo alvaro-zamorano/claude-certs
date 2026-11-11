@@ -1,0 +1,1141 @@
+{
+ "generated": "2026-08-20",
+ "lang": "en",
+ "count": 184,
+ "temas": [
+  "Loop and tools",
+  "Subagents",
+  "Patterns",
+  "Context",
+  "Claude Code",
+  "MCP",
+  "What to use",
+  "API and batch",
+  "Models and cost",
+  "Caching",
+  "Structured output",
+  "Evals",
+  "Security",
+  "RAG",
+  "Compliance",
+  "Judgement (Associate)",
+  "Version traps",
+  "Application design",
+  "Third parties",
+  "Agentic frameworks",
+  "Failure diagnosis",
+  "Production",
+  "Multimodal",
+  "Claude Code in a team",
+  "MCP in deployment",
+  "Failures and cost",
+  "Fundamentals",
+  "Deployment"
+ ],
+ "cards": [
+  {
+   "t": "Loop and tools",
+   "f": "Which field controls whether the agentic loop continues or ends?",
+   "b": "<b>stop_reason</b>. Continues while it is <code>tool_use</code>, ends on <code>end_turn</code>. Never parse natural language, and never use an iteration cap as the primary criterion.",
+   "id": "c0"
+  },
+  {
+   "t": "Loop and tools",
+   "f": "With which role do tool results return to the conversation?",
+   "b": "With <b>role: user</b>, in <code>tool_result</code> blocks linked by <code>tool_use_id</code>. <b>There is no <code>tool</code> or <code>function</code> role</b> in the Claude API.",
+   "id": "c1"
+  },
+  {
+   "t": "Loop and tools",
+   "f": "Two tool_result formatting rules that return 400 if broken",
+   "b": "1) The message goes <b>immediately after</b> the assistant that emitted the <code>tool_use</code>.<br>2) <code>tool_result</code> blocks go <b>first</b> in the <code>content</code> array; text after them.",
+   "id": "c2"
+  },
+  {
+   "t": "Loop and tools",
+   "f": "A tool fails. How do you tell the model?",
+   "b": "A <code>tool_result</code> with <b><code>is_error: true</code></b> and a readable cause. It is not an exception in your app: it is information so the agent can correct course.",
+   "id": "c3"
+  },
+  {
+   "t": "Loop and tools",
+   "f": "The four values of tool_choice",
+   "b": "<code>auto</code> (default with tools) · <code>any</code> (some tool) · <code>tool</code> (a specific one) · <code>none</code> (default without tools).",
+   "id": "c4"
+  },
+  {
+   "t": "Loop and tools",
+   "f": "Side effect of forcing tool_choice to any or tool",
+   "b": "The API <b>prefills the assistant turn</b>, so <b>there will be no natural text before the <code>tool_use</code></b>.",
+   "id": "c5"
+  },
+  {
+   "t": "Loop and tools",
+   "f": "What is the most important factor in a tool's performance?",
+   "b": "The <b>description</b>. Literally in the docs: «by far the most important factor». Target: at least <b>3-4 sentences</b>. Rewriting them cut completion time by 40% in Anthropic's tests.",
+   "id": "c6"
+  },
+  {
+   "t": "Loop and tools",
+   "f": "At how many tools does model selection start to degrade?",
+   "b": "<b>30-50 tools</b> available. The fix is consolidating operations into fewer tools and using tool search. Splitting them across several MCP servers does not help: the model still sees the total.",
+   "id": "c7"
+  },
+  {
+   "t": "Loop and tools",
+   "f": "Client tools vs server tools",
+   "b": "<b>Client</b>: <code>stop_reason: tool_use</code> arrives, <b>you</b> run them and return the result.<br><b>Server</b>: <b>Anthropic</b> runs them inside the same request (web search, code execution, MCP connector).",
+   "id": "c8"
+  },
+  {
+   "t": "Subagents",
+   "f": "What does a subagent inherit from the parent's context?",
+   "b": "<b>Nothing from the history.</b> Only the <b>prompt string</b> it is invoked with crosses over, plus its own system prompt, the project's CLAUDE.md and the tool definitions.",
+   "id": "c9"
+  },
+  {
+   "t": "Subagents",
+   "f": "What does a subagent return to the coordinator?",
+   "b": "Only its <b>final message</b>, as a tool result. It may have spent tens of thousands of tokens and return a distillate of <b>1,000-2,000 tokens</b>.",
+   "id": "c10"
+  },
+  {
+   "t": "Subagents",
+   "f": "How do you launch several subagents in parallel?",
+   "b": "By emitting <b>several spawn calls in a single response</b> from the coordinator. One per turn is sequential execution in disguise.",
+   "id": "c11"
+  },
+  {
+   "t": "Subagents",
+   "f": "The coordinator cannot invoke subagents. What do you check first?",
+   "b": "That the <b>spawn tool is in <code>allowedTools</code></b>. Without that, it falls through to the permission callback or is denied.",
+   "id": "c12"
+  },
+  {
+   "t": "Subagents",
+   "f": "Why route all communication through the coordinator?",
+   "b": "For <b>observability</b>, consistent error handling and control of information flow. <b>Not</b> for savings: multi-agent setups consume ~15× the tokens of a chat.",
+   "id": "c13"
+  },
+  {
+   "t": "Subagents",
+   "f": "Token consumption: simple agent and multi-agent vs a chat",
+   "b": "Simple agent <b>~4×</b>. Multi-agent <b>~15×</b>. That is why they are only justified on high-value tasks.",
+   "id": "c14"
+  },
+  {
+   "t": "Subagents",
+   "f": "The synthesis subagent returns reports with no detail. Most likely cause?",
+   "b": "The coordinator <b>did not include the previous findings in its prompt</b>. Since it inherits no context, it is writing blind.",
+   "id": "c15"
+  },
+  {
+   "t": "Patterns",
+   "f": "Canonical definition of workflow and of agent",
+   "b": "<b>Workflow</b>: LLMs and tools orchestrated through <b>predefined code paths</b>.<br><b>Agent</b>: the LLM <b>dynamically directs</b> its own process and tool use.",
+   "id": "c16"
+  },
+  {
+   "t": "Patterns",
+   "f": "Parallelization vs orchestrator-workers: what is the real difference?",
+   "b": "<b>Whether the subtasks were defined before starting.</b> In parallelization they were; in orchestrator-workers the model decides them at runtime. It is not how many agents there are or whether they run at once.",
+   "id": "c17"
+  },
+  {
+   "t": "Patterns",
+   "f": "When does evaluator-optimizer fit?",
+   "b": "When there are <b>clear evaluation criteria</b> and feedback demonstrably improves the result. Without articulable criteria, the loop spins without converging.",
+   "id": "c18"
+  },
+  {
+   "t": "Patterns",
+   "f": "Before building an agent, what do the docs recommend trying?",
+   "b": "<b>Optimizing a single call</b> with retrieval and in-context examples. Add complexity only when it demonstrably improves the result.",
+   "id": "c19"
+  },
+  {
+   "t": "Context",
+   "f": "What is context rot?",
+   "b": "The more tokens in the window, the <b>lower the recall accuracy</b>. Cause: quadratic attention and training biased toward short sequences. It is a <b>gradient, not a cliff</b>: it fits in the window and still performs worse.",
+   "id": "c20"
+  },
+  {
+   "t": "Context",
+   "f": "The three techniques for long tasks, and when to use each",
+   "b": "<b>Compaction</b>: conversational flow with lots of back and forth.<br><b>Note-taking</b>: iterative development with clear milestones.<br><b>Multi-agent</b>: research with parallel exploration.",
+   "id": "c21"
+  },
+  {
+   "t": "Context",
+   "f": "What does compaction preserve and what does it discard?",
+   "b": "<b>Preserves</b>: architectural decisions, unresolved bugs, implementation details.<br><b>Discards</b>: redundant tool outputs.",
+   "id": "c22"
+  },
+  {
+   "t": "Context",
+   "f": "Why do persistent rules go in CLAUDE.md?",
+   "b": "Because <b>it is reinjected on every request</b>. Compaction can lose the instructions from the initial prompt.",
+   "id": "c23"
+  },
+  {
+   "t": "Context",
+   "f": "What is the safest, lightest form of compaction?",
+   "b": "<b>Tool result pruning</b> (clearing). Once a tool was called long ago, the agent does not need to see its raw result again.",
+   "id": "c24"
+  },
+  {
+   "t": "Context",
+   "f": "Just-in-time vs monolithic context: what does Claude Code do?",
+   "b": "A <b>hybrid</b>: CLAUDE.md is preloaded, glob and grep retrieve just-in-time. Acknowledged trade-off: runtime exploration is <b>slower</b> than precomputed retrieval.",
+   "id": "c25"
+  },
+  {
+   "t": "Claude Code",
+   "f": "There are user and project CLAUDE.md files with different rules. What happens?",
+   "b": "<b>They are concatenated</b>, not overwritten. That is why contradictory instructions across levels must be removed, not left to a supposed winner.",
+   "id": "c26"
+  },
+  {
+   "t": "Claude Code",
+   "f": "In what order are permission rules evaluated?",
+   "b": "<b>deny → ask → allow</b>. The first match decides, and <b>specificity does not alter that order</b>.",
+   "id": "c27"
+  },
+  {
+   "t": "Claude Code",
+   "f": "Settings precedence in Claude Code",
+   "b": "Managed (not overridable) → CLI arguments → local → project → user. <b>Permission rules merge</b> across scopes.",
+   "id": "c28"
+  },
+  {
+   "t": "Claude Code",
+   "f": "Which hook guarantees a destructive action is not executed?",
+   "b": "<b>PreToolUse</b> returning a <b>deny</b> decision: it runs before execution. <code>PostToolUse</code> is too late by definition.",
+   "id": "c29"
+  },
+  {
+   "t": "Claude Code",
+   "f": "Do hooks consume context window?",
+   "b": "<b>No.</b> They run in your process, outside the context window. Only whatever they choose to return consumes context.",
+   "id": "c30"
+  },
+  {
+   "t": "Claude Code",
+   "f": "continue vs resume vs fork",
+   "b": "<b>continue</b>: the most recent session in the directory, no ID.<br><b>resume</b>: a specific session by ID.<br><b>fork</b>: a <b>new session with a copy of the history</b>, leaving the original intact.",
+   "id": "c31"
+  },
+  {
+   "t": "Claude Code",
+   "f": "What exactly does a session fork branch?",
+   "b": "<b>The conversation, not the filesystem.</b> File edits made in the fork are real and visible to other sessions.",
+   "id": "c32"
+  },
+  {
+   "t": "MCP",
+   "f": "In MCP, who controls tools, resources and prompts?",
+   "b": "<b>Tools → the model.</b><br><b>Resources → the application</b> (read-only).<br><b>Prompts → the user</b> (often as slash commands).",
+   "id": "c33"
+  },
+  {
+   "t": "MCP",
+   "f": "The two standard MCP transports",
+   "b": "<b>stdio</b> (newline-delimited JSON-RPC over a subprocess launched by the client) and <b>Streamable HTTP</b> (POST to a single endpoint, JSON response or SSE stream).",
+   "id": "c34"
+  },
+  {
+   "t": "MCP",
+   "f": "Should a stdio MCP server use OAuth?",
+   "b": "<b>No.</b> The spec says stdio <i>should not</i> use the authorization flow: it takes credentials <b>from the environment</b>. OAuth applies to HTTP transports.",
+   "id": "c35"
+  },
+  {
+   "t": "MCP",
+   "f": "Where does the token travel in a remote MCP?",
+   "b": "In the <code>Authorization: Bearer</code> header. <b>Never in a query string.</b> PKCE is mandatory.",
+   "id": "c36"
+  },
+  {
+   "t": "MCP",
+   "f": "401 vs 403 in MCP",
+   "b": "<b>401</b>: unauthorized or invalid token. <b>403</b>: insufficient scopes. <b>400</b>: malformed request.",
+   "id": "c37"
+  },
+  {
+   "t": "MCP",
+   "f": "The three MCP scopes in Claude Code",
+   "b": "<b>local</b> (per machine, default) · <b>project</b> (<code>.mcp.json</code> versioned in the repo, needs approval the first time) · <b>user</b> (all your projects). Precedence local &gt; project &gt; user.",
+   "id": "c38"
+  },
+  {
+   "t": "MCP",
+   "f": "Does Anthropic audit the security of MCP servers?",
+   "b": "<b>No.</b> It reviews connectors against its listing criteria, but does not audit or manage the security of any server. What you expose is your responsibility.",
+   "id": "c39"
+  },
+  {
+   "t": "What to use",
+   "f": "MCP vs Skill, in the official phrasing",
+   "b": "«MCP gives Claude <b>tools</b> for an external system, with connection and authentication handled by the server. Skills give it <b>knowledge about how to use those tools</b>». They are complementary.",
+   "id": "c40"
+  },
+  {
+   "t": "What to use",
+   "f": "Hook vs instruction in CLAUDE.md or a skill: what is the criterion?",
+   "b": "<b>Determinism.</b> «Never edit .env» in CLAUDE.md is <b>a request, not a guarantee</b>. A PreToolUse hook that blocks is <b>enforcement</b>.",
+   "id": "c41"
+  },
+  {
+   "t": "What to use",
+   "f": "Context cost of CLAUDE.md, Skills, MCP, subagents and hooks",
+   "b": "<b>CLAUDE.md</b>: all of it, on every request.<br><b>Skills</b>: only descriptions up front.<br><b>MCP</b>: names up front, schemas deferred.<br><b>Subagents</b>: isolated context.<br><b>Hooks</b>: zero.",
+   "id": "c42"
+  },
+  {
+   "t": "What to use",
+   "f": "The three progressive disclosure levels of a Skill",
+   "b": "<b>L1</b> metadata (name + description, always loaded, ~100 tokens).<br><b>L2</b> the body of SKILL.md, on activation.<br><b>L3</b> resource files, zero cost until read.",
+   "id": "c43"
+  },
+  {
+   "t": "What to use",
+   "f": "Mandatory frontmatter of a Skill in the standard",
+   "b": "Only <b><code>name</code> and <code>description</code></b>. The description: max. 1024 characters, in third person, and must say <b>what it does and when to use it</b>.",
+   "id": "c44"
+  },
+  {
+   "t": "API and batch",
+   "f": "Where does the system prompt go in the Messages API?",
+   "b": "In the <b>top-level <code>system</code> parameter</b>. The <code>messages</code> array only accepts <code>user</code> and <code>assistant</code>: <b>there is no <code>system</code> role</b>.",
+   "id": "c45"
+  },
+  {
+   "t": "API and batch",
+   "f": "429 vs 529",
+   "b": "<b>429</b>: your rate limit (also triggered by sharp traffic spikes → ramp up gradually).<br><b>529</b>: <b>global API overload</b>, not yours → exponential backoff.",
+   "id": "c46"
+  },
+  {
+   "t": "API and batch",
+   "f": "In streaming, how do errors arrive?",
+   "b": "As <b><code>event: error</code> after an HTTP 200</b>: the header was already sent. A handler that only looks at the status code never sees them.",
+   "id": "c47"
+  },
+  {
+   "t": "API and batch",
+   "f": "Message Batches API discount",
+   "b": "<b>50%</b> on input and output. It stacks with prompt caching.",
+   "id": "c48"
+  },
+  {
+   "t": "API and batch",
+   "f": "Batch limits and window",
+   "b": "<b>100,000 requests or 256 MB</b>, whichever comes first. Most finish in <b>under 1 h</b>; results on completion or <b>at 24 h</b>. They <b>expire</b> if they do not complete within 24 h. Downloadable for <b>29 days</b>.",
+   "id": "c49"
+  },
+  {
+   "t": "API and batch",
+   "f": "Does the Batch API support streaming?",
+   "b": "<b>No.</b> <code>stream: true</code> is not supported. Progress is tracked through the batch status counters.",
+   "id": "c50"
+  },
+  {
+   "t": "API and batch",
+   "f": "Timeout of non-streaming calls",
+   "b": "<b>10 minutes.</b> For long operations: streaming, or Batch if latency is tolerable.",
+   "id": "c51"
+  },
+  {
+   "t": "API and batch",
+   "f": "Default retries in the official SDKs",
+   "b": "<b>2</b>, with exponential backoff and respecting the <code>retry-after</code> header.",
+   "id": "c52"
+  },
+  {
+   "t": "Models and cost",
+   "f": "The model selection criterion the exam expects",
+   "b": "<b>Match the model to the task.</b> Never «always use the most capable one». Haiku for volume and speed, Sonnet for balance, Opus for complex reasoning and long agentic work.",
+   "id": "c53"
+  },
+  {
+   "t": "Models and cost",
+   "f": "How are reasoning tokens billed?",
+   "b": "As <b>output</b>, and they <b>count against <code>max_tokens</code></b>, even though the text is not returned. You are charged for the tokens generated, not those of the visible summary.",
+   "id": "c54"
+  },
+  {
+   "t": "Models and cost",
+   "f": "Default effort level, and its trap",
+   "b": "Default <b><code>high</code></b>. It is <b>rendered into the prompt</b>, so changing it between requests <b>breaks the cached prefix</b>. In long sessions, keep it constant.",
+   "id": "c55"
+  },
+  {
+   "t": "Models and cost",
+   "f": "Do cache reads count toward the input-per-minute limit?",
+   "b": "<b>No.</b> ITPM counts <code>input_tokens</code> + <code>cache_creation_input_tokens</code>; <b><code>cache_read_input_tokens</code> does not count</b> on most models.",
+   "id": "c56"
+  },
+  {
+   "t": "Models and cost",
+   "f": "Does max_tokens affect the output-per-minute limit?",
+   "b": "<b>No.</b> OTPM counts the tokens <b>actually generated</b>, not the ceiling you requested.",
+   "id": "c57"
+  },
+  {
+   "t": "Caching",
+   "f": "Prompt cache TTL",
+   "b": "<b>5 minutes</b> by default, <b>1 hour</b> extended. Measured from the <b>start</b> of the request, and every use refreshes it at no extra cost.",
+   "id": "c58"
+  },
+  {
+   "t": "Caching",
+   "f": "Cost of writing and reading cache, and when it pays off",
+   "b": "Write <b>1.25×</b> (5 min) or <b>2×</b> (1 h). Read <b>0.1×</b>.<br>→ With 5 min it pays off on the <b>first read</b>; with 1 h, on the <b>second</b>.",
+   "id": "c59"
+  },
+  {
+   "t": "Caching",
+   "f": "What invalidates the whole cache?",
+   "b": "Changing the <b><code>tools</code></b>. The prefix hierarchy is <code>tools → system → messages</code>, so touching tools drops everything below.",
+   "id": "c60"
+  },
+  {
+   "t": "Caching",
+   "f": "You mark a block for caching, no error, and the cache counters are zero. What is going on?",
+   "b": "The block <b>does not reach the model's minimum cacheable tokens</b> (between 512 and 4,096 depending on the model). Below that <b>it is not cached and no error is returned</b>.",
+   "id": "c61"
+  },
+  {
+   "t": "Caching",
+   "f": "Maximum number of cache breakpoints",
+   "b": "<b>4</b>. The automatic breakpoint uses one of those four.",
+   "id": "c62"
+  },
+  {
+   "t": "Structured output",
+   "f": "What guarantees the JSON matches the schema?",
+   "b": "<b>Structured outputs</b> with constrained decoding. Always valid JSON, no retries.",
+   "id": "c63"
+  },
+  {
+   "t": "Structured output",
+   "f": "Does prefilling with { to force JSON still work?",
+   "b": "<b>No.</b> It is not supported on Claude 4.6 and later, and it is <b>incompatible</b> with JSON outputs. Today it is a historical distractor.",
+   "id": "c64"
+  },
+  {
+   "t": "Structured output",
+   "f": "With a strict schema, when can you still get something that does not validate?",
+   "b": "With <code>stop_reason: <b>refusal</b></code> (returns 200 and the refusal prevails) and with <code>stop_reason: <b>max_tokens</b></code> (truncated). That is why defensive validation is still mandatory.",
+   "id": "c65"
+  },
+  {
+   "t": "Structured output",
+   "f": "Is the casing of enum values guaranteed?",
+   "b": "<b>No.</b> Compare <b>case-insensitively</b> and avoid enums that differ only in casing.",
+   "id": "c66"
+  },
+  {
+   "t": "Structured output",
+   "f": "Without a schema, what gives more format consistency?",
+   "b": "<b>Constraining with examples.</b> The docs say it is more effective than abstract instructions.",
+   "id": "c67"
+  },
+  {
+   "t": "Evals",
+   "f": "20 hand-graded cases or 200 with automated grading?",
+   "b": "<b>200.</b> Literally: «more questions with slightly worse signal and automated grading is better than fewer questions hand-graded at high quality».",
+   "id": "c68"
+  },
+  {
+   "t": "Evals",
+   "f": "Preference order of grading methods",
+   "b": "<b>Code</b> (exact/string match) → <b>LLM-as-judge</b> → <b>human</b>. On human grading the docs say literally <b>«Avoid if possible»</b>.",
+   "id": "c69"
+  },
+  {
+   "t": "Evals",
+   "f": "Three rules for a reliable LLM-as-judge",
+   "b": "1) Detailed, clear rubric.<br>2) <b>Bounded</b> output: binary or a 1-5 scale.<br>3) Ask it to <b>reason before scoring</b> and then <b>discard the reasoning</b>.",
+   "id": "c70"
+  },
+  {
+   "t": "Evals",
+   "f": "How do you tell a hallucination from a prompt failure in production?",
+   "b": "Repeat the same input several times (<b>best-of-N</b>). <b>Inconsistent → hallucination. Reproducible → prompt or model capability.</b>",
+   "id": "c71"
+  },
+  {
+   "t": "Evals",
+   "f": "Grounding technique for long documents",
+   "b": "Ask for the relevant <b>verbatim quotes</b> <b>before</b> answering (for documents over 20k tokens), and <b>retract</b> any claim that has no quote backing it.",
+   "id": "c72"
+  },
+  {
+   "t": "Evals",
+   "f": "Official example of a well-formulated success criterion",
+   "b": "«Fewer than <b>0.1%</b> of outputs over 10,000 trials flagged by the content filter». The bad one would be «safe outputs»: specific and measurable vs vague.",
+   "id": "c73"
+  },
+  {
+   "t": "Security",
+   "f": "Where should untrusted content go?",
+   "b": "<b>Only in <code>tool_result</code> blocks</b>, never in the system prompt or in user text. Claude is trained to treat instructions appearing there with skepticism.",
+   "id": "c74"
+  },
+  {
+   "t": "Security",
+   "f": "Why JSON-encode untrusted content?",
+   "b": "Escaping gives <b>unambiguous delimiters</b> and prevents «escaping» the context by closing quotes or tags.",
+   "id": "c75"
+  },
+  {
+   "t": "Security",
+   "f": "An agent has tools it does not need. What is the right answer?",
+   "b": "<b>Remove the capability.</b> Logging is forensic, confirming suffers approval fatigue, and instructing in the prompt is a request. None of the three closes the vector.",
+   "id": "c76"
+  },
+  {
+   "t": "Security",
+   "f": "Can you put your own instructions inside a tool_result?",
+   "b": "<b>No.</b> They are ignored or flagged as injection. They go in a <b>later user turn</b>.",
+   "id": "c77"
+  },
+  {
+   "t": "Security",
+   "f": "Can an API key's expiry be changed after it is created?",
+   "b": "<b>No.</b> It is chosen <b>at creation time</b> and cannot be modified. After expiry: 401, and they are not reactivated.",
+   "id": "c78"
+  },
+  {
+   "t": "Security",
+   "f": "Does CORS work with zero data retention?",
+   "b": "<b>Not supported.</b> You must route through a backend proxy: never call the API from the browser.",
+   "id": "c79"
+  },
+  {
+   "t": "RAG",
+   "f": "When do you NOT need to build RAG?",
+   "b": "If the knowledge base fits under <b>~200,000 tokens (~500 pages)</b>: put it all in the prompt. With prompt caching, latency &gt;2× lower and cost up to <b>90%</b> lower.",
+   "id": "c80"
+  },
+  {
+   "t": "RAG",
+   "f": "Why add BM25 to vector search?",
+   "b": "Embeddings <b>miss exact lexical matches</b> — identifiers, error codes, rare names. Official example: «Error code TS-999». They are combined with rank fusion.",
+   "id": "c81"
+  },
+  {
+   "t": "RAG",
+   "f": "Contextual retrieval figures (failure reduction)",
+   "b": "Contextual embeddings alone <b>−35%</b> · + contextual BM25 <b>−49%</b> · + reranking <b>−67%</b>. <b>The benefits stack.</b>",
+   "id": "c82"
+  },
+  {
+   "t": "RAG",
+   "f": "Reranking: how many results are retrieved and how many reach the model?",
+   "b": "Retrieve <b>top-150</b>, rerank and pass <b>top-20</b>. Top-20 performs better than top-10 and top-5.",
+   "id": "c83"
+  },
+  {
+   "t": "RAG",
+   "f": "Two RAG approaches Anthropic tested and discarded",
+   "b": "<b>Generic document summaries</b> added to each chunk («very limited gains») and <b>summary-based indexing</b> («poor performance»). They sound reasonable: they are perfect distractors.",
+   "id": "c84"
+  },
+  {
+   "t": "Compliance",
+   "f": "HIPAA vs ZDR with a non-eligible feature",
+   "b": "Under <b>HIPAA the API blocks with a 400</b>.<br>Under <b>ZDR the API does not block</b>: using it is <b>opting out</b> of the agreement for that specific data.",
+   "id": "c85"
+  },
+  {
+   "t": "Compliance",
+   "f": "At what level does HIPAA apply, and can it be turned off?",
+   "b": "At the <b>organization</b> level, and once enabled it is <b>permanent</b>: an admin cannot turn it off. For HIPAA and non-HIPAA workloads you need <b>separate organizations</b>.",
+   "id": "c86"
+  },
+  {
+   "t": "Compliance",
+   "f": "Under HIPAA, where must PHI never appear?",
+   "b": "In <b>JSON schema definitions</b>: property names, <code>enum</code>, <code>const</code>, <code>pattern</code>. Schemas are cached separately and do not get the protections.",
+   "id": "c87"
+  },
+  {
+   "t": "Compliance",
+   "f": "Three features not eligible for zero data retention",
+   "b": "<b>Batch processing</b> (retains results), <b>Files API</b> and <b>code execution</b>. Also the MCP connector and CORS.",
+   "id": "c88"
+  },
+  {
+   "t": "Judgement (Associate)",
+   "f": "Claude cites a specific article number from a regulation. What do you do?",
+   "b": "<b>Verify it against the official text</b> before sharing. Precise-looking details are exactly where it hallucinates, and self-declared confidence <b>is not a signal of accuracy</b>.",
+   "id": "c89"
+  },
+  {
+   "t": "Judgement (Associate)",
+   "f": "You are asked to analyze an Excel file with names and account numbers",
+   "b": "<b>Anonymize or remove the identifiers before uploading it.</b> Internal use does not exempt you from the policy, and «instructing the model not to retain» is not a compliance control.",
+   "id": "c90"
+  },
+  {
+   "t": "Judgement (Associate)",
+   "f": "«Automate this 6-step manual process with Claude»",
+   "b": "<b>Analyze the process before automating it.</b> Two steps may be unnecessary and only one may deserve AI. Automating a bad process gives you a faster bad process.",
+   "id": "c91"
+  },
+  {
+   "t": "Judgement (Associate)",
+   "f": "You always fix the same thing by hand in every output. What does that mean?",
+   "b": "That fix <b>is configuration, not work</b>. Move it into the Project instructions so it comes out right the first time.",
+   "id": "c92"
+  },
+  {
+   "t": "Judgement (Associate)",
+   "f": "A Project that worked degrades after six months. Typical cause?",
+   "b": "The <b>knowledge sources and instructions went stale</b> and nobody maintained them. A Project is a living artifact.",
+   "id": "c93"
+  },
+  {
+   "t": "Version traps",
+   "f": "Is extended thinking with budget_tokens still current?",
+   "b": "<b>No.</b> Deprecated and rejected with 400 on recent models. Today <b>adaptive thinking</b> rules, on by default.",
+   "id": "c94"
+  },
+  {
+   "t": "Version traps",
+   "f": "Are sampling and roots still alive in MCP?",
+   "b": "<b>No.</b> Deprecated in the current spec. The live client primitive is <b>elicitation</b>, and the modern spec is <b>stateless</b> (no <code>initialize</code> handshake).",
+   "id": "c95"
+  },
+  {
+   "t": "Version traps",
+   "f": "Is Task or Agent the subagent tool?",
+   "b": "The exam guide says <b>Task</b>; current docs renamed it to <b>Agent</b> and both <b>coexist</b> in recent releases. On the exam, anchor your answer in the guide.",
+   "id": "c96"
+  },
+  {
+   "t": "Version traps",
+   "f": "At what level does the stop_reason tool_use / end_turn pair live?",
+   "b": "At the <b>Messages API</b> level. In the Agent SDK result <code>tool_use</code> is not a possible value, because the SDK loop does not stop there.",
+   "id": "c97"
+  },
+  {
+   "t": "Application design",
+   "f": "You port an agent from <code>claude -p</code> to the Agent SDK and it loses tone and conventions. Why?",
+   "b": "The CLI uses the <b>full prompt by default</b>; the Agent SDK starts with a <b>minimal prompt</b> covering only tool calling. Set the preset explicitly when porting.",
+   "id": "c98"
+  },
+  {
+   "t": "Application design",
+   "f": "You send <code>tools</code> in the request. What does the API add to your system prompt?",
+   "b": "A block of <b>tool use instructions plus the JSON schemas</b>, before yours. Hundreds of tokens you didn't write, and they vary with <code>tool_choice</code>.",
+   "id": "c99"
+  },
+  {
+   "t": "Application design",
+   "f": "A prompt works well on claude.ai and differently via API. Cause?",
+   "b": "claude.ai applies its own <b>product system prompt</b> (date, format, behavior) that <b>does not exist in the API</b>. Anthropic publishes it in their release notes.",
+   "id": "c100"
+  },
+  {
+   "t": "Application design",
+   "f": "Long context: where does the question go and where the documents?",
+   "b": "<b>Documents at the top, question at the end.</b> In 20k+ token contexts the docs report up to <b>30%</b> better quality.",
+   "id": "c101"
+  },
+  {
+   "t": "Application design",
+   "f": "Structured output complexity limits per request",
+   "b": "<b>20</b> tools with <code>strict</code> · <b>24</b> optional parameters total · <b>16</b> with union types · compilation timeout <b>180 s</b>.",
+   "id": "c102"
+  },
+  {
+   "t": "Application design",
+   "f": "\"Schema is too complex for compilation\". First lever?",
+   "b": "Turn <b>optionals into <code>required</code></b>: each optional nearly doubles part of the state space. Then: flatten nesting and split across several requests.",
+   "id": "c103"
+  },
+  {
+   "t": "Application design",
+   "f": "Which JSON Schema constraints does strict mode NOT support?",
+   "b": "<b>Numeric</b> constraints (<code>minimum</code>/<code>maximum</code>), string <b>length</b>, <b>recursive</b> schemas and <b>external</b> <code>$ref</code>. They 400: validate ranges in your code.",
+   "id": "c104"
+  },
+  {
+   "t": "Application design",
+   "f": "You've corrected Claude twice on the same thing and it's getting worse",
+   "b": "The context is <b>polluted with failed approaches</b>. Official heuristic: clear it and restate more precisely, don't push on in the same thread.",
+   "id": "c105"
+  },
+  {
+   "t": "Application design",
+   "f": "What is lost in a compaction and what survives?",
+   "b": "<b>Survives</b>: system prompt, root CLAUDE.md and automatic memory (re-injected from disk).<br><b>Lost</b>: rules with <code>paths:</code> and nested CLAUDE.md, until a file that activates them is read again.",
+   "id": "c106"
+  },
+  {
+   "t": "Application design",
+   "f": "The four install scopes of a plugin",
+   "b": "<b>user</b> (default) · <b>project</b> (versioned in the repo, travels with git) · <b>local</b> (gitignored) · <b>managed</b> (read-only, not overridable).",
+   "id": "c107"
+  },
+  {
+   "t": "Application design",
+   "f": "What determines whether a plugin updates?",
+   "b": "Its <b>version, which is the cache key</b>. Cascade: manifest → marketplace entry → commit SHA → digest → unknown.",
+   "id": "c108"
+  },
+  {
+   "t": "Third parties",
+   "f": "The five platforms and who processes the data",
+   "b": "Claude API → <b>Anthropic</b> · Bedrock → <b>AWS</b> · Claude Platform on AWS → <b>Anthropic</b> · Google Cloud → <b>Google</b> · Foundry → <b>Anthropic</b> on Azure.",
+   "id": "c109"
+  },
+  {
+   "t": "Third parties",
+   "f": "Client requires FedRAMP High and AWS as the sole processor",
+   "b": "<b>Claude on Amazon Bedrock.</b> That's the rule the docs publish. Watch the distractor: Claude Platform on AWS runs on AWS but the processor is Anthropic.",
+   "id": "c110"
+  },
+  {
+   "t": "Third parties",
+   "f": "Two format differences of Vertex versus the 1P API",
+   "b": "<code>model</code> <b>does not go in the body</b> (it goes in the URL) and <code>anthropic_version</code> <b>does go in the body</b> (not as a header).",
+   "id": "c111"
+  },
+  {
+   "t": "Third parties",
+   "f": "On Bedrock, invoking a new model with its base ID gives 400. Why?",
+   "b": "It requires an <b>inference profile</b>: region prefix (<code>global.</code>, <code>us.</code>, <code>eu.</code>) or the profile ARN. Regional routing guarantees residency at <b>+10%</b> price.",
+   "id": "c112"
+  },
+  {
+   "t": "Third parties",
+   "f": "Where does the Message Batches API exist?",
+   "b": "Only in the <b>Claude API</b> and in <b>Claude Platform on AWS</b>. Not Bedrock, not Vertex, not Foundry. Same for data residency.",
+   "id": "c113"
+  },
+  {
+   "t": "Third parties",
+   "f": "What has to change in the code when migrating provider?",
+   "b": "Only <b>the client class and authentication</b>. The messages call is identical. What does change a lot is <b>feature availability</b>.",
+   "id": "c114"
+  },
+  {
+   "t": "Agentic frameworks",
+   "f": "Strands, LangGraph and PydanticAI: what's the axis of each?",
+   "b": "<b>Strands</b>: model-driven loop already built, AWS-first deployment.<br><b>LangGraph</b>: orchestration by <b>state graph</b>, durability and human-in-the-loop.<br><b>PydanticAI</b>: <b>typed</b> loop, the data contract rules.",
+   "id": "c115"
+  },
+  {
+   "t": "Agentic frameworks",
+   "f": "LangGraph: checkpointer vs store",
+   "b": "<b>Checkpointer</b>: snapshots of <b>one thread's</b> state, short-term memory, time travel.<br><b>Store</b>: key-value <b>across threads</b>, long-term memory.",
+   "id": "c116"
+  },
+  {
+   "t": "Agentic frameworks",
+   "f": "Why must nodes be idempotent with checkpointing?",
+   "b": "Checkpoints are saved at <b>step boundaries, not mid-node</b>: on resume, the node <b>re-runs in full</b>. If it charged a payment, it charges again.",
+   "id": "c117"
+  },
+  {
+   "t": "Agentic frameworks",
+   "f": "Anthropic's documented stance on frameworks",
+   "b": "\"The most successful implementations <b>were not using complex frameworks</b>\". Start by calling the API directly; if you use a framework, understand what's underneath.",
+   "id": "c118"
+  },
+  {
+   "t": "Agentic frameworks",
+   "f": "Agent SDK vs Managed Agents",
+   "b": "<b>Agent SDK</b>: loop built, runs <b>in your process</b>.<br><b>Managed Agents</b>: <b>hosted</b> harness with REST API for long, async agents. They are <b>different products</b>.",
+   "id": "c119"
+  },
+  {
+   "t": "Agentic frameworks",
+   "f": "Is Managed Agents eligible for ZDR or HIPAA BAA?",
+   "b": "<b>No.</b> It is <b>stateful by design</b>: it persists session history server-side. Per-session isolation exists, but compliance eligibility runs on another track.",
+   "id": "c120"
+  },
+  {
+   "t": "Agentic frameworks",
+   "f": "You self-host the Agent SDK and threads are lost on restart",
+   "b": "The SDK spawns <b>one subprocess per session</b> with transcripts on <b>local disk</b>, which doesn't survive a restart. Production needs an <b>external session store</b>.",
+   "id": "c121"
+  },
+  {
+   "t": "Failure diagnosis",
+   "f": "The output doesn't have the expected shape",
+   "b": "An <b>output constraint</b> is missing. Rewording the instruction won't fix it: it's not a wording problem.",
+   "id": "c122"
+  },
+  {
+   "t": "Failure diagnosis",
+   "f": "The agent drifts in tone and judgement across turns",
+   "b": "<b>Underspecified system prompt.</b> Neither examples nor schema fix drift: they target other symptoms.",
+   "id": "c123"
+  },
+  {
+   "t": "Failure diagnosis",
+   "f": "The content is right but it invents the structure",
+   "b": "Missing <b>few-shot examples</b> to pin it down.",
+   "id": "c124"
+  },
+  {
+   "t": "Failure diagnosis",
+   "f": "You've iterated the prompt and unforeseen inputs still break it",
+   "b": "Leave the prompt: <b>structured output in the API</b>. JSON outputs constrains the final response; strict tool use validates tool arguments. Cost: compilation on the first call plus input tokens.",
+   "id": "c125"
+  },
+  {
+   "t": "Failure diagnosis",
+   "f": "Tool selection degrades from turn N onward",
+   "b": "Look at the <b>context window</b>, not the schema. If it failed from the first turn, then it would indeed be the description.",
+   "id": "c126"
+  },
+  {
+   "t": "Failure diagnosis",
+   "f": "Tool use error when retrying after a dropped stream",
+   "b": "A <b>half-built block</b>, not the schema. A block is only closed at its <code>content_block_stop</code>.",
+   "id": "c127"
+  },
+  {
+   "t": "Failure diagnosis",
+   "f": "Two tools get confused even though their schemas don't look alike",
+   "b": "Claude chooses by reading the <b>description</b>, not the schema. Add the <b>exclusion condition</b>: one line saying when NOT to call it.",
+   "id": "c128"
+  },
+  {
+   "t": "Production",
+   "f": "How large are real tool outputs versus development fixtures?",
+   "b": "<b>3 to 5 times larger</b>. A session that holds 50 turns in testing can hit the ceiling <b>at turn 8</b> in production.",
+   "id": "c129"
+  },
+  {
+   "t": "Production",
+   "f": "Context cost of connecting five MCP servers \"just in case\"",
+   "b": "~<b>55,000 tokens</b> in definitions before Claude does anything. Tool search cuts it by over 85%; it defers the <b>context</b>, not the payload.",
+   "id": "c130"
+  },
+  {
+   "t": "Production",
+   "f": "A stream cuts off mid tool_use block. What can you NOT do?",
+   "b": "<b>Rebuild it from the partial deltas.</b> Tool use and thinking blocks are not partially recoverable; you only resume from the last text block.",
+   "id": "c131"
+  },
+  {
+   "t": "Production",
+   "f": "When is a block closed and when does a message end?",
+   "b": "The block, at its <code>content_block_stop</code>. The message, at <code>message_stop</code>. A tool use's deltas are partial JSON: don't parse before the block closes.",
+   "id": "c132"
+  },
+  {
+   "t": "Multimodal",
+   "f": "Formula for the cost of an image",
+   "b": "<code>⌈width/28⌉ × ⌈height/28⌉</code> visual tokens. Claude sees <b>28×28 px patches</b>, not pixels.",
+   "id": "c133"
+  },
+  {
+   "t": "Multimodal",
+   "f": "Visual token ceiling per image",
+   "b": "It goes <b>by tier, not by model</b>. High resolution (4.7+): max side <b>2576 px</b>, <b>4784</b> tokens. Standard: <b>1568 px</b> and <b>1568</b> tokens. Anything larger is rescaled automatically.",
+   "id": "c134"
+  },
+  {
+   "t": "Multimodal",
+   "f": "Inline base64, Files API or Batches: when each?",
+   "b": "<b>base64</b>: single-use image. <b>Files API</b>: assets reused across requests (avoids resending bytes every turn). <b>Batches</b>: offline work, lower cost per token, non-deterministic latency.",
+   "id": "c135"
+  },
+  {
+   "t": "Multimodal",
+   "f": "Is firing a thousand synchronous calls in parallel batching?",
+   "b": "<b>No.</b> Parallelism doesn't lower cost per token. It's the mistake the material names explicitly.",
+   "id": "c136"
+  },
+  {
+   "t": "Production",
+   "f": "The four memory scopes and what decides which one",
+   "b": "<b>The shape of the session</b> decides. In context (easy, fails sooner) · external (latency, survives) · summarized (cheap, loses what isn't preserved) · stateless (jobs that close).",
+   "id": "c137"
+  },
+  {
+   "t": "Production",
+   "f": "Repeatable state vs repeatable instructions",
+   "b": "<b>Different</b> problems. State is memory. Repeatable instructions are a <b>Skill</b>: markdown loaded on demand when its description matches, not injected into every session.",
+   "id": "c138"
+  },
+  {
+   "t": "Production",
+   "f": "Workflow or agent, in one sentence",
+   "b": "<b>Workflow</b> if you can write the exact steps in code. <b>Agent</b> if you can specify the goal and the tools but <b>not the path</b>.",
+   "id": "c139"
+  },
+  {
+   "t": "Production",
+   "f": "A tool can do something irreversible. When does the human checkpoint come in?",
+   "b": "<b>Before wiring the loop</b>, as a design decision. After the first incident the write already reached the customer. A log is forensic, not preventive.",
+   "id": "c140"
+  },
+  {
+   "t": "Production",
+   "f": "When to turn on reasoning?",
+   "b": "Only where <b>a reasoning pass changes the answer</b>, calibrating effort to the problem instead of raising it on every call. Thinking blocks come back unmodified or the next request fails.",
+   "id": "c141"
+  },
+  {
+   "t": "Claude Code in a team",
+   "f": "By what criterion is the permission mode chosen?",
+   "b": "By the <b>risk profile</b> of the work and the environment, <b>not</b> by a preference for fewer prompts. Bypass against a live repository removes every control point.",
+   "id": "c142"
+  },
+  {
+   "t": "Claude Code in a team",
+   "f": "The permission mode isn't enough to protect a critical path. What do you add?",
+   "b": "A <b>deny rule</b> on that path, at project or enterprise level. The mode decides how much it asks; the rule decides what is <b>unreachable</b>.",
+   "id": "c143"
+  },
+  {
+   "t": "Claude Code in a team",
+   "f": "An automated reviewer says: a null check is missing on line 40, and this will degrade the payments service",
+   "b": "The first is <b>provable from the diff</b>: confirm it on the cited line. The second is a <b>hypothesis to verify</b>: it asserted it without the evidence that would prove it.",
+   "id": "c144"
+  },
+  {
+   "t": "Claude Code in a team",
+   "f": "Where does the human gate go in an automated review?",
+   "b": "Where a finding turns into an <b>action that's hard to reverse</b>. Not on every comment (noise and rubber-stamping) nor at the end (the damage is done).",
+   "id": "c145"
+  },
+  {
+   "t": "Claude Code in a team",
+   "f": "Too many false positives in the CI review",
+   "b": "Give it the <b>team's conventions</b>, otherwise it has to guess. Asking for more rigor without criteria increases the noise.",
+   "id": "c146"
+  },
+  {
+   "t": "Claude Code in a team",
+   "f": "The four durable-context mechanisms and what each one solves",
+   "b": "<b>CLAUDE.md</b>: project memory, dilutes with size.<br><b>Rule files</b>: scope guidance to where it applies.<br><b>Hooks</b>: enforce deterministically.<br><b>Subagents</b>: move exploration out of the main context.",
+   "id": "c147"
+  },
+  {
+   "t": "Claude Code in a team",
+   "f": "What happens if you put all four mechanisms in a single CLAUDE.md?",
+   "b": "A file that <b>dilutes, costs more to maintain and is easier to ignore</b>. Each mechanism solves a different problem.",
+   "id": "c148"
+  },
+  {
+   "t": "Claude Code in a team",
+   "f": "Your plugin installs on your machine and fails on everyone else's",
+   "b": "Almost certainly an <b>absolute path</b> to your home directory. Rules: paths <b>relative to the project root</b>, environment variables documented or validated at install, and <b>test from a clean machine</b>.",
+   "id": "c149"
+  },
+  {
+   "t": "Claude Code in a team",
+   "f": "What makes a skill portable across Claude Code, API and Agent SDK?",
+   "b": "A <b>scoped description</b> and <b>no assumptions about the local environment</b>. Each runtime loads it differently: filesystem, beta headers with container, and setting sources.",
+   "id": "c150"
+  },
+  {
+   "t": "Claude Code in a team",
+   "f": "Do subagents preload the main thread's skills?",
+   "b": "<b>No, in any runtime.</b> They start clean. If they need a specific skill, declare it in their definition.",
+   "id": "c151"
+  },
+  {
+   "t": "MCP in deployment",
+   "f": "stdio or HTTP: what decides which?",
+   "b": "<b>stdio</b> for servers running on your machine. <b>HTTP</b> for anything hosted remotely or used by several developers.",
+   "id": "c152"
+  },
+  {
+   "t": "MCP in deployment",
+   "f": "A stdio server declared in the repo's .mcp.json",
+   "b": "A configuration that <b>looks shareable and isn't</b>: the file travels with the repo, but the process only exists on the machine of whoever wrote it.",
+   "id": "c153"
+  },
+  {
+   "t": "MCP in deployment",
+   "f": "What does a team MCP server require?",
+   "b": "<b>HTTP transport and project or enterprise scope</b>, both. Transport and scope are independent decisions with dependent consequences.",
+   "id": "c154"
+  },
+  {
+   "t": "MCP in deployment",
+   "f": "Regulated client: identity, credentials, auditing and configuration control",
+   "b": "Identity → <b>OAuth</b>. Service credentials → <b>environment variables</b>. Auditing → <b>PostToolUse</b> hooks. Configuration lockdown → enterprise <b>managed settings</b>.",
+   "id": "c155"
+  },
+  {
+   "t": "MCP in deployment",
+   "f": "Why does identifying security requirements before deploying matter?",
+   "b": "None of the four controls is hard to implement, but <b>all are hard to retrofit</b> after a deployment has failed a security review.",
+   "id": "c156"
+  },
+  {
+   "t": "Evals",
+   "f": "When do you write the eval?",
+   "b": "<b>Before building.</b> Identifying the expected behavior forces you to define success while the design can still change. It turns \"it's done\" from a feeling into a score.",
+   "id": "c157"
+  },
+  {
+   "t": "Evals",
+   "f": "Grader by the shape of the output",
+   "b": "A single correct form → <b>exact match</b>. Structured output → <b>code check</b>. Open-ended quality → <b>LLM judge</b>, calibrated beforehand against human-labeled cases.",
+   "id": "c158"
+  },
+  {
+   "t": "Evals",
+   "f": "Unit and functional green, e2e red",
+   "b": "The break is at <b>the seam</b> between components. Full answer in two halves: <b>fix the handoff</b> and <b>add the integration test</b> that was missing.",
+   "id": "c159"
+  },
+  {
+   "t": "Evals",
+   "f": "What does each test level catch?",
+   "b": "<b>Unit</b>: logic inside one component. <b>Functional</b>: that it meets its spec. <b>Integration</b>: the handoff between two. <b>E2E</b>: the whole flow — it says it fails, not where.",
+   "id": "c160"
+  },
+  {
+   "t": "Evals",
+   "f": "What is a trace for?",
+   "b": "To know <b>which step</b> produced the bad result. It turns a day of investigation into a short fix.",
+   "id": "c161"
+  },
+  {
+   "t": "Evals",
+   "f": "One search or iterative search?",
+   "b": "<b>A single one</b> for single-fact queries. <b>Iterative</b> when the question is genuinely multi-step. Iterating on something simple burns tokens without improving anything.",
+   "id": "c162"
+  },
+  {
+   "t": "Failures and cost",
+   "f": "First question for any failure",
+   "b": "<b>Could waiting and retrying fix it?</b> If yes → exponential backoff <b>with a cap and a budget</b>. Never an immediate loop, which only makes it worse.",
+   "id": "c163"
+  },
+  {
+   "t": "Failures and cost",
+   "f": "A failure no retry fixes",
+   "b": "Demands a <b>named fallback</b>. Without one, the unhandled exception becomes the default behavior and one bad response takes down the whole flow.",
+   "id": "c164"
+  },
+  {
+   "t": "Failures and cost",
+   "f": "A tool fails: empty result or error flag?",
+   "b": "<b>Error flag.</b> The model reads empty as valid data and reasons about something that doesn't exist.",
+   "id": "c165"
+  },
+  {
+   "t": "Failures and cost",
+   "f": "Cost has spiked and you don't know where",
+   "b": "<b>Instrument first</b>: token cost, latency and error rate <b>on every call</b>. Then tune one chosen lever, instead of guessing from the invoice.",
+   "id": "c166"
+  },
+  {
+   "t": "Failures and cost",
+   "f": "When does the orchestrator-workers pattern earn its cost?",
+   "b": "Only on tasks that <b>split into independent parallel parts</b>. It multiplies cost by the number of subagents (~<b>15×</b> in the published case); on coupled work a single agent does it for a fraction.",
+   "id": "c167"
+  },
+  {
+   "t": "Failures and cost",
+   "f": "\"Our users are trusted, injection doesn't affect us\"",
+   "b": "Doesn't help: <b>injection arrives through the content the agent reads</b>, not the user who types. The model reads its whole context as a single token stream, with no line between instruction and data.",
+   "id": "c168"
+  },
+  {
+   "t": "Failures and cost",
+   "f": "What gives a regulated reviewer control over the action boundary?",
+   "b": "A <b>hook that blocks and logs before</b> the tool runs. \"Before\" is what makes it a control; a later log only allows inspection.",
+   "id": "c169"
+  },
+  {
+   "t": "Fundamentals",
+   "f": "What unit should you think and budget in?",
+   "b": "In <b>tokens</b>, not words. It's what the API measures and charges, and what the context window measures. The word-token conversion isn't constant.",
+   "id": "c170"
+  },
+  {
+   "t": "Fundamentals",
+   "f": "The two ways to break the context window",
+   "b": "The input doesn't fit → <b>error before generating</b>, no partial response.<br>It runs out midway → <b>truncated</b> output with <code>stop_reason: model_context_window_exceeded</code>.",
+   "id": "c171"
+  },
+  {
+   "t": "Fundamentals",
+   "f": "Who manages the conversation history?",
+   "b": "<b>The application.</b> The window is a fixed budget that holds the entire request at once; nobody prunes for you.",
+   "id": "c172"
+  },
+  {
+   "t": "Fundamentals",
+   "f": "Why does a test that compares against exact text fail?",
+   "b": "<b>Sampling</b> makes generation non-deterministic: the same prompt returns different wording. That's what evals exist for.",
+   "id": "c173"
+  },
+  {
+   "t": "Fundamentals",
+   "f": "Model and reasoning mode: how are they chosen?",
+   "b": "They are <b>separate, composable levers</b>. Floor-up rule: the smallest model and the simplest reasoning <b>that pass your eval</b>, adding capacity only where the eval asks for it.",
+   "id": "c174"
+  },
+  {
+   "t": "Fundamentals",
+   "f": "The four interaction modes and what decides them",
+   "b": "<b>Synchronous · streaming · async/await · batch.</b> Two questions: is anyone waiting? and real time or offline volume?",
+   "id": "c175"
+  },
+  {
+   "t": "Fundamentals",
+   "f": "Does streaming speed up the response?",
+   "b": "<b>No.</b> It improves <i>perceived</i> latency, in exchange for you assembling the response from partial events.",
+   "id": "c176"
+  },
+  {
+   "t": "Deployment",
+   "f": "Alias or pinned model version?",
+   "b": "<b>Pin the specific version</b>, and keep the previous one available. An alias is \"the current edition of the book\": the text changes without notice. With a pin, you adopt the change <b>deliberately</b> and have a way back.",
+   "id": "c177"
+  },
+  {
+   "t": "Deployment",
+   "f": "How do you choose and defend a deployment platform?",
+   "b": "You choose by the client's <b>cloud and compliance posture</b>. You defend it by <b>measuring</b>: latency from <b>their</b> region, compliance against <b>their</b> certification, and <b>total cost per call</b>, not price per token.",
+   "id": "c178"
+  },
+  {
+   "t": "Deployment",
+   "f": "When is compliance raised with a regulated client?",
+   "b": "At <b>scoping</b>. It's <b>pass or fail</b>: if it shows up late, it kills the build at contract review.",
+   "id": "c179"
+  },
+  {
+   "t": "Deployment",
+   "f": "What does a well-packaged accelerator keep and what does it expose?",
+   "b": "It keeps the <b>reusable logic</b>, exposes the client-specific parts as <b>documented parameters</b>, and ships the <b>eval and the audit log</b>. Package while hot: knowing what was client-specific is the most expensive thing to reconstruct later.",
+   "id": "c180"
+  },
+  {
+   "t": "Deployment",
+   "f": "What does a maintainer accept?",
+   "b": "<b>What they can verify</b>: scoped code, a runnable example, a test and the assumptions written down. <b>License rights are confirmed before</b> the technical review.",
+   "id": "c181"
+  },
+  {
+   "t": "Deployment",
+   "f": "Is trust inherited between components?",
+   "b": "<b>No.</b> Every point where data crosses is a <b>trust boundary</b> and must be established explicitly. An application is only as contained as its <b>most privileged</b> seam.",
+   "id": "c182"
+  },
+  {
+   "t": "Deployment",
+   "f": "A seam that can't be secured",
+   "b": "Goes to a <b>human owner</b>, it doesn't ship.",
+   "id": "c183"
+  }
+ ]
+}
